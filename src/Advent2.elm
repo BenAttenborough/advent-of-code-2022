@@ -65,10 +65,6 @@ runAttackParser string =
     Parser.run attackParser string
 
 
-
--- convertOks : ( Result err Attack, Result err Attack ) -> Result err ( Attack, Attack )
-
-
 convertOks tuple =
     Result.map2 (\a b -> ( a, b )) (Tuple.first tuple) (Tuple.second tuple)
 
