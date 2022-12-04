@@ -1,7 +1,7 @@
 module Advent2 exposing (..)
 
-import Html exposing (a)
 import Parser exposing (..)
+import Result exposing (toMaybe)
 
 
 testInput : String
@@ -11,13 +11,92 @@ B X
 C Z"""
 
 
-type Attack
+type Action
     = Rock
     | Paper
     | Scissors
 
 
-attackParser : Parser Attack
+type Result
+    = Win
+    | Lose
+    | Draw
+
+
+rockValue =
+    1
+
+
+paperValue =
+    2
+
+
+scissorsValue =
+    3
+
+
+loseValue =
+    0
+
+
+drawValue =
+    3
+
+
+winValue =
+    6
+
+
+type alias Combat =
+    { attack : Action
+    , defense : Action
+    }
+
+
+type alias CombatCheat =
+    { attack : Action
+    , response : Result
+    }
+
+
+resolveCombat : Combat -> Int
+resolveCombat { attack, defense } =
+    case attack of
+        Rock ->
+            case defense of
+                Rock ->
+                    rockValue + drawValue
+
+                Paper ->
+                    paperValue + winValue
+
+                Scissors ->
+                    scissorsValue + loseValue
+
+        Paper ->
+            case defense of
+                Rock ->
+                    rockValue + loseValue
+
+                Paper ->
+                    paperValue + drawValue
+
+                Scissors ->
+                    scissorsValue + winValue
+
+        Scissors ->
+            case defense of
+                Rock ->
+                    rockValue + winValue
+
+                Paper ->
+                    paperValue + loseValue
+
+                Scissors ->
+                    scissorsValue + drawValue
+
+
+attackParser : Parser Action
 attackParser =
     oneOf
         [ succeed Rock
@@ -29,12 +108,7 @@ attackParser =
         ]
 
 
-characterParser : Parser ()
-characterParser =
-    chompWhile (\c -> c == 'A' || c == 'B' || c == 'C')
-
-
-defenseParser : Parser Attack
+defenseParser : Parser Action
 defenseParser =
     oneOf
         [ succeed Rock
@@ -49,32 +123,91 @@ defenseParser =
 partOne input =
     input
         |> String.lines
-        |> List.map (\x -> Tuple.pair (getAttack x) (getDefense (String.right 1 x)))
-        |> List.map convertOks
+        |> List.filterMap parseString
+        |> List.map resolveCombat
+        |> List.sum
 
 
-getAttack string =
-    Parser.run attackParser string
+parseString : String -> Maybe Combat
+parseString string =
+    let
+        attack =
+            Parser.run attackParser string
+                |> toMaybe
+
+        defense =
+            Parser.run defenseParser (String.right 1 string)
+                |> toMaybe
+    in
+    Maybe.map2 (\a b -> Combat a b) attack defense
 
 
-getDefense string =
-    Parser.run defenseParser string
+parseStringCheat : String -> Maybe CombatCheat
+parseStringCheat string =
+    let
+        attack =
+            Parser.run attackParser string
+                |> toMaybe
+
+        response =
+            Parser.run resultParser (String.right 1 string)
+                |> toMaybe
+    in
+    Maybe.map2 (\a b -> CombatCheat a b) attack response
 
 
-runAttackParser string =
-    Parser.run attackParser string
+resultParser : Parser Result
+resultParser =
+    oneOf
+        [ succeed Lose
+            |. keyword "X"
+        , succeed Draw
+            |. keyword "Y"
+        , succeed Win
+            |. keyword "Z"
+        ]
 
 
-convertOks tuple =
-    Result.map2 (\a b -> ( a, b )) (Tuple.first tuple) (Tuple.second tuple)
+resolveResult : CombatCheat -> Int
+resolveResult { attack, response } =
+    case attack of
+        Rock ->
+            case response of
+                Win ->
+                    paperValue + winValue
+
+                Lose ->
+                    scissorsValue + loseValue
+
+                Draw ->
+                    rockValue + drawValue
+
+        Paper ->
+            case response of
+                Win ->
+                    scissorsValue + winValue
+
+                Lose ->
+                    rockValue + loseValue
+
+                Draw ->
+                    paperValue + drawValue
+
+        Scissors ->
+            case response of
+                Win ->
+                    rockValue + winValue
+
+                Lose ->
+                    paperValue + loseValue
+
+                Draw ->
+                    scissorsValue + drawValue
 
 
-
--- case tuple of
---    (Ok a, Ok b) ->
---         Ok (a, b)
---     ( Err x, _ ) ->
---         Err x
---     ( _, Err x ) ->
---         Err x
--- see https://elmprogramming.com/pattern-matching.html
+partTwo input =
+    input
+        |> String.lines
+        |> List.filterMap parseStringCheat
+        |> List.map resolveResult
+        |> List.sum
