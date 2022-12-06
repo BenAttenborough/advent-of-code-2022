@@ -96,6 +96,28 @@ resolveCombat { attack, defense } =
                     scissorsValue + drawValue
 
 
+generalParser : Parser Combat
+generalParser =
+    succeed Combat
+        |= oneOf
+            [ succeed Rock
+                |. keyword "A"
+            , succeed Paper
+                |. keyword "B"
+            , succeed Scissors
+                |. keyword "C"
+            ]
+        |. spaces
+        |= oneOf
+            [ succeed Rock
+                |. keyword "X"
+            , succeed Paper
+                |. keyword "Y"
+            , succeed Scissors
+                |. keyword "Z"
+            ]
+
+
 attackParser : Parser Action
 attackParser =
     oneOf
@@ -123,23 +145,28 @@ defenseParser =
 partOne input =
     input
         |> String.lines
-        |> List.filterMap parseString
+        |> List.filterMap
+            (\string ->
+                string
+                    |> Parser.run generalParser
+                    |> toMaybe
+            )
         |> List.map resolveCombat
         |> List.sum
 
 
-parseString : String -> Maybe Combat
-parseString string =
-    let
-        attack =
-            Parser.run attackParser string
-                |> toMaybe
 
-        defense =
-            Parser.run defenseParser (String.right 1 string)
-                |> toMaybe
-    in
-    Maybe.map2 (\a b -> Combat a b) attack defense
+-- parseString : String -> Maybe Combat
+-- parseString string =
+--     let
+--         attack =
+--             Parser.run attackParser string
+--                 |> toMaybe
+--         defense =
+--             Parser.run defenseParser (String.right 1 string)
+--                 |> toMaybe
+--     in
+--     Maybe.map2 (\a b -> Combat a b) attack defense
 
 
 parseStringCheat : String -> Maybe CombatCheat
