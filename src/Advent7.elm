@@ -1,5 +1,6 @@
 module Advent7 exposing (..)
 
+import Html exposing (a)
 import Parser exposing (..)
 
 
@@ -8,26 +9,18 @@ type Command
     | LS
 
 
-type File
-    = File Int String
 
-
-type Directory
-    = Directory String
-
-
-type FileType
-    = DirectoryObject Directory
-    | FileObject File
-
-
-type alias DirectoryContent =
-    { files : List File
-    , directories : List Directory
-    }
-
-
-
+-- type File
+--     = File Int String
+-- type Directory
+--     = Directory String
+-- type FileType
+--     = DirectoryObject Directory
+--     | FileObject File
+-- type alias DirectoryContent =
+--     { files : List File
+--     , directories : List Directory
+--     }
 -- fileParser : Parser DirectoryContent
 -- fileParser =
 --     succeed identity
@@ -54,6 +47,13 @@ commandParser =
 
 
 
+-- lineParser : Parser a
+-- lineParser =
+--     succeed identity
+--         |= oneOf
+--             [ commandParser
+--             , fileSizeParser
+--             ]
 -- commandParser : Parser Command
 -- commandParser =
 --     oneOf
@@ -79,3 +79,43 @@ commandParser =
 day7PartOne input =
     input
         |> String.lines
+
+
+type Directory
+    = Empty String Int
+    | Node String Int (List Directory)
+
+
+directoryA : Directory
+directoryA =
+    Node "/"
+        56
+        [ Node "a"
+            2
+            [ Empty "b1" 5
+            , Empty "b2" 15
+            , Node "b3"
+                23
+                [ Empty "c1" 3 ]
+            ]
+        ]
+
+
+type alias State =
+    { currentDir : String
+    , size : Int
+    , children : List Directory
+    }
+
+
+
+-- createDirectory
+
+
+testFunction : List String -> String
+testFunction entries =
+    let
+        finish entry next =
+            next (entry :: entries)
+    in
+    "abc"
