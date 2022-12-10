@@ -4,9 +4,8 @@ import Html exposing (a)
 import Parser exposing (..)
 
 
-spacesOnly : Parser ()
-spacesOnly =
-    chompWhile (\c -> c == ' ')
+
+-- See ParsersTests for examples
 
 
 listParser : Parser (List String)
@@ -37,11 +36,12 @@ isNewLine char =
 listParserStep : List String -> Parser (Step (List String) (List String))
 listParserStep entries =
     let
+        finish : String -> (List String -> Step (List String) (List String)) -> Step (List String) (List String)
         finish entry next =
             next (entry :: entries)
     in
     succeed finish
-        |. symbol "-"
+        |. symbol "- "
         |= zeroOrMore (not << isNewLine)
         |= oneOf
             [ succeed Loop
@@ -49,8 +49,3 @@ listParserStep entries =
             , succeed (Done << List.reverse)
                 |. end
             ]
-
-
-hello : String
-hello =
-    "Hello"
