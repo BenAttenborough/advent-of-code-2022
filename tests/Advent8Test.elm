@@ -18,10 +18,11 @@ testInput =
 
 suite : Test
 suite =
-    -- let
-    --     _ =
-    --         Debug.log "Advent Day 8" (day8Part1 testInput)
-    -- in
+    let
+        _ =
+            Debug.log "day8Part1"
+                (day8Part1 testInput)
+    in
     describe "Advent Day 8"
         [ describe "Part 1" <|
             [ test "Example" <|
@@ -42,24 +43,22 @@ suite =
             --         Expect.equal
             --             3
             --             (numberOfVisibleTrees [ 1, 3, 3, 2, 5 ] -1 0)
-            , test "numberOfVisibleTrees 3 in list [ 1, 3, 3, 2, 5 ]" <|
-                \_ ->
-                    Expect.equal
-                        ( 3, [ ( 1, True ), ( 3, True ), ( 3, False ), ( 2, False ), ( 5, True ) ] )
-                        (numberOfVisibleTrees
-                            [ ( 1, False )
-                            , ( 3, False )
-                            , ( 3, False )
-                            , ( 2, False )
-                            , ( 5, False )
-                            ]
-                            -1
-                            0
-                            []
-                        )
-
+            -- , test "findVisibleTrees 3 in list [ 1, 3, 3, 2, 5 ]" <|
+            --     \_ ->
+            --         Expect.equal
+            --             [ ( 1, True ), ( 3, True ), ( 3, False ), ( 2, False ), ( 5, True ) ]
+            --             (findVisibleTrees
+            --                 -1
+            --                 []
+            --                 [ ( 1, False )
+            --                 , ( 3, False )
+            --                 , ( 3, False )
+            --                 , ( 2, False )
+            --                 , ( 5, False )
+            --                 ]
+            --             )
             -- , test "day8Part1" <|
-            --     \_ -> Expect.equal 21 day8Part1 testInput
+            --     \_ -> Expect.equal [] (day8Part1 testInput)
             ]
         ]
 
