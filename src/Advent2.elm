@@ -155,20 +155,6 @@ partOne input =
         |> List.sum
 
 
-
--- parseString : String -> Maybe Combat
--- parseString string =
---     let
---         attack =
---             Parser.run attackParser string
---                 |> toMaybe
---         defense =
---             Parser.run defenseParser (String.right 1 string)
---                 |> toMaybe
---     in
---     Maybe.map2 (\a b -> Combat a b) attack defense
-
-
 parseStringCheat : String -> Maybe CombatCheat
 parseStringCheat string =
     let

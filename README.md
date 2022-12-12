@@ -1,11 +1,8 @@
 # advent-of-code-2022
 
-`elm repl`
+You can import files and run functions `elm repl`
+E.g. `import Advent1`
 
-`import Advent1`
-
-`Advent1.test`
-
-We are up to https://adventofcode.com/2022/day/1#part2
+## Tests
 
 To run tests run `elm-test` or `elm-test --watch`

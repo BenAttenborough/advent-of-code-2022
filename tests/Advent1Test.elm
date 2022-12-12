@@ -26,22 +26,11 @@ testInput =
 suite : Test
 suite =
     describe "Advent Day 1"
-        [ describe "Dummy test"
-            [ test "Example" <|
-                \_ -> Expect.equal True True
-            ]
-        , describe "getBiggestRations"
-            [ test "Test input results in 24000" <|
+        [ describe "Parse input"
+            [ test "Parse input into lists" <|
                 \_ ->
                     Expect.equal
-                        (Ok 24000)
-                        (getBiggestRations testInput)
-            ]
-        , describe "getTopThreeRations"
-            [ test "Test input results in 45000" <|
-                \_ ->
-                    Expect.equal
-                        (Ok 45000)
-                        (getTopThreeRations testInput)
+                        (Just 24000)
+                        (advent1Part1 testInput)
             ]
         ]
