@@ -13,11 +13,6 @@ type Directory
     | Node String Int (List Directory)
 
 
-directoryA : Directory
-directoryA =
-    Node "/" 56 [ Node "a" 2 [ Empty "b1" 5, Empty "b2" 15 ] ]
-
-
 
 -- type File
 --     = File Int String
@@ -88,11 +83,6 @@ commandParser =
 day7PartOne input =
     input
         |> String.lines
-
-
-type Directory
-    = Empty String Int
-    | Node String Int (List Directory)
 
 
 directoryA : Directory
