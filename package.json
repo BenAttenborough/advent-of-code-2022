@@ -1,0 +1,25 @@
+{
+  "name": "advent-of-code-2022",
+  "version": "1.0.0",
+  "description": "Advent of Code 2022",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "elm-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BenAttenborough/advent-of-code-2022.git"
+  },
+  "author": "Ben Attenborough",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/BenAttenborough/advent-of-code-2022/issues"
+  },
+  "homepage": "https://github.com/BenAttenborough/advent-of-code-2022#readme",
+  "devDependencies": {
+    "elm-watch": "^1.1.1"
+  }
+}

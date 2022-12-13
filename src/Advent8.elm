@@ -27,27 +27,25 @@ day8Part1 input =
         -- Turn each tree into tuple. Second value used to indicate if tree has been counted
         -- I've just realised this probably isn't useful
         |> List.map (List.map (\tree -> ( tree, False )))
-        |> outputGrid
-
-
-
--- |> List.map (findVisibleTrees -1 [])
--- -- |> outputGrid
--- |> List.map List.reverse
--- |> List.map (findVisibleTrees -1 [])
--- |> List.map List.reverse
--- -- |> outputGrid
--- |> Matrix.fromLists
--- |> Maybe.map Matrix.transpose
--- |> Maybe.map Matrix.toLists
--- |> Maybe.map (List.map (findVisibleTrees -1 []))
--- |> Maybe.map (List.map List.reverse)
--- -- |> Maybe.map outputGrid
--- |> Maybe.map (List.map (findVisibleTrees -1 []))
--- -- |> Maybe.map outputGrid
--- |> Maybe.map (List.map (List.filter Tuple.second))
--- |> Maybe.map (List.map List.length)
--- |> Maybe.map List.sum
+        -- |> outputGrid
+        |> List.map (findVisibleTrees -1 [])
+        -- |> outputGrid
+        |> List.map List.reverse
+        |> List.map (findVisibleTrees -1 [])
+        |> List.map List.reverse
+        -- |> outputGrid
+        |> Matrix.fromLists
+        |> Maybe.map Matrix.transpose
+        |> Maybe.map Matrix.toLists
+        |> Maybe.map (List.map (findVisibleTrees -1 []))
+        |> Maybe.map (List.map List.reverse)
+        -- |> Maybe.map outputGrid
+        |> Maybe.map (List.map (findVisibleTrees -1 []))
+        -- |> Maybe.map outputGrid
+        -- |> Maybe.withDefault ""
+        |> Maybe.map (List.map (List.filter Tuple.second))
+        |> Maybe.map (List.map List.length)
+        |> Maybe.map List.sum
 
 
 stringToGrid : String -> List (List ( Int, Bool ))
@@ -75,10 +73,8 @@ outputGrid list =
             )
         |> List.map (List.map String.fromInt)
         |> List.map (String.join "")
-
-
-
--- |> List.map String.toList
+        |> List.intersperse "\n"
+        |> String.join ""
 
 
 findVisibleTrees : Int -> List ( Int, Bool ) -> List ( Int, Bool ) -> List ( Int, Bool )
@@ -119,6 +115,9 @@ view model =
         [ p []
             [ text <| Debug.toString (day8Part1 day8TestData)
             ]
+
+        -- , pre [ Html.Attributes.style "white-space" "pre-wrap" ]
+        --     [ text (day8Part1 day8TestData) ]
         ]
 
 

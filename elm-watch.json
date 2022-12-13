@@ -1,0 +1,10 @@
+{
+    "targets": {
+        "My target name": {
+            "inputs": [
+                "src/Advent8.elm"
+            ],
+            "output": "html/advent8.js"
+        }
+    }
+}
