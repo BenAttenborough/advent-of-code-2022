@@ -1,4 +1,13 @@
-module Advent8Data exposing (day8Part1Data)
+module Advent8Data exposing (day8Part1Data, day8TestData)
+
+
+day8TestData : String
+day8TestData =
+    """30373
+25512
+65332
+33549
+35390"""
 
 
 day8Part1Data : String

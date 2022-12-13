@@ -4419,10 +4419,141 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var $author$project$Advent8$charToInt = function (_char) {
+	return $elm$core$Char$isDigit(_char) ? $elm$core$Maybe$Just(
+		$elm$core$Char$toCode(_char) - 48) : $elm$core$Maybe$Nothing;
+};
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$String$lines = _String_lines;
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $author$project$Advent8$outputGrid = function (list) {
+	return A2(
+		$elm$core$List$map,
+		$elm$core$String$join(''),
+		A2(
+			$elm$core$List$map,
+			$elm$core$List$map($elm$core$String$fromInt),
+			A2(
+				$elm$core$List$map,
+				$elm$core$List$map(
+					function (_v0) {
+						var height = _v0.a;
+						var tagged = _v0.b;
+						return tagged ? 1 : 0;
+					}),
+				list)));
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $author$project$Advent8$day8Part1 = function (input) {
+	return $author$project$Advent8$outputGrid(
+		A2(
+			$elm$core$List$map,
+			$elm$core$List$map(
+				function (tree) {
+					return _Utils_Tuple2(tree, false);
+				}),
+			A2(
+				$elm$core$List$map,
+				$elm$core$List$filterMap($author$project$Advent8$charToInt),
+				A2(
+					$elm$core$List$map,
+					$elm$core$String$toList,
+					$elm$core$String$lines(input)))));
+};
+var $author$project$Advent8Data$day8TestData = '30373\n25512\n65332\n33549\n35390';
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Advent8$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
@@ -4434,7 +4565,9 @@ var $author$project$Advent8$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Test ')
+						$elm$html$Html$text(
+						$elm$core$Debug$toString(
+							$author$project$Advent8$day8Part1($author$project$Advent8Data$day8TestData)))
 					]))
 			]));
 };

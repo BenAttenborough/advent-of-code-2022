@@ -1,5 +1,6 @@
 module Advent8 exposing (..)
 
+import Advent8Data exposing (day8Part1Data, day8TestData)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Matrix
@@ -26,24 +27,27 @@ day8Part1 input =
         -- Turn each tree into tuple. Second value used to indicate if tree has been counted
         -- I've just realised this probably isn't useful
         |> List.map (List.map (\tree -> ( tree, False )))
-        -- |> outputGrid
-        |> List.map (findVisibleTrees -1 [])
-        -- |> outputGrid
-        |> List.map List.reverse
-        |> List.map (findVisibleTrees -1 [])
-        |> List.map List.reverse
-        -- |> outputGrid
-        |> Matrix.fromLists
-        |> Maybe.map Matrix.transpose
-        |> Maybe.map Matrix.toLists
-        |> Maybe.map (List.map (findVisibleTrees -1 []))
-        |> Maybe.map (List.map List.reverse)
-        -- |> Maybe.map outputGrid
-        |> Maybe.map (List.map (findVisibleTrees -1 []))
-        -- |> Maybe.map outputGrid
-        |> Maybe.map (List.map (List.filter Tuple.second))
-        |> Maybe.map (List.map List.length)
-        |> Maybe.map List.sum
+        |> outputGrid
+
+
+
+-- |> List.map (findVisibleTrees -1 [])
+-- -- |> outputGrid
+-- |> List.map List.reverse
+-- |> List.map (findVisibleTrees -1 [])
+-- |> List.map List.reverse
+-- -- |> outputGrid
+-- |> Matrix.fromLists
+-- |> Maybe.map Matrix.transpose
+-- |> Maybe.map Matrix.toLists
+-- |> Maybe.map (List.map (findVisibleTrees -1 []))
+-- |> Maybe.map (List.map List.reverse)
+-- -- |> Maybe.map outputGrid
+-- |> Maybe.map (List.map (findVisibleTrees -1 []))
+-- -- |> Maybe.map outputGrid
+-- |> Maybe.map (List.map (List.filter Tuple.second))
+-- |> Maybe.map (List.map List.length)
+-- |> Maybe.map List.sum
 
 
 stringToGrid : String -> List (List ( Int, Bool ))
@@ -58,24 +62,23 @@ stringToGrid input =
 
 
 outputGrid list =
-    let
-        output =
-            list
-                |> List.map
-                    (List.map
-                        (\( height, tagged ) ->
-                            if tagged then
-                                1
-
-                            else
-                                0
-                        )
-                    )
-                |> List.map (List.map String.fromInt)
-                |> List.map (String.join "")
-                |> Debug.log ">"
-    in
     list
+        |> List.map
+            (List.map
+                (\( height, tagged ) ->
+                    if tagged then
+                        1
+
+                    else
+                        0
+                )
+            )
+        |> List.map (List.map String.fromInt)
+        |> List.map (String.join "")
+
+
+
+-- |> List.map String.toList
 
 
 findVisibleTrees : Int -> List ( Int, Bool ) -> List ( Int, Bool ) -> List ( Int, Bool )
@@ -114,7 +117,7 @@ day8Part2 input =
 view model =
     div []
         [ p []
-            [ text "Test "
+            [ text <| Debug.toString (day8Part1 day8TestData)
             ]
         ]
 
