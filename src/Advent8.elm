@@ -100,20 +100,60 @@ testInput =
 35390"""
 
 
+type alias TreesSeen =
+    { north : Int
+    , south : Int
+    , east : Int
+    , west : Int
+    }
+
+
+type TreeHeight
+    = TreeHeight Int
+
+
+type alias Tree =
+    { height : TreeHeight
+    , treesSeen : TreesSeen
+    }
+
+
 day8Part2 input =
     input
         |> String.lines
         |> List.map String.toList
         |> List.map (List.filterMap charToInt)
-        -- Turn each tree into tuple. Second value used to indicate if tree has been counted
-        -- I've just realised this probably isn't useful
-        |> List.map (List.map (\tree -> ( tree, False )))
+        |> List.map (List.map (\height -> Tree (TreeHeight height) (TreesSeen 0 0 0 0)))
+
+
+seenTrees : List Tree -> List Tree
+seenTrees trees =
+    trees
+
+
+
+-- case trees of
+--     [] ->
+--         List.reverse processedTrees
+--     head :: rest ->
+--         if Tuple.first head > currentHighest then
+--             findVisibleTrees (Tuple.first head) (( Tuple.first head, True ) :: processedTrees) rest
+--         else
+--             findVisibleTrees currentHighest (head :: processedTrees) rest
+
+
+listTreeExample : List Tree
+listTreeExample =
+    [ { height = TreeHeight 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 0, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 7, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } } ]
 
 
 view model =
     div []
         [ p []
-            [ text <| Debug.toString (day8Part1 day8TestData)
+            [ text "TEST\n"
+
+            -- , text <| Debug.toString (day8Part2 day8TestData)
+            , text <| Debug.toString (seenTrees listTreeExample)
             ]
 
         -- , pre [ Html.Attributes.style "white-space" "pre-wrap" ]
