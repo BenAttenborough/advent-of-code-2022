@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1671053042602"
+    "1671115591241"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7518,40 +7518,244 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$core$Basics$identity = function (x) {
-	return x;
+var $author$project$Advent8$Tree = F2(
+	function (height, treesSeen) {
+		return {height: height, treesSeen: treesSeen};
+	});
+var $author$project$Advent8$TreesSeen = F4(
+	function (north, south, east, west) {
+		return {east: east, north: north, south: south, west: west};
+	});
+var $author$project$Advent8$charToInt = function (_char) {
+	return $elm$core$Char$isDigit(_char) ? $elm$core$Maybe$Just(
+		$elm$core$Char$toCode(_char) - 48) : $elm$core$Maybe$Nothing;
 };
-var $author$project$Advent8$TreeHeight = function (a) {
-	return {$: 'TreeHeight', a: a};
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$String$lines = _String_lines;
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $elm_community$list_extra$List$Extra$Continue = function (a) {
+	return {$: 'Continue', a: a};
 };
-var $author$project$Advent8$listTreeExample = _List_fromArray(
-	[
-		{
-		height: $author$project$Advent8$TreeHeight(3),
-		treesSeen: {east: 0, north: 0, south: 0, west: 0}
-	},
-		{
-		height: $author$project$Advent8$TreeHeight(0),
-		treesSeen: {east: 0, north: 0, south: 0, west: 0}
-	},
-		{
-		height: $author$project$Advent8$TreeHeight(3),
-		treesSeen: {east: 0, north: 0, south: 0, west: 0}
-	},
-		{
-		height: $author$project$Advent8$TreeHeight(7),
-		treesSeen: {east: 0, north: 0, south: 0, west: 0}
-	},
-		{
-		height: $author$project$Advent8$TreeHeight(3),
-		treesSeen: {east: 0, north: 0, south: 0, west: 0}
+var $elm_community$list_extra$List$Extra$Stop = function (a) {
+	return {$: 'Stop', a: a};
+};
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
 	}
-	]);
-var $elm$html$Html$p = _VirtualDom_node('p');
-var $author$project$Advent8$seenTrees = function (trees) {
-	return trees;
 };
+var $elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$stoppableFoldl = F3(
+	function (func, acc, list) {
+		stoppableFoldl:
+		while (true) {
+			if (!list.b) {
+				return acc;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				var _v1 = A2(func, x, acc);
+				if (_v1.$ === 'Continue') {
+					var newAcc = _v1.a;
+					var $temp$func = func,
+						$temp$acc = newAcc,
+						$temp$list = xs;
+					func = $temp$func;
+					acc = $temp$acc;
+					list = $temp$list;
+					continue stoppableFoldl;
+				} else {
+					var finalAcc = _v1.a;
+					return finalAcc;
+				}
+			}
+		}
+	});
+var $elm$core$List$tail = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(xs);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Advent8$seenTrees = function (trees) {
+	return A3(
+		$elm$core$Maybe$map2,
+		function (firstTree_) {
+			return A2(
+				$elm_community$list_extra$List$Extra$stoppableFoldl,
+				F2(
+					function (nextTree, acc) {
+						return (_Utils_cmp(nextTree.height, firstTree_.height) > -1) ? $elm_community$list_extra$List$Extra$Stop(acc + 1) : $elm_community$list_extra$List$Extra$Continue(acc + 1);
+					}),
+				0);
+		},
+		$elm$core$List$head(trees),
+		$elm$core$List$tail(trees));
+};
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Advent8$day8Part2 = function (input) {
+	return A2(
+		$elm$core$List$map,
+		function (trees) {
+			return A2(
+				$elm$core$List$map,
+				function (tree) {
+					return A2(
+						$author$project$Advent8$Tree,
+						tree.height,
+						A4(
+							$author$project$Advent8$TreesSeen,
+							tree.treesSeen.north,
+							tree.treesSeen.south,
+							A2(
+								$elm$core$Maybe$withDefault,
+								0,
+								$author$project$Advent8$seenTrees(trees)),
+							tree.treesSeen.west));
+				},
+				trees);
+		},
+		A2(
+			$elm$core$List$map,
+			$elm$core$List$map(
+				function (height) {
+					return A2(
+						$author$project$Advent8$Tree,
+						height,
+						A4($author$project$Advent8$TreesSeen, 0, 0, 0, 0));
+				}),
+			A2(
+				$elm$core$List$map,
+				$elm$core$List$filterMap($author$project$Advent8$charToInt),
+				A2(
+					$elm$core$List$map,
+					$elm$core$String$toList,
+					$elm$core$String$lines(input)))));
+};
+var $author$project$Advent8Data$day8TestData = '30373\n25512\n65332\n33549\n35390';
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$pre = _VirtualDom_node('pre');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$Debug$toString = _Debug_toString;
@@ -7562,14 +7766,17 @@ var $author$project$Advent8$view = function (model) {
 		_List_fromArray(
 			[
 				A2(
-				$elm$html$Html$p,
-				_List_Nil,
+				$elm$html$Html$pre,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('TEST\n'),
+						A2($elm$html$Html$Attributes$style, 'white-space', 'pre-line')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('TEST\n\n'),
 						$elm$html$Html$text(
 						$elm$core$Debug$toString(
-							$author$project$Advent8$seenTrees($author$project$Advent8$listTreeExample)))
+							$author$project$Advent8$day8Part2($author$project$Advent8Data$day8TestData)))
 					]))
 			]));
 };

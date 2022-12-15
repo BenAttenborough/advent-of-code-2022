@@ -3,6 +3,7 @@ module Advent8 exposing (..)
 import Advent8Data exposing (day8Part1Data, day8TestData)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import List.Extra as List
 import Matrix
 
 
@@ -25,7 +26,6 @@ day8Part1 input =
         |> List.map String.toList
         |> List.map (List.filterMap charToInt)
         -- Turn each tree into tuple. Second value used to indicate if tree has been counted
-        -- I've just realised this probably isn't useful
         |> List.map (List.map (\tree -> ( tree, False )))
         -- |> outputGrid
         |> List.map (findVisibleTrees -1 [])
@@ -113,7 +113,7 @@ type TreeHeight
 
 
 type alias Tree =
-    { height : TreeHeight
+    { height : Int
     , treesSeen : TreesSeen
     }
 
@@ -123,41 +123,91 @@ day8Part2 input =
         |> String.lines
         |> List.map String.toList
         |> List.map (List.filterMap charToInt)
-        |> List.map (List.map (\height -> Tree (TreeHeight height) (TreesSeen 0 0 0 0)))
+        |> List.map (List.map (\height -> Tree height (TreesSeen 0 0 0 0)))
+        |> List.map
+            (\trees ->
+                List.map
+                    (\tree ->
+                        Tree tree.height
+                            (TreesSeen
+                                tree.treesSeen.north
+                                tree.treesSeen.south
+                                (Maybe.withDefault
+                                    0
+                                    (seenTrees trees)
+                                )
+                                tree.treesSeen.west
+                            )
+                    )
+                    trees
+            )
 
 
-seenTrees : List Tree -> List Tree
+next : List a -> Maybe a
+next list =
+    case list of
+        [] ->
+            Nothing
+
+        _ :: tail ->
+            List.head tail
+
+
+seenTrees : List Tree -> Maybe Int
 seenTrees trees =
-    trees
+    Maybe.map2
+        (\firstTree_ ->
+            List.stoppableFoldl
+                (\nextTree acc ->
+                    if nextTree.height >= firstTree_.height then
+                        List.Stop (acc + 1)
+
+                    else
+                        List.Continue (acc + 1)
+                )
+                0
+        )
+        (List.head trees)
+        (List.tail trees)
 
 
 
 -- case trees of
 --     [] ->
---         List.reverse processedTrees
---     head :: rest ->
---         if Tuple.first head > currentHighest then
---             findVisibleTrees (Tuple.first head) (( Tuple.first head, True ) :: processedTrees) rest
---         else
---             findVisibleTrees currentHighest (head :: processedTrees) rest
+--         count
+--     head :: tail ->
+--         1
 
 
 listTreeExample : List Tree
 listTreeExample =
-    [ { height = TreeHeight 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 0, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 7, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }, { height = TreeHeight 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } } ]
+    [ { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 0, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 7, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    ]
+
+
+listTreeExample2 : List Tree
+listTreeExample2 =
+    [ { height = 5, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 0, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 4, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    ]
 
 
 view model =
     div []
-        [ p []
-            [ text "TEST\n"
+        [ pre [ style "white-space" "pre-line" ]
+            [ text "TEST\n\n"
+            , text <| Debug.toString (day8Part2 day8TestData)
 
-            -- , text <| Debug.toString (day8Part2 day8TestData)
-            , text <| Debug.toString (seenTrees listTreeExample)
+            -- , text <| Debug.toString (seenTrees listTreeExample)
+            -- , text <| Debug.toString (seenTrees listTreeExample2)
             ]
-
-        -- , pre [ Html.Attributes.style "white-space" "pre-wrap" ]
-        --     [ text (day8Part1 day8TestData) ]
         ]
 
 
