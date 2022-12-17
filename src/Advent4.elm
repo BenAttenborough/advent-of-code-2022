@@ -72,6 +72,7 @@ day4Part1 input =
     input
         |> String.lines
         |> List.map (Parser.run stringParser)
+        |> Debug.log "da"
         |> List.map (Result.map (\list -> doesOneListContainOther list.worker1 list.worker2))
         |> List.map Result.toMaybe
         |> List.filterMap identity

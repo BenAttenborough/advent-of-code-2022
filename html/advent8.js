@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1671115591241"
+    "1671295920479"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7618,6 +7618,10 @@ var $elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
+var $elm$core$String$foldr = _String_foldr;
+var $elm$core$String$toList = function (string) {
+	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
+};
 var $elm_community$list_extra$List$Extra$Continue = function (a) {
 	return {$: 'Continue', a: a};
 };
@@ -7687,21 +7691,19 @@ var $elm$core$List$tail = function (list) {
 var $author$project$Advent8$seenTrees = function (trees) {
 	return A3(
 		$elm$core$Maybe$map2,
-		function (firstTree_) {
-			return A2(
-				$elm_community$list_extra$List$Extra$stoppableFoldl,
-				F2(
-					function (nextTree, acc) {
-						return (_Utils_cmp(nextTree.height, firstTree_.height) > -1) ? $elm_community$list_extra$List$Extra$Stop(acc + 1) : $elm_community$list_extra$List$Extra$Continue(acc + 1);
-					}),
-				0);
-		},
+		F2(
+			function (firstTree, otherTrees) {
+				return A3(
+					$elm_community$list_extra$List$Extra$stoppableFoldl,
+					F2(
+						function (nextTree, acc) {
+							return (_Utils_cmp(nextTree.height, firstTree.height) > -1) ? $elm_community$list_extra$List$Extra$Stop(acc + 1) : $elm_community$list_extra$List$Extra$Continue(acc + 1);
+						}),
+					0,
+					otherTrees);
+			}),
 		$elm$core$List$head(trees),
 		$elm$core$List$tail(trees));
-};
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
 var $elm$core$Maybe$withDefault = F2(
 	function (_default, maybe) {
@@ -7712,28 +7714,33 @@ var $elm$core$Maybe$withDefault = F2(
 			return _default;
 		}
 	});
+var $author$project$Advent8$treesIterator2 = function (trees) {
+	return A2(
+		$elm$core$List$map,
+		function (tree) {
+			return A2(
+				$author$project$Advent8$Tree,
+				tree.height,
+				A4(
+					$author$project$Advent8$TreesSeen,
+					tree.treesSeen.north,
+					tree.treesSeen.south,
+					A2(
+						$elm$core$Maybe$withDefault,
+						0,
+						$author$project$Advent8$seenTrees(trees)),
+					A2(
+						$elm$core$Maybe$withDefault,
+						0,
+						$author$project$Advent8$seenTrees(
+							$elm$core$List$reverse(trees)))));
+		},
+		trees);
+};
 var $author$project$Advent8$day8Part2 = function (input) {
 	return A2(
 		$elm$core$List$map,
-		function (trees) {
-			return A2(
-				$elm$core$List$map,
-				function (tree) {
-					return A2(
-						$author$project$Advent8$Tree,
-						tree.height,
-						A4(
-							$author$project$Advent8$TreesSeen,
-							tree.treesSeen.north,
-							tree.treesSeen.south,
-							A2(
-								$elm$core$Maybe$withDefault,
-								0,
-								$author$project$Advent8$seenTrees(trees)),
-							tree.treesSeen.west));
-				},
-				trees);
-		},
+		$author$project$Advent8$treesIterator2,
 		A2(
 			$elm$core$List$map,
 			$elm$core$List$map(
@@ -7751,11 +7758,11 @@ var $author$project$Advent8$day8Part2 = function (input) {
 					$elm$core$String$toList,
 					$elm$core$String$lines(input)))));
 };
-var $author$project$Advent8Data$day8TestData = '30373\n25512\n65332\n33549\n35390';
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$pre = _VirtualDom_node('pre');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Advent8$testInput = '30373\n25512\n65332\n33549\n35390';
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$Debug$toString = _Debug_toString;
@@ -7776,7 +7783,7 @@ var $author$project$Advent8$view = function (model) {
 						$elm$html$Html$text('TEST\n\n'),
 						$elm$html$Html$text(
 						$elm$core$Debug$toString(
-							$author$project$Advent8$day8Part2($author$project$Advent8Data$day8TestData)))
+							$author$project$Advent8$day8Part2($author$project$Advent8$testInput)))
 					]))
 			]));
 };

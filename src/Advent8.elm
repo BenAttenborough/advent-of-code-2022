@@ -1,6 +1,7 @@
 module Advent8 exposing (..)
 
 import Advent8Data exposing (day8Part1Data, day8TestData)
+import Array
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
@@ -118,29 +119,79 @@ type alias Tree =
     }
 
 
+
+-- treeIterator savedTrees trees =
+--     case trees of
+--         [] ->
+--             List.reverse savedTrees
+--         head :: tail ->
+--             treeIterator tail (seenTrees trees :: savedTrees)
+
+
 day8Part2 input =
     input
         |> String.lines
         |> List.map String.toList
         |> List.map (List.filterMap charToInt)
         |> List.map (List.map (\height -> Tree height (TreesSeen 0 0 0 0)))
-        |> List.map
-            (\trees ->
-                List.map
-                    (\tree ->
-                        Tree tree.height
-                            (TreesSeen
-                                tree.treesSeen.north
-                                tree.treesSeen.south
-                                (Maybe.withDefault
-                                    0
-                                    (seenTrees trees)
-                                )
-                                tree.treesSeen.west
-                            )
-                    )
-                    trees
-            )
+        |> List.map treesIterator2
+
+
+
+-- |> List.map (treeRowIterator seenTrees [])
+-- |> List.map (List.map (\x -> x.height))
+-- |> Array.fromList
+-- |> Array.get 3
+-- -------
+-- |> Matrix.fromLists
+-- |> Maybe.map Matrix.transpose
+-- |> Maybe.map Matrix.toLists
+-- |> Maybe.map
+--     (List.map
+--         (\trees ->
+--             List.map
+--                 (\tree ->
+--                     Tree tree.height
+--                         (TreesSeen
+--                             (Maybe.withDefault
+--                                 0
+--                                 (seenTrees trees)
+--                             )
+--                             (Maybe.withDefault
+--                                 0
+--                                 (seenTrees
+--                                     (List.reverse trees)
+--                                 )
+--                             )
+--                             tree.treesSeen.east
+--                             tree.treesSeen.west
+--                         )
+--                 )
+--                 trees
+--         )
+--     )
+-- |> Maybe.map
+--     (List.map
+--         (List.map (\tree -> tree.treesSeen))
+--     )
+-- |> Maybe.map
+--     (List.map
+--         (List.map
+--             (\tree ->
+--                 [ tree.north
+--                 , tree.south
+--                 , tree.east
+--                 , tree.west
+--                 ]
+--             )
+--         )
+--     )
+-- |> Maybe.map
+--     (List.map
+--         (List.map
+--             (List.foldl (*) 1)
+--         )
+--     )
 
 
 next : List a -> Maybe a
@@ -153,49 +204,94 @@ next list =
             List.head tail
 
 
+
+-- given a List of trees count how many trees can be seen to right of head
+
+
 seenTrees : List Tree -> Maybe Int
 seenTrees trees =
     Maybe.map2
-        (\firstTree_ ->
+        (\firstTree otherTrees ->
             List.stoppableFoldl
                 (\nextTree acc ->
-                    if nextTree.height >= firstTree_.height then
+                    if nextTree.height >= firstTree.height then
                         List.Stop (acc + 1)
 
                     else
                         List.Continue (acc + 1)
                 )
                 0
+                otherTrees
         )
         (List.head trees)
         (List.tail trees)
 
 
+treesIterator =
+    \trees ->
+        List.map
+            (\tree ->
+                Tree tree.height
+                    (TreesSeen
+                        tree.treesSeen.north
+                        tree.treesSeen.south
+                        (Maybe.withDefault
+                            0
+                            (seenTrees trees)
+                        )
+                        (Maybe.withDefault
+                            0
+                            (seenTrees
+                                (List.reverse trees)
+                            )
+                        )
+                    )
+            )
+            trees
 
--- case trees of
---     [] ->
---         count
---     head :: tail ->
---         1
+
+treesIterator2 =
+    \trees ->
+        List.map
+            (\tree ->
+                Tree tree.height
+                    (TreesSeen
+                        tree.treesSeen.north
+                        tree.treesSeen.south
+                        (Maybe.withDefault
+                            0
+                            (seenTrees trees)
+                        )
+                        (Maybe.withDefault
+                            0
+                            (seenTrees
+                                (List.reverse trees)
+                            )
+                        )
+                    )
+            )
+            trees
 
 
-listTreeExample : List Tree
-listTreeExample =
+treeRowIterator : (List Tree -> Maybe Int) -> List (Maybe Int) -> List Tree -> List Int
+treeRowIterator fnc initialTrees trees =
+    case trees of
+        [] ->
+            initialTrees
+                |> List.reverse
+                |> List.filterMap identity
+
+        head :: tail ->
+            treeRowIterator fnc (fnc trees :: initialTrees) tail
+
+
+listTreeAoCExampleX : List Tree
+listTreeAoCExampleX =
     [ { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    , { height = 0, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
     , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    , { height = 7, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    ]
-
-
-listTreeExample2 : List Tree
-listTreeExample2 =
-    [ { height = 5, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    , { height = 0, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 5, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
     , { height = 4, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
-    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 9, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
     ]
 
 
@@ -203,13 +299,23 @@ view model =
     div []
         [ pre [ style "white-space" "pre-line" ]
             [ text "TEST\n\n"
-            , text <| Debug.toString (day8Part2 day8TestData)
+            , text <| Debug.toString (day8Part2 testInput)
 
-            -- , text <| Debug.toString (seenTrees listTreeExample)
-            -- , text <| Debug.toString (seenTrees listTreeExample2)
+            -- , text <| "\n"
+            -- , text <| Debug.toString (treeRowIterator seenTrees [] listTreeAoCExampleX)
+            -- , text <| Debug.toString listTreeAoCExampleX
             ]
         ]
 
 
 main =
     view "dummy model"
+
+
+testRow =
+    [ { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 5, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 4, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    , { height = 9, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
+    ]
