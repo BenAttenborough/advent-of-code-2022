@@ -135,125 +135,35 @@ day8Part2 input =
         |> List.map (List.filterMap charToInt)
         |> List.map (List.map (\height -> Tree height (TreesSeen 0 0 0 0)))
         |> List.map treesIterator
-
-
-
--- |> List.map (treeRowIterator seenTrees [])
--- |> List.map (List.map (\x -> x.height))
--- |> Matrix.fromLists
--- |> Maybe.map Matrix.transpose
--- |> Maybe.map Matrix.toLists
--- |> Maybe.map (List.map treesIteratorNorthSouth)
--- |> Maybe.map
---     (List.map
---         (List.map
---             (\tree ->
---                 tree.treesSeen
---             )
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (\treesSeen ->
---                 treesSeen.north
---                     * treesSeen.south
---                     * treesSeen.east
---                     * treesSeen.west
---             )
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (\tree ->
---                 -- tree.treesSeen
---                 [ tree.treesSeen.north
---                 , tree.treesSeen.south
---                 , tree.treesSeen.east
---                 , tree.treesSeen.west
---                 ]
---             )
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (\tree ->
---                 tree
---             )
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (\tree ->
---                 [ tree.treesSeen.north
---                 , tree.treesSeen.south
---                 , tree.treesSeen.east
---                 , tree.treesSeen.west
---                 ]
---             )
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (List.foldl (*) 1)
---         )
---     )
--- |> Maybe.map Array.fromList
--- |> Maybe.map Array.get 3
--- -------
--- |> Matrix.fromLists
--- |> Maybe.map Matrix.transpose
--- |> Maybe.map Matrix.toLists
--- |> Maybe.map
---     (List.map
---         (\trees ->
---             List.map
---                 (\tree ->
---                     Tree tree.height
---                         (TreesSeen
---                             (Maybe.withDefault
---                                 0
---                                 (seenTrees trees)
---                             )
---                             (Maybe.withDefault
---                                 0
---                                 (seenTrees
---                                     (List.reverse trees)
---                                 )
---                             )
---                             tree.treesSeen.east
---                             tree.treesSeen.west
---                         )
---                 )
---                 trees
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map (\tree -> tree.treesSeen))
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (\tree ->
---                 [ tree.north
---                 , tree.south
---                 , tree.east
---                 , tree.west
---                 ]
---             )
---         )
---     )
--- |> Maybe.map
---     (List.map
---         (List.map
---             (List.foldl (*) 1)
---         )
---     )
+        |> Matrix.fromLists
+        |> Maybe.map Matrix.transpose
+        |> Maybe.map Matrix.toLists
+        |> Maybe.map (List.map treesIteratorNorthSouth)
+        |> Maybe.map
+            (List.map
+                (List.map
+                    (\tree ->
+                        tree.treesSeen
+                    )
+                )
+            )
+        |> Maybe.map
+            (List.map
+                (List.map
+                    (\treesSeen ->
+                        treesSeen.north
+                            * treesSeen.south
+                            * treesSeen.east
+                            * treesSeen.west
+                    )
+                )
+            )
+        |> Maybe.map Matrix.fromLists
+        |> Maybe.map (Maybe.map Matrix.transpose)
+        |> Maybe.map (Maybe.map Matrix.toLists)
+        |> Maybe.map (Maybe.map (List.map List.maximum))
+        |> Maybe.map (Maybe.map (List.filterMap identity))
+        |> Maybe.map (Maybe.map List.maximum)
 
 
 next : List a -> Maybe a
@@ -292,8 +202,13 @@ seenTrees trees =
 treesIterator =
     \trees ->
         let
-            rowScenicValues row =
-                treeRowIterator seenTrees [] row
+            rowScenicValues =
+                treeRowIterator seenTrees [] trees
+                    |> Array.fromList
+
+            rowScenicValuesReverse =
+                treeRowIterator seenTrees [] (List.reverse trees)
+                    |> List.reverse
                     |> Array.fromList
         in
         List.indexedMap
@@ -302,8 +217,8 @@ treesIterator =
                     (TreesSeen
                         tree.treesSeen.north
                         tree.treesSeen.south
-                        (Maybe.withDefault 1 (Array.get index (rowScenicValues trees)))
-                        (Maybe.withDefault 1 (Array.get index (rowScenicValues (List.reverse trees))))
+                        (Maybe.withDefault 1 (Array.get index rowScenicValues))
+                        (Maybe.withDefault 1 (Array.get index rowScenicValuesReverse))
                      -- You can't just reverse the list!
                     )
             )
@@ -313,16 +228,21 @@ treesIterator =
 treesIteratorNorthSouth =
     \trees ->
         let
-            rowScenicValues row =
-                treeRowIterator seenTrees [] row
+            rowScenicValues =
+                treeRowIterator seenTrees [] trees
+                    |> Array.fromList
+
+            rowScenicValuesReverse =
+                treeRowIterator seenTrees [] (List.reverse trees)
+                    |> List.reverse
                     |> Array.fromList
         in
         List.indexedMap
             (\index tree ->
                 Tree tree.height
                     (TreesSeen
-                        (Maybe.withDefault 1 (Array.get index (rowScenicValues trees)))
-                        (Maybe.withDefault 1 (Array.get index (rowScenicValues (List.reverse trees))))
+                        (Maybe.withDefault 1 (Array.get index rowScenicValues))
+                        (Maybe.withDefault 1 (Array.get index rowScenicValuesReverse))
                         tree.treesSeen.east
                         tree.treesSeen.west
                     )
@@ -358,7 +278,9 @@ view model =
             [ text "TEST\n\n"
             , text <| Debug.toString (day8Part2 testInput)
             , text <| "\n"
-            , text <| Debug.toString (treeRowIterator seenTrees [] listTreeAoCExampleX)
+
+            -- , text <| Debug.toString (treeRowIterator seenTrees [] listTreeAoCExampleX)
+            , text <| Debug.toString (day8Part2 day8Part1Data)
 
             -- , text <| Debug.toString listTreeAoCExampleX
             ]
