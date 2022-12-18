@@ -1,6 +1,7 @@
 module Advent8Test exposing (..)
 
 import Advent8 exposing (..)
+import Advent8Data exposing (day8Part1Data)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Parser exposing (Parser)
@@ -124,5 +125,15 @@ suite =
             [ test "seenTrees in [] expected to be Nothing" <|
                 \_ ->
                     Expect.equal Nothing (seenTrees listTreeEmpty)
+            ]
+        , describe "Part 2 day8Part2 testinput" <|
+            [ test "day8Part2 testinput = 8" <|
+                \_ ->
+                    Expect.equal 8 (day8Part2 testInput)
+            ]
+        , describe "Part 2 day8Part2 day8Part1Data" <|
+            [ test "day8Part2 testinput = 201684" <|
+                \_ ->
+                    Expect.equal 201684 (day8Part2 day8Part1Data)
             ]
         ]

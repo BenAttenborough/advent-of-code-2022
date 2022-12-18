@@ -158,12 +158,13 @@ day8Part2 input =
                     )
                 )
             )
-        |> Maybe.map Matrix.fromLists
-        |> Maybe.map (Maybe.map Matrix.transpose)
-        |> Maybe.map (Maybe.map Matrix.toLists)
-        |> Maybe.map (Maybe.map (List.map List.maximum))
-        |> Maybe.map (Maybe.map (List.filterMap identity))
-        |> Maybe.map (Maybe.map List.maximum)
+        |> Maybe.andThen Matrix.fromLists
+        |> Maybe.map Matrix.transpose
+        |> Maybe.map Matrix.toLists
+        |> Maybe.map (List.map List.maximum)
+        |> Maybe.map (List.filterMap identity)
+        |> Maybe.andThen List.maximum
+        |> Maybe.withDefault -1
 
 
 next : List a -> Maybe a
@@ -219,7 +220,6 @@ treesIterator =
                         tree.treesSeen.south
                         (Maybe.withDefault 1 (Array.get index rowScenicValues))
                         (Maybe.withDefault 1 (Array.get index rowScenicValuesReverse))
-                     -- You can't just reverse the list!
                     )
             )
             trees
@@ -276,12 +276,13 @@ view model =
     div []
         [ pre [ style "white-space" "pre-line" ]
             [ text "TEST\n\n"
-            , text <| Debug.toString (day8Part2 testInput)
-            , text <| "\n"
 
+            -- , text <| Debug.toString (day8Part2 testInput)
+            -- , text <| "\n"
             -- , text <| Debug.toString (treeRowIterator seenTrees [] listTreeAoCExampleX)
-            , text <| Debug.toString (day8Part2 day8Part1Data)
+            , text <| Debug.toString (day8Part2 testInput)
 
+            -- , text <| Debug.toString (day8Part2 day8Part1Data)
             -- , text <| Debug.toString listTreeAoCExampleX
             ]
         ]
