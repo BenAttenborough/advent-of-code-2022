@@ -1,4 +1,6 @@
-html, body , pre{
+html, body {
     background-color: black;
     color: greenyellow;
+    font-family: monospace;
+    font-size: large;
 }
