@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1671812117527"
+    "1671813115751"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7518,7 +7518,12 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var $elm$core$String$lines = _String_lines;
+var $author$project$Advent7Data$testInput = '$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k';
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Advent7$main = $elm$html$Html$text('Hello Worldx');
+var $elm$core$Debug$toString = _Debug_toString;
+var $author$project$Advent7$main = $elm$html$Html$text(
+	$elm$core$Debug$toString(
+		$elm$core$String$lines($author$project$Advent7Data$testInput)));
 _Platform_export({'Advent7':{'init':_VirtualDom_init($author$project$Advent7$main)(0)(0)}});}(this));

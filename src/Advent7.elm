@@ -1,19 +1,24 @@
 module Advent7 exposing (..)
 
+import Advent7Data
 import Html exposing (Html)
+import Parser exposing (..)
 
 
 main : Html msg
 main =
-    "Hello Worldx"
+    Advent7Data.testInput
+        |> String.lines
+        |> Debug.toString
         |> Html.text
 
 
+type Command
+    = CD
+    | LS
 
--- import Parser exposing (..)
--- type Command
---     = CD
---     | LS
+
+
 -- type Directory
 --     = Empty String Int
 --     | Node String Int (List Directory)
