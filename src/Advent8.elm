@@ -1,7 +1,7 @@
 module Advent8 exposing (..)
 
 import Advent8Data exposing (day8Part1Data, day8TestData)
-import Array
+import Array exposing (Array)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
@@ -28,22 +28,16 @@ day8Part1 input =
         |> List.map (List.filterMap charToInt)
         -- Turn each tree into tuple. Second value used to indicate if tree has been counted
         |> List.map (List.map (\tree -> ( tree, False )))
-        -- |> outputGrid
         |> List.map (findVisibleTrees -1 [])
-        -- |> outputGrid
         |> List.map List.reverse
         |> List.map (findVisibleTrees -1 [])
         |> List.map List.reverse
-        -- |> outputGrid
         |> Matrix.fromLists
         |> Maybe.map Matrix.transpose
         |> Maybe.map Matrix.toLists
         |> Maybe.map (List.map (findVisibleTrees -1 []))
         |> Maybe.map (List.map List.reverse)
-        -- |> Maybe.map outputGrid
         |> Maybe.map (List.map (findVisibleTrees -1 []))
-        -- |> Maybe.map outputGrid
-        -- |> Maybe.withDefault ""
         |> Maybe.map (List.map (List.filter Tuple.second))
         |> Maybe.map (List.map List.length)
         |> Maybe.map List.sum
@@ -55,8 +49,6 @@ stringToGrid input =
         |> String.lines
         |> List.map String.toList
         |> List.map (List.filterMap charToInt)
-        -- Turn each tree into tuple. Second value used to indicate if tree has been counted
-        -- I've just realised this probably isn't useful
         |> List.map (List.map (\tree -> ( tree, False )))
 
 
@@ -92,13 +84,8 @@ findVisibleTrees currentHighest processedTrees trees =
                 findVisibleTrees currentHighest (head :: processedTrees) rest
 
 
-testInput : String
-testInput =
-    """30373
-25512
-65332
-33549
-35390"""
+
+---- PART 2
 
 
 type alias TreesSeen =
@@ -109,23 +96,10 @@ type alias TreesSeen =
     }
 
 
-type TreeHeight
-    = TreeHeight Int
-
-
 type alias Tree =
     { height : Int
     , treesSeen : TreesSeen
     }
-
-
-
--- treeIterator savedTrees trees =
---     case trees of
---         [] ->
---             List.reverse savedTrees
---         head :: tail ->
---             treeIterator tail (seenTrees trees :: savedTrees)
 
 
 day8Part2 input =
@@ -177,12 +151,9 @@ next list =
             List.head tail
 
 
-
--- given a List of trees count how many trees can be seen to right of head
-
-
 seenTrees : List Tree -> Maybe Int
 seenTrees trees =
+    -- given a List of trees count how many trees can be seen to right of head
     Maybe.map2
         (\firstTree otherTrees ->
             List.stoppableFoldl
@@ -203,10 +174,12 @@ seenTrees trees =
 treesIterator =
     \trees ->
         let
+            rowScenicValues : Array Int
             rowScenicValues =
                 treeRowIterator seenTrees [] trees
                     |> Array.fromList
 
+            rowScenicValuesReverse : Array Int
             rowScenicValuesReverse =
                 treeRowIterator seenTrees [] (List.reverse trees)
                     |> List.reverse
@@ -228,6 +201,7 @@ treesIterator =
 treesIteratorNorthSouth =
     \trees ->
         let
+            rowScenicValues : Array Int
             rowScenicValues =
                 treeRowIterator seenTrees [] trees
                     |> Array.fromList
@@ -277,10 +251,10 @@ view model =
         [ pre [ style "white-space" "pre-line" ]
             [ text "TEST\n\n"
 
-            -- , text <| Debug.toString (day8Part2 testInput)
+            -- , text <| Debug.toString (day8Part2 day8TestData)
             -- , text <| "\n"
             -- , text <| Debug.toString (treeRowIterator seenTrees [] listTreeAoCExampleX)
-            , text <| Debug.toString (day8Part2 testInput)
+            , text <| Debug.toString (day8Part2 day8TestData)
 
             -- , text <| Debug.toString (day8Part2 day8Part1Data)
             -- , text <| Debug.toString listTreeAoCExampleX

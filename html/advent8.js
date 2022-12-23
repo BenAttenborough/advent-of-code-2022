@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1671374369938"
+    "1671383970000"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8342,11 +8342,11 @@ var $author$project$Advent8$day8Part2 = function (input) {
 																		$elm$core$String$toList,
 																		$elm$core$String$lines(input))))))))))))))))));
 };
+var $author$project$Advent8Data$day8TestData = '30373\n25512\n65332\n33549\n35390';
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$pre = _VirtualDom_node('pre');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $author$project$Advent8$testInput = '30373\n25512\n65332\n33549\n35390';
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$core$Debug$toString = _Debug_toString;
@@ -8367,7 +8367,7 @@ var $author$project$Advent8$view = function (model) {
 						$elm$html$Html$text('TEST\n\n'),
 						$elm$html$Html$text(
 						$elm$core$Debug$toString(
-							$author$project$Advent8$day8Part2($author$project$Advent8$testInput)))
+							$author$project$Advent8$day8Part2($author$project$Advent8Data$day8TestData)))
 					]))
 			]));
 };
