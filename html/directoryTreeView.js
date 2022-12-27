@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672163976934"
+    "1672164391233"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7518,11 +7518,11 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var $author$project$Advent7$Directory = F2(
+var $author$project$Utilities$TreeViewer$Directory = F2(
 	function (label, files) {
 		return {files: files, label: label};
 	});
-var $author$project$Advent7$File = F2(
+var $author$project$Utilities$TreeViewer$File = F2(
 	function (label, size) {
 		return {label: label, size: size};
 	});
@@ -7531,53 +7531,53 @@ var $zwilias$elm_rosetree$Tree$Tree = F2(
 		return {$: 'Tree', a: a, b: b};
 	});
 var $zwilias$elm_rosetree$Tree$tree = $zwilias$elm_rosetree$Tree$Tree;
-var $author$project$Advent7$demoTree = A2(
+var $author$project$Utilities$TreeViewer$demoTree = A2(
 	$zwilias$elm_rosetree$Tree$tree,
 	A2(
-		$author$project$Advent7$Directory,
+		$author$project$Utilities$TreeViewer$Directory,
 		'root',
 		_List_fromArray(
 			[
-				A2($author$project$Advent7$File, 'a', 123),
-				A2($author$project$Advent7$File, 'b', 54),
-				A2($author$project$Advent7$File, 'c', 5432)
+				A2($author$project$Utilities$TreeViewer$File, 'a', 123),
+				A2($author$project$Utilities$TreeViewer$File, 'b', 54),
+				A2($author$project$Utilities$TreeViewer$File, 'c', 5432)
 			])),
 	_List_fromArray(
 		[
 			A2(
 			$zwilias$elm_rosetree$Tree$tree,
-			A2($author$project$Advent7$Directory, 'home', _List_Nil),
+			A2($author$project$Utilities$TreeViewer$Directory, 'home', _List_Nil),
 			_List_fromArray(
 				[
 					A2(
 					$zwilias$elm_rosetree$Tree$tree,
-					A2($author$project$Advent7$Directory, 'user1', _List_Nil),
+					A2($author$project$Utilities$TreeViewer$Directory, 'user1', _List_Nil),
 					_List_Nil),
 					A2(
 					$zwilias$elm_rosetree$Tree$tree,
-					A2($author$project$Advent7$Directory, 'user2', _List_Nil),
+					A2($author$project$Utilities$TreeViewer$Directory, 'user2', _List_Nil),
 					_List_Nil)
 				])),
 			A2(
 			$zwilias$elm_rosetree$Tree$tree,
 			A2(
-				$author$project$Advent7$Directory,
+				$author$project$Utilities$TreeViewer$Directory,
 				'etc',
 				_List_fromArray(
 					[
-						A2($author$project$Advent7$File, 'd', 5345),
-						A2($author$project$Advent7$File, 'e', 24),
-						A2($author$project$Advent7$File, 'f', 428)
+						A2($author$project$Utilities$TreeViewer$File, 'd', 5345),
+						A2($author$project$Utilities$TreeViewer$File, 'e', 24),
+						A2($author$project$Utilities$TreeViewer$File, 'f', 428)
 					])),
 			_List_Nil),
 			A2(
 			$zwilias$elm_rosetree$Tree$tree,
-			A2($author$project$Advent7$Directory, 'var', _List_Nil),
+			A2($author$project$Utilities$TreeViewer$Directory, 'var', _List_Nil),
 			_List_fromArray(
 				[
 					A2(
 					$zwilias$elm_rosetree$Tree$tree,
-					A2($author$project$Advent7$Directory, 'log', _List_Nil),
+					A2($author$project$Utilities$TreeViewer$Directory, 'log', _List_Nil),
 					_List_Nil)
 				]))
 		]));
@@ -7656,7 +7656,7 @@ var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Advent7$directoryToHtml = function (dir) {
+var $author$project$Utilities$TreeViewer$directoryToHtml = function (dir) {
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -7789,7 +7789,7 @@ var $zwilias$elm_rosetree$Tree$restructure = F3(
 			},
 			_List_Nil);
 	});
-var $author$project$Advent7$toListItems = F2(
+var $author$project$Utilities$TreeViewer$toListItems = F2(
 	function (label, children) {
 		if (!children.b) {
 			return A2(
@@ -7808,12 +7808,12 @@ var $author$project$Advent7$toListItems = F2(
 					]));
 		}
 	});
-var $author$project$Advent7$main = function (root) {
+var $author$project$Utilities$TreeViewer$main = function (root) {
 	return A2(
 		$elm$html$Html$ul,
 		_List_Nil,
 		_List_fromArray(
 			[root]));
 }(
-	A3($zwilias$elm_rosetree$Tree$restructure, $author$project$Advent7$directoryToHtml, $author$project$Advent7$toListItems, $author$project$Advent7$demoTree));
-_Platform_export({'Advent7':{'init':_VirtualDom_init($author$project$Advent7$main)(0)(0)}});}(this));
+	A3($zwilias$elm_rosetree$Tree$restructure, $author$project$Utilities$TreeViewer$directoryToHtml, $author$project$Utilities$TreeViewer$toListItems, $author$project$Utilities$TreeViewer$demoTree));
+_Platform_export({'Utilities':{'TreeViewer':{'init':_VirtualDom_init($author$project$Utilities$TreeViewer$main)(0)(0)}}});}(this));

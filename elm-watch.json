@@ -2,9 +2,9 @@
     "targets": {
         "My target name": {
             "inputs": [
-                "src/Advent7.elm"
+                "src/Utilities/TreeViewer.elm"
             ],
-            "output": "html/advent7.js"
+            "output": "html/directoryTreeView.js"
         }
     }
 }

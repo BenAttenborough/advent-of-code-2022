@@ -9,33 +9,39 @@ import Tree.Zipper as Zipper
 
 type alias Directory =
     { label : String
-    , files : List String
+    , files : List File
+    }
+
+
+type alias File =
+    { label : String
+    , size : Int
     }
 
 
 demoTree : Tree.Tree Directory
 demoTree =
-    tree (Directory "root" [ "a", "b", "c" ])
+    tree (Directory "root" [ File "a" 123, File "b" 54, File "c" 5432 ])
         [ tree (Directory "home" [])
             [ tree (Directory "user1" []) []
             , tree (Directory "user2" []) []
             ]
-        , tree (Directory "etc" []) []
+        , tree (Directory "etc" [ File "d" 5345, File "e" 24, File "f" 428 ]) []
         , tree (Directory "var" [])
             [ tree (Directory "log" []) []
             ]
         ]
 
 
-labelToHtml : Directory -> Html msg
-labelToHtml dir =
-    -- Html.text dir.label
+directoryToHtml : Directory -> Html msg
+directoryToHtml dir =
     Html.div []
         [ Html.p []
             [ Html.text (dir.label ++ " (DIR)") ]
         , Html.div []
-            [ Html.ul []
-                (List.map (\file -> Html.li [] [ Html.text file ]) dir.files)
+            [ dir.files
+                |> List.map (\file -> Html.li [] [ Html.text (file.label ++ " (" ++ String.fromInt file.size ++ ")") ])
+                |> Html.ul []
             ]
         ]
 
@@ -56,7 +62,7 @@ toListItems label children =
 main : Html msg
 main =
     demoTree
-        |> Tree.restructure labelToHtml toListItems
+        |> Tree.restructure directoryToHtml toListItems
         |> (\root -> Html.ul [] [ root ])
 
 
