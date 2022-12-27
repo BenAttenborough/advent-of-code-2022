@@ -21,16 +21,7 @@ type alias File =
 
 demoTree : Tree.Tree Directory
 demoTree =
-    tree (Directory "root" [ File "a" 123, File "b" 54, File "c" 5432 ])
-        [ tree (Directory "home" [])
-            [ tree (Directory "user1" []) []
-            , tree (Directory "user2" []) []
-            ]
-        , tree (Directory "etc" [ File "d" 5345, File "e" 24, File "f" 428 ]) []
-        , tree (Directory "var" [])
-            [ tree (Directory "log" []) []
-            ]
-        ]
+    Tree.singleton (Directory "root" [])
 
 
 directoryToHtml : Directory -> Html msg
@@ -62,8 +53,46 @@ toListItems label children =
 main : Html msg
 main =
     demoTree
+        |> Zipper.fromTree
+        |> Zipper.mapTree
+            addFolder
+        |> Zipper.toTree
+        -- |> Debug.toString
+        -- |> Html.text
         |> Tree.restructure directoryToHtml toListItems
         |> (\root -> Html.ul [] [ root ])
+
+
+addFolder : Tree.Tree Directory -> Tree.Tree Directory
+addFolder t =
+    case Tree.children t of
+        [] ->
+            Tree.replaceChildren
+                [ tree (Directory "home" []) [] ]
+                t
+
+        _ ->
+            Tree.prependChild
+                (tree (Directory "home" []) [])
+                t
+
+
+
+-- addChildToDirectory : Zipper.Zipper Directory -> Directory
+
+
+addChildToDirectory parent child =
+    let
+        data =
+            Tree.label parent
+
+        title =
+            data.label
+
+        files =
+            data.files
+    in
+    tree (Directory title files) [ child ]
 
 
 type TerminalEntry
