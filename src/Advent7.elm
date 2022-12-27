@@ -66,28 +66,6 @@ main =
         |> (\root -> Html.ul [] [ root ])
 
 
-
--- |> Zipper.fromTree
--- |> treeRecurrser [ Tree.label demoTree ] "-"
--- |> List.map
---     (\item ->
---         Html.div []
---             [ Html.text item ]
---     )
--- |> Html.div []
--- |> Debug.toString
--- |> Html.text
-
-
-treeRecurrser agg preprend tree =
-    case Zipper.forward tree of
-        Just a ->
-            treeRecurrser ((preprend ++ Zipper.label a) :: agg) (preprend ++ "-") a
-
-        Nothing ->
-            List.reverse agg
-
-
 type TerminalEntry
     = Command
     | Other
