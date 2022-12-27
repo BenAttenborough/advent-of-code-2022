@@ -3,14 +3,88 @@ module Advent7 exposing (..)
 import Advent7Data
 import Html exposing (Html)
 import Parser exposing (..)
+import Tree exposing (tree)
+import Tree.Zipper as Zipper
+
+
+type alias Directory =
+    { label : String
+    , files : List String
+    }
+
+
+demoTree : Tree.Tree Directory
+demoTree =
+    tree (Directory "root" [ "a", "b", "c" ])
+        [ tree (Directory "home" [])
+            [ tree (Directory "user1" []) []
+            , tree (Directory "user2" []) []
+            ]
+        , tree (Directory "etc" []) []
+        , tree (Directory "var" [])
+            [ tree (Directory "log" []) []
+            ]
+        ]
+
+
+labelToHtml : Directory -> Html msg
+labelToHtml dir =
+    -- Html.text dir.label
+    Html.div []
+        [ Html.p []
+            [ Html.text (dir.label ++ " (DIR)") ]
+        , Html.div []
+            [ Html.ul []
+                (List.map (\file -> Html.li [] [ Html.text file ]) dir.files)
+            ]
+        ]
+
+
+toListItems : Html msg -> List (Html msg) -> Html msg
+toListItems label children =
+    case children of
+        [] ->
+            Html.li [] [ label ]
+
+        _ ->
+            Html.li []
+                [ label
+                , Html.ul [] children
+                ]
 
 
 main : Html msg
 main =
-    Advent7Data.testInput
-        |> String.lines
-        |> Debug.toString
-        |> Html.text
+    demoTree
+        |> Tree.restructure labelToHtml toListItems
+        |> (\root -> Html.ul [] [ root ])
+
+
+
+-- |> Zipper.fromTree
+-- |> treeRecurrser [ Tree.label demoTree ] "-"
+-- |> List.map
+--     (\item ->
+--         Html.div []
+--             [ Html.text item ]
+--     )
+-- |> Html.div []
+-- |> Debug.toString
+-- |> Html.text
+
+
+treeRecurrser agg preprend tree =
+    case Zipper.forward tree of
+        Just a ->
+            treeRecurrser ((preprend ++ Zipper.label a) :: agg) (preprend ++ "-") a
+
+        Nothing ->
+            List.reverse agg
+
+
+type TerminalEntry
+    = Command
+    | Other
 
 
 type Command
@@ -18,7 +92,33 @@ type Command
     | LS
 
 
+commandParser : Parser Command
+commandParser =
+    succeed identity
+        |. symbol "$"
+        |. spaces
+        |= oneOf
+            [ succeed CD
+                |. keyword "cd"
+            , succeed LS
+                |. keyword "ls"
+            ]
 
+
+fileSizeParser : Parser Int
+fileSizeParser =
+    succeed identity
+        |= int
+
+
+
+-- lineParser : Parser a
+-- lineParser =
+--     succeed TerminalEntry
+--         |= oneOf
+--             [ commandParser
+--             , fileSizeParser
+--             ]
 -- type Directory
 --     = Empty String Int
 --     | Node String Int (List Directory)
@@ -37,28 +137,6 @@ type Command
 -- -- fileParser =
 -- --     succeed identity
 -- --         |
--- fileSizeParser : Parser Int
--- fileSizeParser =
---     succeed identity
---         |= int
--- commandParser : Parser Command
--- commandParser =
---     succeed identity
---         |. symbol "$"
---         |. spaces
---         |= oneOf
---             [ succeed CD
---                 |. keyword "cd"
---             , succeed LS
---                 |. keyword "ls"
---             ]
--- -- lineParser : Parser a
--- -- lineParser =
--- --     succeed identity
--- --         |= oneOf
--- --             [ commandParser
--- --             , fileSizeParser
--- --             ]
 -- -- commandParser : Parser Command
 -- -- commandParser =
 -- --     oneOf
