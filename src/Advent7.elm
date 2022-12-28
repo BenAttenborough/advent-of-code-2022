@@ -55,7 +55,26 @@ main =
     demoTree
         |> Zipper.fromTree
         |> Zipper.mapTree
-            addFolder
+            (addFolder
+                (tree (Directory "home" []) [])
+            )
+        |> Zipper.mapTree
+            (addFolder
+                (tree (Directory "var" []) [])
+            )
+        |> Zipper.findNext
+            (\x ->
+                x.label == "home"
+            )
+        |> Maybe.withDefault (Zipper.fromTree demoTree)
+        |> Zipper.mapTree
+            (addFolder
+                (tree (Directory "foo" []) [])
+            )
+        |> Zipper.mapTree
+            (addFolder
+                (tree (Directory "bar" []) [])
+            )
         |> Zipper.toTree
         -- |> Debug.toString
         -- |> Html.text
@@ -63,18 +82,47 @@ main =
         |> (\root -> Html.ul [] [ root ])
 
 
-addFolder : Tree.Tree Directory -> Tree.Tree Directory
-addFolder t =
-    case Tree.children t of
+changeDirectory : String -> Zipper.Zipper Directory -> Maybe (Zipper.Zipper Directory)
+changeDirectory needle haystack =
+    let
+        isNeedleInHaystack list =
+            list
+                |> List.any
+                    (\child ->
+                        let
+                            data =
+                                Tree.label child
+                        in
+                        data.label == needle
+                    )
+    in
+    haystack
+        |> Zipper.children
+        |> (\children ->
+                if isNeedleInHaystack children then
+                    Zipper.findNext
+                        (\x ->
+                            x.label == "home"
+                        )
+                        haystack
+
+                else
+                    Just haystack
+           )
+
+
+addFolder : Tree.Tree Directory -> Tree.Tree Directory -> Tree.Tree Directory
+addFolder child parent =
+    case Tree.children parent of
         [] ->
             Tree.replaceChildren
-                [ tree (Directory "home" []) [] ]
-                t
+                [ child ]
+                parent
 
         _ ->
             Tree.prependChild
-                (tree (Directory "home" []) [])
-                t
+                child
+                parent
 
 
 

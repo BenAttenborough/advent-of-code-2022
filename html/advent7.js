@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672164726916"
+    "1672185113899"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7522,65 +7522,46 @@ var $author$project$Advent7$Directory = F2(
 	function (label, files) {
 		return {files: files, label: label};
 	});
-var $author$project$Advent7$File = F2(
-	function (label, size) {
-		return {label: label, size: size};
-	});
+var $zwilias$elm_rosetree$Tree$children = function (_v0) {
+	var c = _v0.b;
+	return c;
+};
 var $zwilias$elm_rosetree$Tree$Tree = F2(
 	function (a, b) {
 		return {$: 'Tree', a: a, b: b};
 	});
-var $zwilias$elm_rosetree$Tree$tree = $zwilias$elm_rosetree$Tree$Tree;
-var $author$project$Advent7$demoTree = A2(
-	$zwilias$elm_rosetree$Tree$tree,
-	A2(
-		$author$project$Advent7$Directory,
-		'root',
-		_List_fromArray(
-			[
-				A2($author$project$Advent7$File, 'a', 123),
-				A2($author$project$Advent7$File, 'b', 54),
-				A2($author$project$Advent7$File, 'c', 5432)
-			])),
-	_List_fromArray(
-		[
-			A2(
-			$zwilias$elm_rosetree$Tree$tree,
-			A2($author$project$Advent7$Directory, 'home', _List_Nil),
-			_List_fromArray(
-				[
-					A2(
-					$zwilias$elm_rosetree$Tree$tree,
-					A2($author$project$Advent7$Directory, 'user1', _List_Nil),
-					_List_Nil),
-					A2(
-					$zwilias$elm_rosetree$Tree$tree,
-					A2($author$project$Advent7$Directory, 'user2', _List_Nil),
-					_List_Nil)
-				])),
-			A2(
-			$zwilias$elm_rosetree$Tree$tree,
-			A2(
-				$author$project$Advent7$Directory,
-				'etc',
+var $zwilias$elm_rosetree$Tree$prependChild = F2(
+	function (c, _v0) {
+		var v = _v0.a;
+		var cs = _v0.b;
+		return A2(
+			$zwilias$elm_rosetree$Tree$Tree,
+			v,
+			A2($elm$core$List$cons, c, cs));
+	});
+var $zwilias$elm_rosetree$Tree$replaceChildren = F2(
+	function (cs, _v0) {
+		var v = _v0.a;
+		return A2($zwilias$elm_rosetree$Tree$Tree, v, cs);
+	});
+var $author$project$Advent7$addFolder = F2(
+	function (child, parent) {
+		var _v0 = $zwilias$elm_rosetree$Tree$children(parent);
+		if (!_v0.b) {
+			return A2(
+				$zwilias$elm_rosetree$Tree$replaceChildren,
 				_List_fromArray(
-					[
-						A2($author$project$Advent7$File, 'd', 5345),
-						A2($author$project$Advent7$File, 'e', 24),
-						A2($author$project$Advent7$File, 'f', 428)
-					])),
-			_List_Nil),
-			A2(
-			$zwilias$elm_rosetree$Tree$tree,
-			A2($author$project$Advent7$Directory, 'var', _List_Nil),
-			_List_fromArray(
-				[
-					A2(
-					$zwilias$elm_rosetree$Tree$tree,
-					A2($author$project$Advent7$Directory, 'log', _List_Nil),
-					_List_Nil)
-				]))
-		]));
+					[child]),
+				parent);
+		} else {
+			return A2($zwilias$elm_rosetree$Tree$prependChild, child, parent);
+		}
+	});
+var $zwilias$elm_rosetree$Tree$singleton = function (v) {
+	return A2($zwilias$elm_rosetree$Tree$Tree, v, _List_Nil);
+};
+var $author$project$Advent7$demoTree = $zwilias$elm_rosetree$Tree$singleton(
+	A2($author$project$Advent7$Directory, 'root', _List_Nil));
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$core$List$foldrHelper = F4(
@@ -7693,6 +7674,190 @@ var $author$project$Advent7$directoryToHtml = function (dir) {
 					]))
 			]));
 };
+var $zwilias$elm_rosetree$Tree$label = function (_v0) {
+	var v = _v0.a;
+	return v;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
+	var focus = _v0.a.focus;
+	return focus;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
+	return $zwilias$elm_rosetree$Tree$label(
+		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
+};
+var $zwilias$elm_rosetree$Tree$Zipper$find = F3(
+	function (predicate, move, zipper) {
+		find:
+		while (true) {
+			var _v0 = move(zipper);
+			if (_v0.$ === 'Just') {
+				var next = _v0.a;
+				if (predicate(
+					$zwilias$elm_rosetree$Tree$Zipper$label(next))) {
+					return $elm$core$Maybe$Just(next);
+				} else {
+					var $temp$predicate = predicate,
+						$temp$move = move,
+						$temp$zipper = next;
+					predicate = $temp$predicate;
+					move = $temp$move;
+					zipper = $temp$zipper;
+					continue find;
+				}
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		}
+	});
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$Zipper = function (a) {
+	return {$: 'Zipper', a: a};
+};
+var $zwilias$elm_rosetree$Tree$Zipper$firstChild = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = $zwilias$elm_rosetree$Tree$children(zipper.focus);
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var c = _v1.a;
+		var cs = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: cs,
+					before: _List_Nil,
+					crumbs: A2(
+						$elm$core$List$cons,
+						{
+							after: zipper.after,
+							before: zipper.before,
+							label: $zwilias$elm_rosetree$Tree$label(zipper.focus)
+						},
+						zipper.crumbs),
+					focus: c
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$firstOf = F2(
+	function (options, v) {
+		firstOf:
+		while (true) {
+			if (!options.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var option = options.a;
+				var rest = options.b;
+				var _v1 = option(v);
+				if (_v1.$ === 'Just') {
+					var r = _v1.a;
+					return $elm$core$Maybe$Just(r);
+				} else {
+					var $temp$options = rest,
+						$temp$v = v;
+					options = $temp$options;
+					v = $temp$v;
+					continue firstOf;
+				}
+			}
+		}
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$nextSibling = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = zipper.after;
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var next = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: rest,
+					before: A2($elm$core$List$cons, zipper.focus, zipper.before),
+					crumbs: zipper.crumbs,
+					focus: next
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$tree = $zwilias$elm_rosetree$Tree$Tree;
+var $zwilias$elm_rosetree$Tree$Zipper$reconstruct = F4(
+	function (focus, before, after, l) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$tree,
+			l,
+			_Utils_ap(
+				$elm$core$List$reverse(before),
+				_Utils_ap(
+					_List_fromArray(
+						[focus]),
+					after)));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$parent = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = zipper.crumbs;
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var crumb = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: crumb.after,
+					before: crumb.before,
+					crumbs: rest,
+					focus: A4($zwilias$elm_rosetree$Tree$Zipper$reconstruct, zipper.focus, zipper.before, zipper.after, crumb.label)
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$nextSiblingOfAncestor = function (zipper) {
+	nextSiblingOfAncestor:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$parent(zipper);
+		if (_v0.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var parent_ = _v0.a;
+			var _v1 = $zwilias$elm_rosetree$Tree$Zipper$nextSibling(parent_);
+			if (_v1.$ === 'Nothing') {
+				var $temp$zipper = parent_;
+				zipper = $temp$zipper;
+				continue nextSiblingOfAncestor;
+			} else {
+				var s = _v1.a;
+				return $elm$core$Maybe$Just(s);
+			}
+		}
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$forward = function (zipper) {
+	return A2(
+		$zwilias$elm_rosetree$Tree$Zipper$firstOf,
+		_List_fromArray(
+			[$zwilias$elm_rosetree$Tree$Zipper$firstChild, $zwilias$elm_rosetree$Tree$Zipper$nextSibling, $zwilias$elm_rosetree$Tree$Zipper$nextSiblingOfAncestor]),
+		zipper);
+};
+var $zwilias$elm_rosetree$Tree$Zipper$findNext = F2(
+	function (f, zipper) {
+		return A3($zwilias$elm_rosetree$Tree$Zipper$find, f, $zwilias$elm_rosetree$Tree$Zipper$forward, zipper);
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$fromTree = function (t) {
+	return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
+		{after: _List_Nil, before: _List_Nil, crumbs: _List_Nil, focus: t});
+};
+var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
+	function (f, _v0) {
+		var zipper = _v0.a;
+		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
+			_Utils_update(
+				zipper,
+				{
+					focus: f(zipper.focus)
+				}));
+	});
 var $zwilias$elm_rosetree$Tree$restructureHelp = F4(
 	function (fLabel, fTree, acc, stack) {
 		restructureHelp:
@@ -7808,6 +7973,67 @@ var $author$project$Advent7$toListItems = F2(
 					]));
 		}
 	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$previousSibling = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = zipper.before;
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var previous = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: A2($elm$core$List$cons, zipper.focus, zipper.after),
+					before: rest,
+					crumbs: zipper.crumbs,
+					focus: previous
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$firstSibling = function (zipper) {
+	firstSibling:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$previousSibling(zipper);
+		if (_v0.$ === 'Nothing') {
+			return zipper;
+		} else {
+			var z = _v0.a;
+			var $temp$zipper = z;
+			zipper = $temp$zipper;
+			continue firstSibling;
+		}
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$root = function (zipper) {
+	root:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$parent(zipper);
+		if (_v0.$ === 'Nothing') {
+			return $zwilias$elm_rosetree$Tree$Zipper$firstSibling(zipper);
+		} else {
+			var z = _v0.a;
+			var $temp$zipper = z;
+			zipper = $temp$zipper;
+			continue root;
+		}
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$toTree = A2($elm$core$Basics$composeL, $zwilias$elm_rosetree$Tree$Zipper$tree, $zwilias$elm_rosetree$Tree$Zipper$root);
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
 var $author$project$Advent7$main = function (root) {
 	return A2(
 		$elm$html$Html$ul,
@@ -7815,5 +8041,46 @@ var $author$project$Advent7$main = function (root) {
 		_List_fromArray(
 			[root]));
 }(
-	A3($zwilias$elm_rosetree$Tree$restructure, $author$project$Advent7$directoryToHtml, $author$project$Advent7$toListItems, $author$project$Advent7$demoTree));
+	A3(
+		$zwilias$elm_rosetree$Tree$restructure,
+		$author$project$Advent7$directoryToHtml,
+		$author$project$Advent7$toListItems,
+		$zwilias$elm_rosetree$Tree$Zipper$toTree(
+			A2(
+				$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+				$author$project$Advent7$addFolder(
+					A2(
+						$zwilias$elm_rosetree$Tree$tree,
+						A2($author$project$Advent7$Directory, 'bar', _List_Nil),
+						_List_Nil)),
+				A2(
+					$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+					$author$project$Advent7$addFolder(
+						A2(
+							$zwilias$elm_rosetree$Tree$tree,
+							A2($author$project$Advent7$Directory, 'foo', _List_Nil),
+							_List_Nil)),
+					A2(
+						$elm$core$Maybe$withDefault,
+						$zwilias$elm_rosetree$Tree$Zipper$fromTree($author$project$Advent7$demoTree),
+						A2(
+							$zwilias$elm_rosetree$Tree$Zipper$findNext,
+							function (x) {
+								return x.label === 'home';
+							},
+							A2(
+								$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+								$author$project$Advent7$addFolder(
+									A2(
+										$zwilias$elm_rosetree$Tree$tree,
+										A2($author$project$Advent7$Directory, 'var', _List_Nil),
+										_List_Nil)),
+								A2(
+									$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+									$author$project$Advent7$addFolder(
+										A2(
+											$zwilias$elm_rosetree$Tree$tree,
+											A2($author$project$Advent7$Directory, 'home', _List_Nil),
+											_List_Nil)),
+									$zwilias$elm_rosetree$Tree$Zipper$fromTree($author$project$Advent7$demoTree))))))))));
 _Platform_export({'Advent7':{'init':_VirtualDom_init($author$project$Advent7$main)(0)(0)}});}(this));
