@@ -79,11 +79,24 @@ addFolderInternal child parent =
                 [ child ]
                 parent
 
-        _ ->
-            -- This really needs to check no siblings have the same "label" before adding child
-            Tree.prependChild
-                child
+        children ->
+            let
+                childData =
+                    Tree.label child
+
+                childrenLabels =
+                    List.map (\x -> Tree.label x) children
+
+                childLabelConflictsWithExisting =
+                    List.any (\item -> item.label == childData.label) childrenLabels
+            in
+            if childLabelConflictsWithExisting then
                 parent
+
+            else
+                Tree.prependChild
+                    child
+                    parent
 
 
 changeDirectory : String -> Zipper.Zipper Directory -> Zipper.Zipper Directory

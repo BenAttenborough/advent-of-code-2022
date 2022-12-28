@@ -18,7 +18,7 @@ main =
         |> Directory.addFolder (Directory.Directory "var" [])
         |> Directory.changeDirectory "var"
         |> Directory.addFolder (Directory.Directory "a" [])
-        -- We should force addFolder to refuse to ad directory with same name as one
+        -- We should force addFolder to refuse to add directory with same name as one
         -- that already exists (at that level)
         |> Directory.addFolder (Directory.Directory "a" [])
         |> toHtml
