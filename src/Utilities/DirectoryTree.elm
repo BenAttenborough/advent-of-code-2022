@@ -80,12 +80,13 @@ addFolderInternal child parent =
                 parent
 
         _ ->
+            -- This really needs to check no siblings have the same "label" before adding child
             Tree.prependChild
                 child
                 parent
 
 
-changeDirectory : String -> Zipper.Zipper Directory -> Maybe (Zipper.Zipper Directory)
+changeDirectory : String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
 changeDirectory needle haystack =
     let
         isNeedleInHaystack list =
@@ -108,7 +109,8 @@ changeDirectory needle haystack =
                             x.label == "home"
                         )
                         haystack
+                        |> Maybe.withDefault haystack
 
                 else
-                    Just haystack
+                    haystack
            )
