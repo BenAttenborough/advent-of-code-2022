@@ -4,6 +4,7 @@ import Browser
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (class, placeholder, value)
 import Html.Events exposing (keyCode, on, onClick, onInput)
+import Json.Decode as Decode exposing (Decoder, string)
 import Tree.Zipper as Zipper
 import Utilities.DirectoryTree exposing (..)
 
@@ -22,29 +23,42 @@ initialModel =
 
 
 type Msg
-    = SubmitCommand String
-    | OnChange String
+    = OnChange String
+    | OnKeyDown Int
 
 
 view : Model -> Html Msg
 view { command, directoryTree } =
     Html.div []
         [ div []
-            [ directoryTree |> toHtml
+            [ directoryTree |> toHtml ]
+        , input
+            [ placeholder "Type your command"
+            , value command
+            , onInput OnChange
+            , onKeyDown OnKeyDown
             ]
-        , input [ placeholder "Type your command", value command, onInput OnChange ] []
-        , button [ onClick (SubmitCommand command) ] [ text "Submit" ]
+            []
         ]
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SubmitCommand command ->
-            { model | directoryTree = singleton (Directory "root" [ File command 100 ]) }
-
         OnChange command ->
             { model | command = command }
+
+        OnKeyDown key ->
+            if key == 13 then
+                { model | directoryTree = singleton (Directory "root" [ File model.command 100 ]) }
+
+            else
+                model
+
+
+onKeyDown : (Int -> msg) -> Html.Attribute msg
+onKeyDown tagger =
+    on "keydown" (Decode.map tagger keyCode)
 
 
 main : Program () Model Msg
