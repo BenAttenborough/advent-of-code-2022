@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672352126514"
+    "1672354061156"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8332,9 +8332,14 @@ var $author$project$Utilities$DirectoryTree$File = F2(
 	});
 var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 	function (msg, model) {
-		if (msg.$ === 'SubmitCommand') {
+		if (msg.$ === 'OnChange') {
 			var command = msg.a;
 			return _Utils_update(
+				model,
+				{command: command});
+		} else {
+			var key = msg.a;
+			return (key === 13) ? _Utils_update(
 				model,
 				{
 					directoryTree: $author$project$Utilities$DirectoryTree$singleton(
@@ -8343,48 +8348,26 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 							'root',
 							_List_fromArray(
 								[
-									A2($author$project$Utilities$DirectoryTree$File, command, 100)
+									A2($author$project$Utilities$DirectoryTree$File, model.command, 100)
 								])))
-				});
-		} else {
-			var command = msg.a;
-			return _Utils_update(
-				model,
-				{command: command});
+				}) : model;
 		}
 	});
 var $author$project$AlternativeSolutions$DirectoryParser$OnChange = function (a) {
 	return {$: 'OnChange', a: a};
 };
-var $author$project$AlternativeSolutions$DirectoryParser$SubmitCommand = function (a) {
-	return {$: 'SubmitCommand', a: a};
+var $author$project$AlternativeSolutions$DirectoryParser$OnKeyDown = function (a) {
+	return {$: 'OnKeyDown', a: a};
 };
-var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$input = _VirtualDom_node('input');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $elm$html$Html$Events$alwaysStop = function (x) {
 	return _Utils_Tuple2(x, true);
 };
 var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var $elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -8412,6 +8395,24 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$html$Html$Events$keyCode = A2($elm$json$Json$Decode$field, 'keyCode', $elm$json$Json$Decode$int);
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $author$project$AlternativeSolutions$DirectoryParser$onKeyDown = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'keydown',
+		A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$keyCode));
+};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -8421,10 +8422,10 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$placeholder = $elm$html$Html$Attributes$stringProperty('placeholder');
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$html$Html$ul = _VirtualDom_node('ul');
 var $author$project$Utilities$DirectoryTree$directoryToHtml = function (dir) {
 	return A2(
@@ -8701,20 +8702,10 @@ var $author$project$AlternativeSolutions$DirectoryParser$view = function (_v0) {
 					[
 						$elm$html$Html$Attributes$placeholder('Type your command'),
 						$elm$html$Html$Attributes$value(command),
-						$elm$html$Html$Events$onInput($author$project$AlternativeSolutions$DirectoryParser$OnChange)
+						$elm$html$Html$Events$onInput($author$project$AlternativeSolutions$DirectoryParser$OnChange),
+						$author$project$AlternativeSolutions$DirectoryParser$onKeyDown($author$project$AlternativeSolutions$DirectoryParser$OnKeyDown)
 					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick(
-						$author$project$AlternativeSolutions$DirectoryParser$SubmitCommand(command))
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Submit')
-					]))
+				_List_Nil)
 			]));
 };
 var $author$project$AlternativeSolutions$DirectoryParser$main = $elm$browser$Browser$sandbox(
