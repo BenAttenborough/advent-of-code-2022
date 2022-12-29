@@ -1,24 +1,26 @@
 module AlternativeSolutions.Directory exposing (..)
 
 import Html exposing (Html)
-import Tree
 import Tree.Zipper as Zipper
 import Utilities.DirectoryTree as Directory exposing (..)
 
 
 demoTree : Zipper.Zipper Directory
 demoTree =
-    Directory.singleton (Directory.Directory "root" [])
+    singleton (Directory "root" [])
 
 
 main : Html msg
 main =
     demoTree
-        |> Directory.addFolder (Directory.Directory "home" [])
-        |> Directory.addFolder (Directory.Directory "var" [])
-        |> Directory.changeDirectory "var"
-        |> Directory.addFolder (Directory.Directory "a" [])
-        -- We should force addFolder to refuse to add directory with same name as one
-        -- that already exists (at that level)
-        |> Directory.addFolder (Directory.Directory "a" [])
+        |> addFolder (Directory "home" [])
+        |> addFolder (Directory "var" [])
+        |> changeDirectory "var"
+        |> addFolder (Directory "a" [])
+        |> addFile (File "Main.elm" 100)
+        |> changeDirectory "a"
+        |> addFiles
+            [ File "Main.elm" 200
+            , File "README.md" 100
+            ]
         |> toHtml

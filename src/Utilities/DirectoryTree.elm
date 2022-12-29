@@ -1,4 +1,4 @@
-module Utilities.DirectoryTree exposing (Directory, DirectoryTree, addFolder, changeDirectory, singleton, toHtml)
+module Utilities.DirectoryTree exposing (Directory, DirectoryTree, File, addFile, addFiles, addFolder, changeDirectory, singleton, toHtml)
 
 import Html exposing (Html)
 import Parser exposing (..)
@@ -119,7 +119,7 @@ changeDirectory needle haystack =
                 if isNeedleInHaystack children then
                     Zipper.findNext
                         (\x ->
-                            x.label == "home"
+                            x.label == needle
                         )
                         haystack
                         |> Maybe.withDefault haystack
@@ -127,3 +127,31 @@ changeDirectory needle haystack =
                 else
                     haystack
            )
+
+
+addFiles : List File -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+addFiles files directory =
+    let
+        data =
+            Zipper.label directory
+
+        exisitingFiles =
+            data.files
+
+        usedLabels =
+            List.map .label exisitingFiles
+
+        filesToAppend =
+            List.filter (\l -> not (List.member l.label usedLabels)) files
+
+        appendableFiles =
+            List.append exisitingFiles filesToAppend
+    in
+    Zipper.replaceLabel
+        { data | files = appendableFiles }
+        directory
+
+
+addFile : File -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+addFile file directory =
+    addFiles [ file ] directory

@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672253221092"
+    "1672319435539"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7522,35 +7522,10 @@ var $author$project$Utilities$DirectoryTree$Directory = F2(
 	function (label, files) {
 		return {files: files, label: label};
 	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
+var $author$project$Utilities$DirectoryTree$File = F2(
+	function (label, size) {
+		return {label: label, size: size};
 	});
-var $zwilias$elm_rosetree$Tree$children = function (_v0) {
-	var c = _v0.b;
-	return c;
-};
-var $zwilias$elm_rosetree$Tree$label = function (_v0) {
-	var v = _v0.a;
-	return v;
-};
 var $elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -7606,6 +7581,37 @@ var $elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $zwilias$elm_rosetree$Tree$label = function (_v0) {
+	var v = _v0.a;
+	return v;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
+	var focus = _v0.a.focus;
+	return focus;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
+	return $zwilias$elm_rosetree$Tree$label(
+		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
+};
 var $elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -7620,10 +7626,120 @@ var $elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
 var $zwilias$elm_rosetree$Tree$Tree = F2(
 	function (a, b) {
 		return {$: 'Tree', a: a, b: b};
 	});
+var $zwilias$elm_rosetree$Tree$mapLabel = F2(
+	function (f, _v0) {
+		var v = _v0.a;
+		var cs = _v0.b;
+		return A2(
+			$zwilias$elm_rosetree$Tree$Tree,
+			f(v),
+			cs);
+	});
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$Zipper = function (a) {
+	return {$: 'Zipper', a: a};
+};
+var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
+	function (f, _v0) {
+		var zipper = _v0.a;
+		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
+			_Utils_update(
+				zipper,
+				{
+					focus: f(zipper.focus)
+				}));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$mapLabel = F2(
+	function (f, zipper) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+			$zwilias$elm_rosetree$Tree$mapLabel(f),
+			zipper);
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$replaceLabel = F2(
+	function (l, zipper) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$mapLabel,
+			$elm$core$Basics$always(l),
+			zipper);
+	});
+var $author$project$Utilities$DirectoryTree$addFiles = F2(
+	function (files, directory) {
+		var data = $zwilias$elm_rosetree$Tree$Zipper$label(directory);
+		var exisitingFiles = data.files;
+		var usedLabels = A2(
+			$elm$core$List$map,
+			function ($) {
+				return $.label;
+			},
+			exisitingFiles);
+		var filesToAppend = A2(
+			$elm$core$List$filter,
+			function (l) {
+				return !A2($elm$core$List$member, l.label, usedLabels);
+			},
+			files);
+		var appendableFiles = A2($elm$core$List$append, exisitingFiles, filesToAppend);
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$replaceLabel,
+			_Utils_update(
+				data,
+				{files: appendableFiles}),
+			directory);
+	});
+var $author$project$Utilities$DirectoryTree$addFile = F2(
+	function (file, directory) {
+		return A2(
+			$author$project$Utilities$DirectoryTree$addFiles,
+			_List_fromArray(
+				[file]),
+			directory);
+	});
+var $zwilias$elm_rosetree$Tree$children = function (_v0) {
+	var c = _v0.b;
+	return c;
+};
 var $zwilias$elm_rosetree$Tree$prependChild = F2(
 	function (c, _v0) {
 		var v = _v0.a;
@@ -7665,22 +7781,6 @@ var $author$project$Utilities$DirectoryTree$addFolderInternal = F2(
 			return childLabelConflictsWithExisting ? parent : A2($zwilias$elm_rosetree$Tree$prependChild, child, parent);
 		}
 	});
-var $elm$core$Basics$identity = function (x) {
-	return x;
-};
-var $zwilias$elm_rosetree$Tree$Zipper$Zipper = function (a) {
-	return {$: 'Zipper', a: a};
-};
-var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
-	function (f, _v0) {
-		var zipper = _v0.a;
-		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
-			_Utils_update(
-				zipper,
-				{
-					focus: f(zipper.focus)
-				}));
-	});
 var $zwilias$elm_rosetree$Tree$tree = $zwilias$elm_rosetree$Tree$Tree;
 var $author$project$Utilities$DirectoryTree$addFolder = F2(
 	function (folder, parent) {
@@ -7690,16 +7790,8 @@ var $author$project$Utilities$DirectoryTree$addFolder = F2(
 				A2($zwilias$elm_rosetree$Tree$tree, folder, _List_Nil)),
 			parent);
 	});
-var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
-	var focus = _v0.a.focus;
-	return focus;
-};
 var $zwilias$elm_rosetree$Tree$Zipper$children = function (zipper) {
 	return $zwilias$elm_rosetree$Tree$children(
-		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
-};
-var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
-	return $zwilias$elm_rosetree$Tree$label(
 		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
 };
 var $zwilias$elm_rosetree$Tree$Zipper$find = F3(
@@ -7880,7 +7972,7 @@ var $author$project$Utilities$DirectoryTree$changeDirectory = F2(
 				A2(
 					$zwilias$elm_rosetree$Tree$Zipper$findNext,
 					function (x) {
-						return x.label === 'home';
+						return _Utils_eq(x.label, needle);
 					},
 					haystack)) : haystack;
 		}(
@@ -8125,19 +8217,29 @@ var $author$project$Utilities$DirectoryTree$toHtml = function (dir) {
 };
 var $author$project$AlternativeSolutions$Directory$main = $author$project$Utilities$DirectoryTree$toHtml(
 	A2(
-		$author$project$Utilities$DirectoryTree$addFolder,
-		A2($author$project$Utilities$DirectoryTree$Directory, 'a', _List_Nil),
+		$author$project$Utilities$DirectoryTree$addFiles,
+		_List_fromArray(
+			[
+				A2($author$project$Utilities$DirectoryTree$File, 'Main.elm', 200),
+				A2($author$project$Utilities$DirectoryTree$File, 'README.md', 100)
+			]),
 		A2(
-			$author$project$Utilities$DirectoryTree$addFolder,
-			A2($author$project$Utilities$DirectoryTree$Directory, 'a', _List_Nil),
+			$author$project$Utilities$DirectoryTree$changeDirectory,
+			'a',
 			A2(
-				$author$project$Utilities$DirectoryTree$changeDirectory,
-				'var',
+				$author$project$Utilities$DirectoryTree$addFile,
+				A2($author$project$Utilities$DirectoryTree$File, 'Main.elm', 100),
 				A2(
 					$author$project$Utilities$DirectoryTree$addFolder,
-					A2($author$project$Utilities$DirectoryTree$Directory, 'var', _List_Nil),
+					A2($author$project$Utilities$DirectoryTree$Directory, 'a', _List_Nil),
 					A2(
-						$author$project$Utilities$DirectoryTree$addFolder,
-						A2($author$project$Utilities$DirectoryTree$Directory, 'home', _List_Nil),
-						$author$project$AlternativeSolutions$Directory$demoTree))))));
+						$author$project$Utilities$DirectoryTree$changeDirectory,
+						'var',
+						A2(
+							$author$project$Utilities$DirectoryTree$addFolder,
+							A2($author$project$Utilities$DirectoryTree$Directory, 'var', _List_Nil),
+							A2(
+								$author$project$Utilities$DirectoryTree$addFolder,
+								A2($author$project$Utilities$DirectoryTree$Directory, 'home', _List_Nil),
+								$author$project$AlternativeSolutions$Directory$demoTree))))))));
 _Platform_export({'AlternativeSolutions':{'Directory':{'init':_VirtualDom_init($author$project$AlternativeSolutions$Directory$main)(0)(0)}}});}(this));
