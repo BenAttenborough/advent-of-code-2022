@@ -2,7 +2,7 @@ module AlternativeSolutions.Directory exposing (..)
 
 import Html exposing (Html)
 import Tree.Zipper as Zipper
-import Utilities.DirectoryTree as Directory exposing (..)
+import Utilities.DirectoryTree exposing (..)
 
 
 demoTree : Zipper.Zipper Directory
