@@ -103,6 +103,14 @@ update msg model =
                                             , terminalInput = ""
                                         }
 
+                            Touch fileName fileSize ->
+                                { model
+                                    | directoryTree = addFile (File fileName fileSize) model.directoryTree
+                                    , terminalOutput =
+                                        List.append model.terminalOutput [ "Created file" ]
+                                    , terminalInput = ""
+                                }
+
                     Err error ->
                         { model
                             | terminalOutput =
@@ -123,6 +131,7 @@ type Command
     = CD String
     | LS
     | MakeDir String
+    | Touch String Int
 
 
 word : Parser String
@@ -147,6 +156,12 @@ commandParser =
                 |. keyword "mkdir"
                 |. spaces
                 |= word
+            , succeed Touch
+                |. keyword "touch"
+                |. spaces
+                |= word
+                |. spaces
+                |= int
             ]
 
 

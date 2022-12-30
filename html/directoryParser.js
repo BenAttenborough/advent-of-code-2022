@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672442809821"
+    "1672443221826"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8457,6 +8457,41 @@ var $elm$browser$Browser$sandbox = function (impl) {
 			_impl: impl // added by elm-watch
 		});
 };
+var $author$project$Utilities$DirectoryTree$File = F2(
+	function (label, size) {
+		return {label: label, size: size};
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $zwilias$elm_rosetree$Tree$label = function (_v0) {
+	var v = _v0.a;
+	return v;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
+	var focus = _v0.a.focus;
+	return focus;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
+	return $zwilias$elm_rosetree$Tree$label(
+		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
+};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -8478,10 +8513,85 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $zwilias$elm_rosetree$Tree$label = function (_v0) {
-	var v = _v0.a;
-	return v;
-};
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
+var $zwilias$elm_rosetree$Tree$mapLabel = F2(
+	function (f, _v0) {
+		var v = _v0.a;
+		var cs = _v0.b;
+		return A2(
+			$zwilias$elm_rosetree$Tree$Tree,
+			f(v),
+			cs);
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
+	function (f, _v0) {
+		var zipper = _v0.a;
+		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
+			_Utils_update(
+				zipper,
+				{
+					focus: f(zipper.focus)
+				}));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$mapLabel = F2(
+	function (f, zipper) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+			$zwilias$elm_rosetree$Tree$mapLabel(f),
+			zipper);
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$replaceLabel = F2(
+	function (l, zipper) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$mapLabel,
+			$elm$core$Basics$always(l),
+			zipper);
+	});
+var $author$project$Utilities$DirectoryTree$addFiles = F2(
+	function (files, directory) {
+		var data = $zwilias$elm_rosetree$Tree$Zipper$label(directory);
+		var exisitingFiles = data.files;
+		var usedLabels = A2(
+			$elm$core$List$map,
+			function ($) {
+				return $.label;
+			},
+			exisitingFiles);
+		var filesToAppend = A2(
+			$elm$core$List$filter,
+			function (l) {
+				return !A2($elm$core$List$member, l.label, usedLabels);
+			},
+			files);
+		var appendableFiles = A2($elm$core$List$append, exisitingFiles, filesToAppend);
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$replaceLabel,
+			_Utils_update(
+				data,
+				{files: appendableFiles}),
+			directory);
+	});
+var $author$project$Utilities$DirectoryTree$addFile = F2(
+	function (file, directory) {
+		return A2(
+			$author$project$Utilities$DirectoryTree$addFiles,
+			_List_fromArray(
+				[file]),
+			directory);
+	});
 var $author$project$Utilities$DirectoryTree$childLabelConflictsWithExisting = F2(
 	function (child, children) {
 		var childrenLabels = A2(
@@ -8529,16 +8639,6 @@ var $author$project$Utilities$DirectoryTree$addFolderInternal = F2(
 			var children = _v0;
 			return A2($author$project$Utilities$DirectoryTree$childLabelConflictsWithExisting, child, children) ? parent : A2($zwilias$elm_rosetree$Tree$prependChild, child, parent);
 		}
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
-	function (f, _v0) {
-		var zipper = _v0.a;
-		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
-			_Utils_update(
-				zipper,
-				{
-					focus: f(zipper.focus)
-				}));
 	});
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
@@ -8622,10 +8722,6 @@ var $zwilias$elm_rosetree$Tree$Zipper$root = function (zipper) {
 		}
 	}
 };
-var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
-	var focus = _v0.a.focus;
-	return focus;
-};
 var $zwilias$elm_rosetree$Tree$Zipper$toTree = A2($elm$core$Basics$composeL, $zwilias$elm_rosetree$Tree$Zipper$tree, $zwilias$elm_rosetree$Tree$Zipper$root);
 var $author$project$Utilities$DirectoryTree$addFolderCommand = F2(
 	function (folder, parent) {
@@ -8640,20 +8736,8 @@ var $author$project$Utilities$DirectoryTree$addFolderCommand = F2(
 					A2($zwilias$elm_rosetree$Tree$tree, folder, _List_Nil)),
 				parent));
 	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $zwilias$elm_rosetree$Tree$Zipper$children = function (zipper) {
 	return $zwilias$elm_rosetree$Tree$children(
-		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
-};
-var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
-	return $zwilias$elm_rosetree$Tree$label(
 		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
 };
 var $zwilias$elm_rosetree$Tree$Zipper$find = F3(
@@ -8817,9 +8901,9 @@ var $author$project$AlternativeSolutions$DirectoryParser$LS = {$: 'LS'};
 var $author$project$AlternativeSolutions$DirectoryParser$MakeDir = function (a) {
 	return {$: 'MakeDir', a: a};
 };
-var $elm$core$Basics$always = F2(
-	function (a, _v0) {
-		return a;
+var $author$project$AlternativeSolutions$DirectoryParser$Touch = F2(
+	function (a, b) {
+		return {$: 'Touch', a: a, b: b};
 	});
 var $elm$parser$Parser$Advanced$Bad = F2(
 	function (a, b) {
@@ -8870,17 +8954,35 @@ var $elm$parser$Parser$Advanced$ignorer = F2(
 		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$always, keepParser, ignoreParser);
 	});
 var $elm$parser$Parser$ignorer = $elm$parser$Parser$Advanced$ignorer;
-var $elm$parser$Parser$Advanced$keeper = F2(
-	function (parseFunc, parseArg) {
-		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$apL, parseFunc, parseArg);
+var $elm$parser$Parser$ExpectingInt = {$: 'ExpectingInt'};
+var $elm$parser$Parser$Advanced$consumeBase = _Parser_consumeBase;
+var $elm$parser$Parser$Advanced$consumeBase16 = _Parser_consumeBase16;
+var $elm$parser$Parser$Advanced$bumpOffset = F2(
+	function (newOffset, s) {
+		return {col: s.col + (newOffset - s.offset), context: s.context, indent: s.indent, offset: newOffset, row: s.row, src: s.src};
 	});
-var $elm$parser$Parser$keeper = $elm$parser$Parser$Advanced$keeper;
-var $elm$parser$Parser$ExpectingKeyword = function (a) {
-	return {$: 'ExpectingKeyword', a: a};
+var $elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
+var $elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
 };
-var $elm$parser$Parser$Advanced$Token = F2(
-	function (a, b) {
-		return {$: 'Token', a: a, b: b};
+var $elm$parser$Parser$Advanced$consumeExp = F2(
+	function (offset, src) {
+		if (A3($elm$parser$Parser$Advanced$isAsciiCode, 101, offset, src) || A3($elm$parser$Parser$Advanced$isAsciiCode, 69, offset, src)) {
+			var eOffset = offset + 1;
+			var expOffset = (A3($elm$parser$Parser$Advanced$isAsciiCode, 43, eOffset, src) || A3($elm$parser$Parser$Advanced$isAsciiCode, 45, eOffset, src)) ? (eOffset + 1) : eOffset;
+			var newOffset = A2($elm$parser$Parser$Advanced$chompBase10, expOffset, src);
+			return _Utils_eq(expOffset, newOffset) ? (-newOffset) : newOffset;
+		} else {
+			return offset;
+		}
+	});
+var $elm$parser$Parser$Advanced$consumeDotAndExp = F2(
+	function (offset, src) {
+		return A3($elm$parser$Parser$Advanced$isAsciiCode, 46, offset, src) ? A2(
+			$elm$parser$Parser$Advanced$consumeExp,
+			A2($elm$parser$Parser$Advanced$chompBase10, offset + 1, src),
+			src) : A2($elm$parser$Parser$Advanced$consumeExp, offset, src);
 	});
 var $elm$parser$Parser$Advanced$AddRight = F2(
 	function (a, b) {
@@ -8898,12 +9000,155 @@ var $elm$parser$Parser$Advanced$fromState = F2(
 			$elm$parser$Parser$Advanced$Empty,
 			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
 	});
+var $elm$parser$Parser$Advanced$finalizeInt = F5(
+	function (invalid, handler, startOffset, _v0, s) {
+		var endOffset = _v0.a;
+		var n = _v0.b;
+		if (handler.$ === 'Err') {
+			var x = handler.a;
+			return A2(
+				$elm$parser$Parser$Advanced$Bad,
+				true,
+				A2($elm$parser$Parser$Advanced$fromState, s, x));
+		} else {
+			var toValue = handler.a;
+			return _Utils_eq(startOffset, endOffset) ? A2(
+				$elm$parser$Parser$Advanced$Bad,
+				_Utils_cmp(s.offset, startOffset) < 0,
+				A2($elm$parser$Parser$Advanced$fromState, s, invalid)) : A3(
+				$elm$parser$Parser$Advanced$Good,
+				true,
+				toValue(n),
+				A2($elm$parser$Parser$Advanced$bumpOffset, endOffset, s));
+		}
+	});
+var $elm$parser$Parser$Advanced$fromInfo = F4(
+	function (row, col, x, context) {
+		return A2(
+			$elm$parser$Parser$Advanced$AddRight,
+			$elm$parser$Parser$Advanced$Empty,
+			A4($elm$parser$Parser$Advanced$DeadEnd, row, col, x, context));
+	});
+var $elm$core$String$toFloat = _String_toFloat;
+var $elm$parser$Parser$Advanced$finalizeFloat = F6(
+	function (invalid, expecting, intSettings, floatSettings, intPair, s) {
+		var intOffset = intPair.a;
+		var floatOffset = A2($elm$parser$Parser$Advanced$consumeDotAndExp, intOffset, s.src);
+		if (floatOffset < 0) {
+			return A2(
+				$elm$parser$Parser$Advanced$Bad,
+				true,
+				A4($elm$parser$Parser$Advanced$fromInfo, s.row, s.col - (floatOffset + s.offset), invalid, s.context));
+		} else {
+			if (_Utils_eq(s.offset, floatOffset)) {
+				return A2(
+					$elm$parser$Parser$Advanced$Bad,
+					false,
+					A2($elm$parser$Parser$Advanced$fromState, s, expecting));
+			} else {
+				if (_Utils_eq(intOffset, floatOffset)) {
+					return A5($elm$parser$Parser$Advanced$finalizeInt, invalid, intSettings, s.offset, intPair, s);
+				} else {
+					if (floatSettings.$ === 'Err') {
+						var x = floatSettings.a;
+						return A2(
+							$elm$parser$Parser$Advanced$Bad,
+							true,
+							A2($elm$parser$Parser$Advanced$fromState, s, invalid));
+					} else {
+						var toValue = floatSettings.a;
+						var _v1 = $elm$core$String$toFloat(
+							A3($elm$core$String$slice, s.offset, floatOffset, s.src));
+						if (_v1.$ === 'Nothing') {
+							return A2(
+								$elm$parser$Parser$Advanced$Bad,
+								true,
+								A2($elm$parser$Parser$Advanced$fromState, s, invalid));
+						} else {
+							var n = _v1.a;
+							return A3(
+								$elm$parser$Parser$Advanced$Good,
+								true,
+								toValue(n),
+								A2($elm$parser$Parser$Advanced$bumpOffset, floatOffset, s));
+						}
+					}
+				}
+			}
+		}
+	});
+var $elm$parser$Parser$Advanced$number = function (c) {
+	return $elm$parser$Parser$Advanced$Parser(
+		function (s) {
+			if (A3($elm$parser$Parser$Advanced$isAsciiCode, 48, s.offset, s.src)) {
+				var zeroOffset = s.offset + 1;
+				var baseOffset = zeroOffset + 1;
+				return A3($elm$parser$Parser$Advanced$isAsciiCode, 120, zeroOffset, s.src) ? A5(
+					$elm$parser$Parser$Advanced$finalizeInt,
+					c.invalid,
+					c.hex,
+					baseOffset,
+					A2($elm$parser$Parser$Advanced$consumeBase16, baseOffset, s.src),
+					s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 111, zeroOffset, s.src) ? A5(
+					$elm$parser$Parser$Advanced$finalizeInt,
+					c.invalid,
+					c.octal,
+					baseOffset,
+					A3($elm$parser$Parser$Advanced$consumeBase, 8, baseOffset, s.src),
+					s) : (A3($elm$parser$Parser$Advanced$isAsciiCode, 98, zeroOffset, s.src) ? A5(
+					$elm$parser$Parser$Advanced$finalizeInt,
+					c.invalid,
+					c.binary,
+					baseOffset,
+					A3($elm$parser$Parser$Advanced$consumeBase, 2, baseOffset, s.src),
+					s) : A6(
+					$elm$parser$Parser$Advanced$finalizeFloat,
+					c.invalid,
+					c.expecting,
+					c._int,
+					c._float,
+					_Utils_Tuple2(zeroOffset, 0),
+					s)));
+			} else {
+				return A6(
+					$elm$parser$Parser$Advanced$finalizeFloat,
+					c.invalid,
+					c.expecting,
+					c._int,
+					c._float,
+					A3($elm$parser$Parser$Advanced$consumeBase, 10, s.offset, s.src),
+					s);
+			}
+		});
+};
+var $elm$parser$Parser$Advanced$int = F2(
+	function (expecting, invalid) {
+		return $elm$parser$Parser$Advanced$number(
+			{
+				binary: $elm$core$Result$Err(invalid),
+				expecting: expecting,
+				_float: $elm$core$Result$Err(invalid),
+				hex: $elm$core$Result$Err(invalid),
+				_int: $elm$core$Result$Ok($elm$core$Basics$identity),
+				invalid: invalid,
+				octal: $elm$core$Result$Err(invalid)
+			});
+	});
+var $elm$parser$Parser$int = A2($elm$parser$Parser$Advanced$int, $elm$parser$Parser$ExpectingInt, $elm$parser$Parser$ExpectingInt);
+var $elm$parser$Parser$Advanced$keeper = F2(
+	function (parseFunc, parseArg) {
+		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$apL, parseFunc, parseArg);
+	});
+var $elm$parser$Parser$keeper = $elm$parser$Parser$Advanced$keeper;
+var $elm$parser$Parser$ExpectingKeyword = function (a) {
+	return {$: 'ExpectingKeyword', a: a};
+};
+var $elm$parser$Parser$Advanced$Token = F2(
+	function (a, b) {
+		return {$: 'Token', a: a, b: b};
+	});
 var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
 var $elm$parser$Parser$Advanced$isSubString = _Parser_isSubString;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$Basics$not = _Basics_not;
 var $elm$parser$Parser$Advanced$keyword = function (_v0) {
 	var kwd = _v0.a;
 	var expecting = _v0.b;
@@ -9136,7 +9381,20 @@ var $author$project$AlternativeSolutions$DirectoryParser$commandParser = A2(
 						$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$MakeDir),
 						$elm$parser$Parser$keyword('mkdir')),
 					$elm$parser$Parser$spaces),
-				$author$project$AlternativeSolutions$DirectoryParser$word)
+				$author$project$AlternativeSolutions$DirectoryParser$word),
+				A2(
+				$elm$parser$Parser$keeper,
+				A2(
+					$elm$parser$Parser$keeper,
+					A2(
+						$elm$parser$Parser$ignorer,
+						A2(
+							$elm$parser$Parser$ignorer,
+							$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$Touch),
+							$elm$parser$Parser$keyword('touch')),
+						$elm$parser$Parser$spaces),
+					A2($elm$parser$Parser$ignorer, $author$project$AlternativeSolutions$DirectoryParser$word, $elm$parser$Parser$spaces)),
+				$elm$parser$Parser$int)
 			])));
 var $elm$parser$Parser$deadEndsToString = function (deadEnds) {
 	return 'TODO deadEndsToString';
@@ -9254,7 +9512,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 										_List_fromArray(
 											['List']))
 								});
-						default:
+						case 'MakeDir':
 							var name = command.a;
 							var _v4 = A2(
 								$author$project$Utilities$DirectoryTree$addFolderCommand,
@@ -9286,6 +9544,23 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 												[err]))
 									});
 							}
+						default:
+							var fileName = command.a;
+							var fileSize = command.b;
+							return _Utils_update(
+								model,
+								{
+									directoryTree: A2(
+										$author$project$Utilities$DirectoryTree$addFile,
+										A2($author$project$Utilities$DirectoryTree$File, fileName, fileSize),
+										model.directoryTree),
+									terminalInput: '',
+									terminalOutput: A2(
+										$elm$core$List$append,
+										model.terminalOutput,
+										_List_fromArray(
+											['Created file']))
+								});
 					}
 				} else {
 					var error = parserResult.a;
