@@ -1,4 +1,4 @@
-module Utilities.DirectoryTree exposing (Directory, DirectoryTree, File, addFile, addFiles, addFolder, changeDirectory, singleton, toHtml)
+module Utilities.DirectoryTree exposing (Directory, DirectoryTree, File, addFile, addFiles, addFolder, addFolderCommand, changeDirectory, changeDirectoryCommand, singleton, toHtml)
 
 import Html exposing (Html)
 import Parser exposing (..)
@@ -71,6 +71,18 @@ addFolder folder parent =
             )
 
 
+childLabelConflictsWithExisting : Tree Directory -> List (Tree Directory) -> Bool
+childLabelConflictsWithExisting child children =
+    let
+        childData =
+            Tree.label child
+
+        childrenLabels =
+            List.map (\x -> Tree.label x) children
+    in
+    List.any (\item -> item.label == childData.label) childrenLabels
+
+
 addFolderInternal : Tree.Tree Directory -> Tree.Tree Directory -> Tree.Tree Directory
 addFolderInternal child parent =
     case Tree.children parent of
@@ -80,23 +92,27 @@ addFolderInternal child parent =
                 parent
 
         children ->
-            let
-                childData =
-                    Tree.label child
-
-                childrenLabels =
-                    List.map (\x -> Tree.label x) children
-
-                childLabelConflictsWithExisting =
-                    List.any (\item -> item.label == childData.label) childrenLabels
-            in
-            if childLabelConflictsWithExisting then
+            if childLabelConflictsWithExisting child children then
                 parent
 
             else
                 Tree.prependChild
                     child
                     parent
+
+
+addFolderCommand : Directory -> Zipper.Zipper Directory -> Result String (Zipper.Zipper Directory)
+addFolderCommand folder parent =
+    if childLabelConflictsWithExisting (tree folder []) (Tree.children (Zipper.toTree parent)) then
+        Err ("mkdir: " ++ folder.label ++ ": File exists")
+
+    else
+        parent
+            |> Zipper.mapTree
+                (addFolderInternal
+                    (tree folder [])
+                )
+            |> Ok
 
 
 changeDirectory : String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
@@ -126,6 +142,36 @@ changeDirectory needle haystack =
 
                 else
                     haystack
+           )
+
+
+changeDirectoryCommand : String -> Zipper.Zipper Directory -> Result String (Zipper.Zipper Directory)
+changeDirectoryCommand needle haystack =
+    let
+        isNeedleInHaystack list =
+            list
+                |> List.any
+                    (\child ->
+                        let
+                            data =
+                                Tree.label child
+                        in
+                        data.label == needle
+                    )
+    in
+    haystack
+        |> Zipper.children
+        |> (\children ->
+                if isNeedleInHaystack children then
+                    Zipper.findNext
+                        (\x ->
+                            x.label == needle
+                        )
+                        haystack
+                        |> Result.fromMaybe "THIS ERROR SHOULD BE IMPOSSIBLE"
+
+                else
+                    Err "Directory not found"
            )
 
 

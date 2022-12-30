@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672423465898"
+    "1672442702064"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8478,13 +8478,29 @@ var $elm$core$List$any = F2(
 			}
 		}
 	});
-var $zwilias$elm_rosetree$Tree$children = function (_v0) {
-	var c = _v0.b;
-	return c;
-};
 var $zwilias$elm_rosetree$Tree$label = function (_v0) {
 	var v = _v0.a;
 	return v;
+};
+var $author$project$Utilities$DirectoryTree$childLabelConflictsWithExisting = F2(
+	function (child, children) {
+		var childrenLabels = A2(
+			$elm$core$List$map,
+			function (x) {
+				return $zwilias$elm_rosetree$Tree$label(x);
+			},
+			children);
+		var childData = $zwilias$elm_rosetree$Tree$label(child);
+		return A2(
+			$elm$core$List$any,
+			function (item) {
+				return _Utils_eq(item.label, childData.label);
+			},
+			childrenLabels);
+	});
+var $zwilias$elm_rosetree$Tree$children = function (_v0) {
+	var c = _v0.b;
+	return c;
 };
 var $zwilias$elm_rosetree$Tree$prependChild = F2(
 	function (c, _v0) {
@@ -8511,20 +8527,7 @@ var $author$project$Utilities$DirectoryTree$addFolderInternal = F2(
 				parent);
 		} else {
 			var children = _v0;
-			var childrenLabels = A2(
-				$elm$core$List$map,
-				function (x) {
-					return $zwilias$elm_rosetree$Tree$label(x);
-				},
-				children);
-			var childData = $zwilias$elm_rosetree$Tree$label(child);
-			var childLabelConflictsWithExisting = A2(
-				$elm$core$List$any,
-				function (item) {
-					return _Utils_eq(item.label, childData.label);
-				},
-				childrenLabels);
-			return childLabelConflictsWithExisting ? parent : A2($zwilias$elm_rosetree$Tree$prependChild, child, parent);
+			return A2($author$project$Utilities$DirectoryTree$childLabelConflictsWithExisting, child, children) ? parent : A2($zwilias$elm_rosetree$Tree$prependChild, child, parent);
 		}
 	});
 var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
@@ -8537,14 +8540,105 @@ var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
 					focus: f(zipper.focus)
 				}));
 	});
+var $elm$core$Basics$composeL = F3(
+	function (g, f, x) {
+		return g(
+			f(x));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$previousSibling = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = zipper.before;
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var previous = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: A2($elm$core$List$cons, zipper.focus, zipper.after),
+					before: rest,
+					crumbs: zipper.crumbs,
+					focus: previous
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$firstSibling = function (zipper) {
+	firstSibling:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$previousSibling(zipper);
+		if (_v0.$ === 'Nothing') {
+			return zipper;
+		} else {
+			var z = _v0.a;
+			var $temp$zipper = z;
+			zipper = $temp$zipper;
+			continue firstSibling;
+		}
+	}
+};
 var $zwilias$elm_rosetree$Tree$tree = $zwilias$elm_rosetree$Tree$Tree;
-var $author$project$Utilities$DirectoryTree$addFolder = F2(
+var $zwilias$elm_rosetree$Tree$Zipper$reconstruct = F4(
+	function (focus, before, after, l) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$tree,
+			l,
+			_Utils_ap(
+				$elm$core$List$reverse(before),
+				_Utils_ap(
+					_List_fromArray(
+						[focus]),
+					after)));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$parent = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = zipper.crumbs;
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var crumb = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: crumb.after,
+					before: crumb.before,
+					crumbs: rest,
+					focus: A4($zwilias$elm_rosetree$Tree$Zipper$reconstruct, zipper.focus, zipper.before, zipper.after, crumb.label)
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$root = function (zipper) {
+	root:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$parent(zipper);
+		if (_v0.$ === 'Nothing') {
+			return $zwilias$elm_rosetree$Tree$Zipper$firstSibling(zipper);
+		} else {
+			var z = _v0.a;
+			var $temp$zipper = z;
+			zipper = $temp$zipper;
+			continue root;
+		}
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
+	var focus = _v0.a.focus;
+	return focus;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$toTree = A2($elm$core$Basics$composeL, $zwilias$elm_rosetree$Tree$Zipper$tree, $zwilias$elm_rosetree$Tree$Zipper$root);
+var $author$project$Utilities$DirectoryTree$addFolderCommand = F2(
 	function (folder, parent) {
 		return A2(
-			$zwilias$elm_rosetree$Tree$Zipper$mapTree,
-			$author$project$Utilities$DirectoryTree$addFolderInternal(
-				A2($zwilias$elm_rosetree$Tree$tree, folder, _List_Nil)),
-			parent);
+			$author$project$Utilities$DirectoryTree$childLabelConflictsWithExisting,
+			A2($zwilias$elm_rosetree$Tree$tree, folder, _List_Nil),
+			$zwilias$elm_rosetree$Tree$children(
+				$zwilias$elm_rosetree$Tree$Zipper$toTree(parent))) ? $elm$core$Result$Err('mkdir: ' + (folder.label + ': File exists')) : $elm$core$Result$Ok(
+			A2(
+				$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+				$author$project$Utilities$DirectoryTree$addFolderInternal(
+					A2($zwilias$elm_rosetree$Tree$tree, folder, _List_Nil)),
+				parent));
 	});
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -8553,6 +8647,168 @@ var $elm$core$List$append = F2(
 		} else {
 			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
 		}
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$children = function (zipper) {
+	return $zwilias$elm_rosetree$Tree$children(
+		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
+};
+var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
+	return $zwilias$elm_rosetree$Tree$label(
+		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
+};
+var $zwilias$elm_rosetree$Tree$Zipper$find = F3(
+	function (predicate, move, zipper) {
+		find:
+		while (true) {
+			var _v0 = move(zipper);
+			if (_v0.$ === 'Just') {
+				var next = _v0.a;
+				if (predicate(
+					$zwilias$elm_rosetree$Tree$Zipper$label(next))) {
+					return $elm$core$Maybe$Just(next);
+				} else {
+					var $temp$predicate = predicate,
+						$temp$move = move,
+						$temp$zipper = next;
+					predicate = $temp$predicate;
+					move = $temp$move;
+					zipper = $temp$zipper;
+					continue find;
+				}
+			} else {
+				return $elm$core$Maybe$Nothing;
+			}
+		}
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$firstChild = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = $zwilias$elm_rosetree$Tree$children(zipper.focus);
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var c = _v1.a;
+		var cs = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: cs,
+					before: _List_Nil,
+					crumbs: A2(
+						$elm$core$List$cons,
+						{
+							after: zipper.after,
+							before: zipper.before,
+							label: $zwilias$elm_rosetree$Tree$label(zipper.focus)
+						},
+						zipper.crumbs),
+					focus: c
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$firstOf = F2(
+	function (options, v) {
+		firstOf:
+		while (true) {
+			if (!options.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var option = options.a;
+				var rest = options.b;
+				var _v1 = option(v);
+				if (_v1.$ === 'Just') {
+					var r = _v1.a;
+					return $elm$core$Maybe$Just(r);
+				} else {
+					var $temp$options = rest,
+						$temp$v = v;
+					options = $temp$options;
+					v = $temp$v;
+					continue firstOf;
+				}
+			}
+		}
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$nextSibling = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = zipper.after;
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var next = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: rest,
+					before: A2($elm$core$List$cons, zipper.focus, zipper.before),
+					crumbs: zipper.crumbs,
+					focus: next
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$nextSiblingOfAncestor = function (zipper) {
+	nextSiblingOfAncestor:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$parent(zipper);
+		if (_v0.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var parent_ = _v0.a;
+			var _v1 = $zwilias$elm_rosetree$Tree$Zipper$nextSibling(parent_);
+			if (_v1.$ === 'Nothing') {
+				var $temp$zipper = parent_;
+				zipper = $temp$zipper;
+				continue nextSiblingOfAncestor;
+			} else {
+				var s = _v1.a;
+				return $elm$core$Maybe$Just(s);
+			}
+		}
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$forward = function (zipper) {
+	return A2(
+		$zwilias$elm_rosetree$Tree$Zipper$firstOf,
+		_List_fromArray(
+			[$zwilias$elm_rosetree$Tree$Zipper$firstChild, $zwilias$elm_rosetree$Tree$Zipper$nextSibling, $zwilias$elm_rosetree$Tree$Zipper$nextSiblingOfAncestor]),
+		zipper);
+};
+var $zwilias$elm_rosetree$Tree$Zipper$findNext = F2(
+	function (f, zipper) {
+		return A3($zwilias$elm_rosetree$Tree$Zipper$find, f, $zwilias$elm_rosetree$Tree$Zipper$forward, zipper);
+	});
+var $elm$core$Result$fromMaybe = F2(
+	function (err, maybe) {
+		if (maybe.$ === 'Just') {
+			var v = maybe.a;
+			return $elm$core$Result$Ok(v);
+		} else {
+			return $elm$core$Result$Err(err);
+		}
+	});
+var $author$project$Utilities$DirectoryTree$changeDirectoryCommand = F2(
+	function (needle, haystack) {
+		var isNeedleInHaystack = function (list) {
+			return A2(
+				$elm$core$List$any,
+				function (child) {
+					var data = $zwilias$elm_rosetree$Tree$label(child);
+					return _Utils_eq(data.label, needle);
+				},
+				list);
+		};
+		return function (children) {
+			return isNeedleInHaystack(children) ? A2(
+				$elm$core$Result$fromMaybe,
+				'THIS ERROR SHOULD BE IMPOSSIBLE',
+				A2(
+					$zwilias$elm_rosetree$Tree$Zipper$findNext,
+					function (x) {
+						return _Utils_eq(x.label, needle);
+					},
+					haystack)) : $elm$core$Result$Err('Directory not found');
+		}(
+			$zwilias$elm_rosetree$Tree$Zipper$children(haystack));
 	});
 var $author$project$AlternativeSolutions$DirectoryParser$CD = function (a) {
 	return {$: 'CD', a: a};
@@ -8878,7 +9134,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$commandParser = A2(
 					A2(
 						$elm$parser$Parser$ignorer,
 						$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$MakeDir),
-						$elm$parser$Parser$keyword('makedir')),
+						$elm$parser$Parser$keyword('mkdir')),
 					$elm$parser$Parser$spaces),
 				$author$project$AlternativeSolutions$DirectoryParser$word)
 			])));
@@ -8959,17 +9215,34 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 					var command = parserResult.a;
 					switch (command.$) {
 						case 'CD':
-							var value = command.a;
-							return _Utils_update(
-								model,
-								{
-									terminalInput: '',
-									terminalOutput: A2(
-										$elm$core$List$append,
-										model.terminalOutput,
-										_List_fromArray(
-											['Change directory: ' + value]))
-								});
+							var directoryName = command.a;
+							var _v3 = A2($author$project$Utilities$DirectoryTree$changeDirectoryCommand, directoryName, model.directoryTree);
+							if (_v3.$ === 'Ok') {
+								var value = _v3.a;
+								return _Utils_update(
+									model,
+									{
+										directoryTree: value,
+										terminalInput: '',
+										terminalOutput: A2(
+											$elm$core$List$append,
+											model.terminalOutput,
+											_List_fromArray(
+												['Change directory: ' + directoryName]))
+									});
+							} else {
+								var err = _v3.a;
+								return _Utils_update(
+									model,
+									{
+										terminalInput: '',
+										terminalOutput: A2(
+											$elm$core$List$append,
+											model.terminalOutput,
+											_List_fromArray(
+												[err]))
+									});
+							}
 						case 'LS':
 							return _Utils_update(
 								model,
@@ -8983,20 +9256,36 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 								});
 						default:
 							var name = command.a;
-							return _Utils_update(
-								model,
-								{
-									directoryTree: A2(
-										$author$project$Utilities$DirectoryTree$addFolder,
-										A2($author$project$Utilities$DirectoryTree$Directory, name, _List_Nil),
-										model.directoryTree),
-									terminalInput: '',
-									terminalOutput: A2(
-										$elm$core$List$append,
-										model.terminalOutput,
-										_List_fromArray(
-											['Made directory: ' + name]))
-								});
+							var _v4 = A2(
+								$author$project$Utilities$DirectoryTree$addFolderCommand,
+								A2($author$project$Utilities$DirectoryTree$Directory, name, _List_Nil),
+								model.directoryTree);
+							if (_v4.$ === 'Ok') {
+								var val = _v4.a;
+								return _Utils_update(
+									model,
+									{
+										directoryTree: val,
+										terminalInput: '',
+										terminalOutput: A2(
+											$elm$core$List$append,
+											model.terminalOutput,
+											_List_fromArray(
+												['Made directory: ' + name]))
+									});
+							} else {
+								var err = _v4.a;
+								return _Utils_update(
+									model,
+									{
+										terminalInput: '',
+										terminalOutput: A2(
+											$elm$core$List$append,
+											model.terminalOutput,
+											_List_fromArray(
+												[err]))
+									});
+							}
 					}
 				} else {
 					var error = parserResult.a;
@@ -9245,92 +9534,6 @@ var $author$project$Utilities$DirectoryTree$toListItems = F2(
 					]));
 		}
 	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$previousSibling = function (_v0) {
-	var zipper = _v0.a;
-	var _v1 = zipper.before;
-	if (!_v1.b) {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var previous = _v1.a;
-		var rest = _v1.b;
-		return $elm$core$Maybe$Just(
-			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
-				{
-					after: A2($elm$core$List$cons, zipper.focus, zipper.after),
-					before: rest,
-					crumbs: zipper.crumbs,
-					focus: previous
-				}));
-	}
-};
-var $zwilias$elm_rosetree$Tree$Zipper$firstSibling = function (zipper) {
-	firstSibling:
-	while (true) {
-		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$previousSibling(zipper);
-		if (_v0.$ === 'Nothing') {
-			return zipper;
-		} else {
-			var z = _v0.a;
-			var $temp$zipper = z;
-			zipper = $temp$zipper;
-			continue firstSibling;
-		}
-	}
-};
-var $zwilias$elm_rosetree$Tree$Zipper$reconstruct = F4(
-	function (focus, before, after, l) {
-		return A2(
-			$zwilias$elm_rosetree$Tree$tree,
-			l,
-			_Utils_ap(
-				$elm$core$List$reverse(before),
-				_Utils_ap(
-					_List_fromArray(
-						[focus]),
-					after)));
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$parent = function (_v0) {
-	var zipper = _v0.a;
-	var _v1 = zipper.crumbs;
-	if (!_v1.b) {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var crumb = _v1.a;
-		var rest = _v1.b;
-		return $elm$core$Maybe$Just(
-			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
-				{
-					after: crumb.after,
-					before: crumb.before,
-					crumbs: rest,
-					focus: A4($zwilias$elm_rosetree$Tree$Zipper$reconstruct, zipper.focus, zipper.before, zipper.after, crumb.label)
-				}));
-	}
-};
-var $zwilias$elm_rosetree$Tree$Zipper$root = function (zipper) {
-	root:
-	while (true) {
-		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$parent(zipper);
-		if (_v0.$ === 'Nothing') {
-			return $zwilias$elm_rosetree$Tree$Zipper$firstSibling(zipper);
-		} else {
-			var z = _v0.a;
-			var $temp$zipper = z;
-			zipper = $temp$zipper;
-			continue root;
-		}
-	}
-};
-var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
-	var focus = _v0.a.focus;
-	return focus;
-};
-var $zwilias$elm_rosetree$Tree$Zipper$toTree = A2($elm$core$Basics$composeL, $zwilias$elm_rosetree$Tree$Zipper$tree, $zwilias$elm_rosetree$Tree$Zipper$root);
 var $author$project$Utilities$DirectoryTree$toHtml = function (dir) {
 	return function (root) {
 		return A2(

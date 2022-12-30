@@ -62,12 +62,22 @@ update msg model =
                 case parserResult of
                     Ok command ->
                         case command of
-                            CD value ->
-                                { model
-                                    | terminalOutput =
-                                        List.append model.terminalOutput [ "Change directory: " ++ value ]
-                                    , terminalInput = ""
-                                }
+                            CD directoryName ->
+                                case changeDirectoryCommand directoryName model.directoryTree of
+                                    Ok value ->
+                                        { model
+                                            | directoryTree = value
+                                            , terminalOutput =
+                                                List.append model.terminalOutput [ "Change directory: " ++ directoryName ]
+                                            , terminalInput = ""
+                                        }
+
+                                    Err err ->
+                                        { model
+                                            | terminalOutput =
+                                                List.append model.terminalOutput [ err ]
+                                            , terminalInput = ""
+                                        }
 
                             LS ->
                                 { model
@@ -76,13 +86,29 @@ update msg model =
                                     , terminalInput = ""
                                 }
 
+                            -- MakeDir name ->
+                            --     { model
+                            --         | directoryTree = addFolder (Directory name []) model.directoryTree
+                            --         , terminalOutput =
+                            --             List.append model.terminalOutput [ "Made directory: " ++ name ]
+                            --         , terminalInput = ""
+                            --     }
                             MakeDir name ->
-                                { model
-                                    | directoryTree = addFolder (Directory name []) model.directoryTree
-                                    , terminalOutput =
-                                        List.append model.terminalOutput [ "Made directory: " ++ name ]
-                                    , terminalInput = ""
-                                }
+                                case addFolderCommand (Directory name []) model.directoryTree of
+                                    Ok val ->
+                                        { model
+                                            | directoryTree = val
+                                            , terminalOutput =
+                                                List.append model.terminalOutput [ "Made directory: " ++ name ]
+                                            , terminalInput = ""
+                                        }
+
+                                    Err err ->
+                                        { model
+                                            | terminalOutput =
+                                                List.append model.terminalOutput [ err ]
+                                            , terminalInput = ""
+                                        }
 
                     Err error ->
                         { model
@@ -125,7 +151,7 @@ commandParser =
             , succeed LS
                 |. keyword "ls"
             , succeed MakeDir
-                |. keyword "makedir"
+                |. keyword "mkdir"
                 |. spaces
                 |= word
             ]
