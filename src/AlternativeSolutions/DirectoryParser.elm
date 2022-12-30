@@ -4,21 +4,24 @@ import Browser
 import Html exposing (Html, button, div, input, text)
 import Html.Attributes exposing (class, placeholder, value)
 import Html.Events exposing (keyCode, on, onClick, onInput)
-import Json.Decode as Decode exposing (Decoder, string)
+import Json.Decode as Decode
+import Parser exposing (..)
 import Tree.Zipper as Zipper
 import Utilities.DirectoryTree exposing (..)
 
 
 type alias Model =
-    { command : String
+    { terminalInput : String
     , directoryTree : Zipper.Zipper Directory
+    , terminalOutput : List String
     }
 
 
 initialModel : Model
 initialModel =
-    { command = ""
+    { terminalInput = ""
     , directoryTree = singleton (Directory "root" [])
+    , terminalOutput = []
     }
 
 
@@ -28,13 +31,15 @@ type Msg
 
 
 view : Model -> Html Msg
-view { command, directoryTree } =
+view { terminalInput, directoryTree, terminalOutput } =
     Html.div []
         [ div []
             [ directoryTree |> toHtml ]
+        , div [ class "terminalOutput" ]
+            (List.map (\line -> div [] [ text ("> " ++ line) ]) terminalOutput)
         , input
             [ placeholder "Type your command"
-            , value command
+            , value terminalInput
             , onInput OnChange
             , onKeyDown OnKeyDown
             ]
@@ -45,12 +50,46 @@ view { command, directoryTree } =
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        OnChange command ->
-            { model | command = command }
+        OnChange terminalInput ->
+            { model | terminalInput = terminalInput }
 
         OnKeyDown key ->
             if key == 13 then
-                { model | directoryTree = singleton (Directory "root" [ File model.command 100 ]) }
+                let
+                    parserResult =
+                        Parser.run commandParser model.terminalInput
+                in
+                case parserResult of
+                    Ok command ->
+                        case command of
+                            CD value ->
+                                { model
+                                    | terminalOutput =
+                                        List.append model.terminalOutput [ "Change directory: " ++ value ]
+                                    , terminalInput = ""
+                                }
+
+                            LS ->
+                                { model
+                                    | terminalOutput =
+                                        List.append model.terminalOutput [ "List" ]
+                                    , terminalInput = ""
+                                }
+
+                            MakeDir name ->
+                                { model
+                                    | directoryTree = addFolder (Directory name []) model.directoryTree
+                                    , terminalOutput =
+                                        List.append model.terminalOutput [ "Made directory: " ++ name ]
+                                    , terminalInput = ""
+                                }
+
+                    Err error ->
+                        { model
+                            | terminalOutput =
+                                List.append model.terminalOutput [ "Error: " ++ Parser.deadEndsToString error ]
+                            , terminalInput = ""
+                        }
 
             else
                 model
@@ -59,6 +98,37 @@ update msg model =
 onKeyDown : (Int -> msg) -> Html.Attribute msg
 onKeyDown tagger =
     on "keydown" (Decode.map tagger keyCode)
+
+
+type Command
+    = CD String
+    | LS
+    | MakeDir String
+
+
+word : Parser String
+word =
+    getChompedString <|
+        succeed ()
+            |. chompIf Char.isAlphaNum
+            |. chompWhile Char.isAlphaNum
+
+
+commandParser : Parser Command
+commandParser =
+    succeed identity
+        |= oneOf
+            [ succeed CD
+                |. keyword "cd"
+                |. spaces
+                |= word
+            , succeed LS
+                |. keyword "ls"
+            , succeed MakeDir
+                |. keyword "makedir"
+                |. spaces
+                |= word
+            ]
 
 
 main : Program () Model Msg

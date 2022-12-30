@@ -1,0 +1,19 @@
+input {
+    background-color: transparent;
+    color: greenyellow;
+    font-family: monospace;
+    font-size: large;
+    width: 100%;
+    border: solid 3px greenyellow;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+input:focus {
+    outline: none;
+}
+
+.terminalOutput {
+    padding: 5px;
+    margin: 5px 0;
+}
