@@ -86,13 +86,6 @@ update msg model =
                                     , terminalInput = ""
                                 }
 
-                            -- MakeDir name ->
-                            --     { model
-                            --         | directoryTree = addFolder (Directory name []) model.directoryTree
-                            --         , terminalOutput =
-                            --             List.append model.terminalOutput [ "Made directory: " ++ name ]
-                            --         , terminalInput = ""
-                            --     }
                             MakeDir name ->
                                 case addFolderCommand (Directory name []) model.directoryTree of
                                     Ok val ->
