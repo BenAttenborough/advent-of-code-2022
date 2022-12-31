@@ -32,18 +32,22 @@ type Msg
 
 view : Model -> Html Msg
 view { terminalInput, directoryTree, terminalOutput } =
-    Html.div []
+    Html.div [ class "main-container" ]
         [ div []
-            [ directoryTree |> toHtml ]
-        , div [ class "terminalOutput" ]
-            (List.map (\line -> div [] [ text line ]) terminalOutput)
-        , input
-            [ placeholder "Type your command"
-            , value terminalInput
-            , onInput OnChange
-            , onKeyDown OnKeyDown
+            [ div [] [ text "Directory tree" ]
+            , directoryTree |> toHtml
             ]
-            []
+        , div []
+            [ div [ class "terminalOutput" ]
+                (List.map (\line -> div [] [ text line ]) terminalOutput)
+            , input
+                [ placeholder "Type your command"
+                , value terminalInput
+                , onInput OnChange
+                , onKeyDown OnKeyDown
+                ]
+                []
+            ]
         ]
 
 

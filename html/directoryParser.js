@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672490207330"
+    "1672515580469"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -10002,7 +10002,10 @@ var $author$project$AlternativeSolutions$DirectoryParser$view = function (_v0) {
 	var terminalOutput = _v0.terminalOutput;
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$class('main-container')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -10010,36 +10013,49 @@ var $author$project$AlternativeSolutions$DirectoryParser$view = function (_v0) {
 				_List_Nil,
 				_List_fromArray(
 					[
+						A2(
+						$elm$html$Html$div,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Directory tree')
+							])),
 						$author$project$Utilities$DirectoryTree$toHtml(directoryTree)
 					])),
 				A2(
 				$elm$html$Html$div,
+				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('terminalOutput')
-					]),
-				A2(
-					$elm$core$List$map,
-					function (line) {
-						return A2(
-							$elm$html$Html$div,
-							_List_Nil,
-							_List_fromArray(
-								[
-									$elm$html$Html$text(line)
-								]));
-					},
-					terminalOutput)),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$placeholder('Type your command'),
-						$elm$html$Html$Attributes$value(terminalInput),
-						$elm$html$Html$Events$onInput($author$project$AlternativeSolutions$DirectoryParser$OnChange),
-						$author$project$AlternativeSolutions$DirectoryParser$onKeyDown($author$project$AlternativeSolutions$DirectoryParser$OnKeyDown)
-					]),
-				_List_Nil)
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('terminalOutput')
+							]),
+						A2(
+							$elm$core$List$map,
+							function (line) {
+								return A2(
+									$elm$html$Html$div,
+									_List_Nil,
+									_List_fromArray(
+										[
+											$elm$html$Html$text(line)
+										]));
+							},
+							terminalOutput)),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$placeholder('Type your command'),
+								$elm$html$Html$Attributes$value(terminalInput),
+								$elm$html$Html$Events$onInput($author$project$AlternativeSolutions$DirectoryParser$OnChange),
+								$author$project$AlternativeSolutions$DirectoryParser$onKeyDown($author$project$AlternativeSolutions$DirectoryParser$OnKeyDown)
+							]),
+						_List_Nil)
+					]))
 			]));
 };
 var $author$project$AlternativeSolutions$DirectoryParser$main = $elm$browser$Browser$sandbox(
