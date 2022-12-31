@@ -1,4 +1,19 @@
-module Utilities.DirectoryTree exposing (Directory, DirectoryTree, File, addFile, addFiles, addFolder, addFolderCommand, changeDirectory, changeDirectoryCommand, listDir, singleton, toHtml)
+module Utilities.DirectoryTree exposing
+    ( Directory
+    , DirectoryTree
+    , File
+    , addFile
+    , addFiles
+    , addFolder
+    , addFolderCommand
+    , changeDirectory
+    , changeDirectoryCommand
+    , getLabelsRecursively
+    , listDir
+    , printRoute
+    , singleton
+    , toHtml
+    )
 
 import Html exposing (Html)
 import Parser exposing (..)
@@ -225,3 +240,36 @@ listDir directory =
                 |> List.map (\file -> file.label ++ " " ++ String.fromInt file.size ++ " (File)")
     in
     List.append directories files
+
+
+printRoute : Zipper.Zipper Directory -> String
+printRoute directory =
+    -- "TODO: Get route"
+    directory
+        |> Zipper.label
+        |> .label
+
+
+getLabelFromZipper : Zipper.Zipper Directory -> String
+getLabelFromZipper dir =
+    let
+        data =
+            Zipper.label dir
+    in
+    data.label
+
+
+getLabelsRecursively : Zipper.Zipper Directory -> List String -> String
+getLabelsRecursively dir list =
+    let
+        label =
+            getLabelFromZipper dir
+    in
+    case Zipper.backward dir of
+        Nothing ->
+            (label ++ "/")
+                :: list
+                |> String.concat
+
+        Just directory ->
+            getLabelsRecursively directory ((label ++ "/") :: list)

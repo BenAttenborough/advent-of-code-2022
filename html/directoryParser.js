@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672485738075"
+    "1672490207330"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8972,10 +8972,12 @@ var $author$project$Utilities$DirectoryTree$changeDirectoryCommand = F2(
 var $author$project$AlternativeSolutions$DirectoryParser$CD = function (a) {
 	return {$: 'CD', a: a};
 };
+var $author$project$AlternativeSolutions$DirectoryParser$Clear = {$: 'Clear'};
 var $author$project$AlternativeSolutions$DirectoryParser$LS = {$: 'LS'};
 var $author$project$AlternativeSolutions$DirectoryParser$MakeDir = function (a) {
 	return {$: 'MakeDir', a: a};
 };
+var $author$project$AlternativeSolutions$DirectoryParser$Pwd = {$: 'Pwd'};
 var $author$project$AlternativeSolutions$DirectoryParser$Touch = F2(
 	function (a, b) {
 		return {$: 'Touch', a: a, b: b};
@@ -9495,11 +9497,45 @@ var $author$project$AlternativeSolutions$DirectoryParser$commandParser = A2(
 							$elm$parser$Parser$keyword('touch')),
 						$elm$parser$Parser$spaces),
 					A2($elm$parser$Parser$ignorer, $author$project$AlternativeSolutions$DirectoryParser$word, $elm$parser$Parser$spaces)),
-				$elm$parser$Parser$int)
+				$elm$parser$Parser$int),
+				A2(
+				$elm$parser$Parser$ignorer,
+				$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$Clear),
+				$elm$parser$Parser$keyword('clear')),
+				A2(
+				$elm$parser$Parser$ignorer,
+				$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$Pwd),
+				$elm$parser$Parser$keyword('pwd'))
 			])));
 var $elm$parser$Parser$deadEndsToString = function (deadEnds) {
 	return 'TODO deadEndsToString';
 };
+var $elm$core$String$concat = function (strings) {
+	return A2($elm$core$String$join, '', strings);
+};
+var $author$project$Utilities$DirectoryTree$getLabelFromZipper = function (dir) {
+	var data = $zwilias$elm_rosetree$Tree$Zipper$label(dir);
+	return data.label;
+};
+var $author$project$Utilities$DirectoryTree$getLabelsRecursively = F2(
+	function (dir, list) {
+		getLabelsRecursively:
+		while (true) {
+			var label = $author$project$Utilities$DirectoryTree$getLabelFromZipper(dir);
+			var _v0 = $zwilias$elm_rosetree$Tree$Zipper$backward(dir);
+			if (_v0.$ === 'Nothing') {
+				return $elm$core$String$concat(
+					A2($elm$core$List$cons, label + '/', list));
+			} else {
+				var directory = _v0.a;
+				var $temp$dir = directory,
+					$temp$list = A2($elm$core$List$cons, label + '/', list);
+				dir = $temp$dir;
+				list = $temp$list;
+				continue getLabelsRecursively;
+			}
+		}
+	});
 var $author$project$Utilities$DirectoryTree$listDir = function (directory) {
 	var directories = A2(
 		$elm$core$List$map,
@@ -9663,7 +9699,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 												[err]))
 									});
 							}
-						default:
+						case 'Touch':
 							var fileName = command.a;
 							var fileSize = command.b;
 							return _Utils_update(
@@ -9679,6 +9715,23 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 										model.terminalOutput,
 										_List_fromArray(
 											['Created file']))
+								});
+						case 'Clear':
+							return _Utils_update(
+								model,
+								{terminalInput: '', terminalOutput: _List_Nil});
+						default:
+							return _Utils_update(
+								model,
+								{
+									terminalInput: '',
+									terminalOutput: A2(
+										$elm$core$List$append,
+										model.terminalOutput,
+										_List_fromArray(
+											[
+												A2($author$project$Utilities$DirectoryTree$getLabelsRecursively, model.directoryTree, _List_Nil)
+											]))
 								});
 					}
 				} else {

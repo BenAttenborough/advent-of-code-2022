@@ -111,6 +111,19 @@ update msg model =
                                     , terminalInput = ""
                                 }
 
+                            Clear ->
+                                { model
+                                    | terminalOutput = []
+                                    , terminalInput = ""
+                                }
+
+                            Pwd ->
+                                { model
+                                    | terminalOutput =
+                                        List.append model.terminalOutput [ getLabelsRecursively model.directoryTree [] ]
+                                    , terminalInput = ""
+                                }
+
                     Err error ->
                         { model
                             | terminalOutput =
@@ -132,6 +145,8 @@ type Command
     | LS
     | MakeDir String
     | Touch String Int
+    | Clear
+    | Pwd
 
 
 word : Parser String
@@ -170,6 +185,10 @@ commandParser =
                 |= word
                 |. spaces
                 |= int
+            , succeed Clear
+                |. keyword "clear"
+            , succeed Pwd
+                |. keyword "pwd"
             ]
 
 
