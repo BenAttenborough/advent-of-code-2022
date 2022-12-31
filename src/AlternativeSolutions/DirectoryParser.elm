@@ -36,7 +36,7 @@ view { terminalInput, directoryTree, terminalOutput } =
         [ div []
             [ directoryTree |> toHtml ]
         , div [ class "terminalOutput" ]
-            (List.map (\line -> div [] [ text ("> " ++ line) ]) terminalOutput)
+            (List.map (\line -> div [] [ text line ]) terminalOutput)
         , input
             [ placeholder "Type your command"
             , value terminalInput
@@ -82,7 +82,7 @@ update msg model =
                             LS ->
                                 { model
                                     | terminalOutput =
-                                        List.append model.terminalOutput [ "List" ]
+                                        List.append model.terminalOutput (listDir model.directoryTree)
                                     , terminalInput = ""
                                 }
 
@@ -138,8 +138,16 @@ word : Parser String
 word =
     getChompedString <|
         succeed ()
-            |. chompIf Char.isAlphaNum
-            |. chompWhile Char.isAlphaNum
+            |. chompIf (\c -> Char.isAlphaNum c)
+            |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
+
+
+dirWord : Parser String
+dirWord =
+    getChompedString <|
+        succeed ()
+            |. chompIf (\c -> Char.isAlphaNum c || c == '.')
+            |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
 
 
 commandParser : Parser Command
@@ -149,7 +157,7 @@ commandParser =
             [ succeed CD
                 |. keyword "cd"
                 |. spaces
-                |= word
+                |= dirWord
             , succeed LS
                 |. keyword "ls"
             , succeed MakeDir

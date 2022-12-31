@@ -1,4 +1,4 @@
-module Utilities.DirectoryTree exposing (Directory, DirectoryTree, File, addFile, addFiles, addFolder, addFolderCommand, changeDirectory, changeDirectoryCommand, singleton, toHtml)
+module Utilities.DirectoryTree exposing (Directory, DirectoryTree, File, addFile, addFiles, addFolder, addFolderCommand, changeDirectory, changeDirectoryCommand, listDir, singleton, toHtml)
 
 import Html exposing (Html)
 import Parser exposing (..)
@@ -147,32 +147,37 @@ changeDirectory needle haystack =
 
 changeDirectoryCommand : String -> Zipper.Zipper Directory -> Result String (Zipper.Zipper Directory)
 changeDirectoryCommand needle haystack =
-    let
-        isNeedleInHaystack list =
-            list
-                |> List.any
-                    (\child ->
-                        let
-                            data =
-                                Tree.label child
-                        in
-                        data.label == needle
-                    )
-    in
-    haystack
-        |> Zipper.children
-        |> (\children ->
-                if isNeedleInHaystack children then
-                    Zipper.findNext
-                        (\x ->
-                            x.label == needle
-                        )
-                        haystack
-                        |> Result.fromMaybe "THIS ERROR SHOULD BE IMPOSSIBLE"
+    if needle == ".." then
+        Zipper.backward haystack
+            |> Result.fromMaybe "Error: Cannot go back any further"
 
-                else
-                    Err "Directory not found"
-           )
+    else
+        let
+            isNeedleInHaystack list =
+                list
+                    |> List.any
+                        (\child ->
+                            let
+                                data =
+                                    Tree.label child
+                            in
+                            data.label == needle
+                        )
+        in
+        haystack
+            |> Zipper.children
+            |> (\children ->
+                    if isNeedleInHaystack children then
+                        Zipper.findNext
+                            (\x ->
+                                x.label == needle
+                            )
+                            haystack
+                            |> Result.fromMaybe "THIS ERROR SHOULD BE IMPOSSIBLE"
+
+                    else
+                        Err "Directory not found"
+               )
 
 
 addFiles : List File -> Zipper.Zipper Directory -> Zipper.Zipper Directory
@@ -201,3 +206,22 @@ addFiles files directory =
 addFile : File -> Zipper.Zipper Directory -> Zipper.Zipper Directory
 addFile file directory =
     addFiles [ file ] directory
+
+
+listDir : Zipper.Zipper Directory -> List String
+listDir directory =
+    let
+        data =
+            Zipper.label directory
+
+        directories =
+            directory
+                |> Zipper.children
+                |> List.map Tree.label
+                |> List.map (\dir -> dir.label ++ " (DIR)")
+
+        files =
+            data.files
+                |> List.map (\file -> file.label ++ " " ++ String.fromInt file.size ++ " (File)")
+    in
+    List.append directories files

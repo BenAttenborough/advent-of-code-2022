@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672443221826"
+    "1672485738075"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -8736,6 +8736,97 @@ var $author$project$Utilities$DirectoryTree$addFolderCommand = F2(
 					A2($zwilias$elm_rosetree$Tree$tree, folder, _List_Nil)),
 				parent));
 	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$firstOf = F2(
+	function (options, v) {
+		firstOf:
+		while (true) {
+			if (!options.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var option = options.a;
+				var rest = options.b;
+				var _v1 = option(v);
+				if (_v1.$ === 'Just') {
+					var r = _v1.a;
+					return $elm$core$Maybe$Just(r);
+				} else {
+					var $temp$options = rest,
+						$temp$v = v;
+					options = $temp$options;
+					v = $temp$v;
+					continue firstOf;
+				}
+			}
+		}
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$lastChild = function (_v0) {
+	var zipper = _v0.a;
+	var _v1 = $elm$core$List$reverse(
+		$zwilias$elm_rosetree$Tree$children(zipper.focus));
+	if (!_v1.b) {
+		return $elm$core$Maybe$Nothing;
+	} else {
+		var c = _v1.a;
+		var rest = _v1.b;
+		return $elm$core$Maybe$Just(
+			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
+				{
+					after: _List_Nil,
+					before: rest,
+					crumbs: A2(
+						$elm$core$List$cons,
+						{
+							after: zipper.after,
+							before: zipper.before,
+							label: $zwilias$elm_rosetree$Tree$label(zipper.focus)
+						},
+						zipper.crumbs),
+					focus: c
+				}));
+	}
+};
+var $zwilias$elm_rosetree$Tree$Zipper$lastDescendant = function (zipper) {
+	lastDescendant:
+	while (true) {
+		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$lastChild(zipper);
+		if (_v0.$ === 'Nothing') {
+			return zipper;
+		} else {
+			var child = _v0.a;
+			var $temp$zipper = child;
+			zipper = $temp$zipper;
+			continue lastDescendant;
+		}
+	}
+};
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$backward = function (zipper) {
+	return A2(
+		$zwilias$elm_rosetree$Tree$Zipper$firstOf,
+		_List_fromArray(
+			[
+				A2(
+				$elm$core$Basics$composeR,
+				$zwilias$elm_rosetree$Tree$Zipper$previousSibling,
+				$elm$core$Maybe$map($zwilias$elm_rosetree$Tree$Zipper$lastDescendant)),
+				$zwilias$elm_rosetree$Tree$Zipper$parent
+			]),
+		zipper);
+};
 var $zwilias$elm_rosetree$Tree$Zipper$children = function (zipper) {
 	return $zwilias$elm_rosetree$Tree$children(
 		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
@@ -8789,29 +8880,6 @@ var $zwilias$elm_rosetree$Tree$Zipper$firstChild = function (_v0) {
 				}));
 	}
 };
-var $zwilias$elm_rosetree$Tree$Zipper$firstOf = F2(
-	function (options, v) {
-		firstOf:
-		while (true) {
-			if (!options.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var option = options.a;
-				var rest = options.b;
-				var _v1 = option(v);
-				if (_v1.$ === 'Just') {
-					var r = _v1.a;
-					return $elm$core$Maybe$Just(r);
-				} else {
-					var $temp$options = rest,
-						$temp$v = v;
-					options = $temp$options;
-					v = $temp$v;
-					continue firstOf;
-				}
-			}
-		}
-	});
 var $zwilias$elm_rosetree$Tree$Zipper$nextSibling = function (_v0) {
 	var zipper = _v0.a;
 	var _v1 = zipper.after;
@@ -8872,27 +8940,34 @@ var $elm$core$Result$fromMaybe = F2(
 	});
 var $author$project$Utilities$DirectoryTree$changeDirectoryCommand = F2(
 	function (needle, haystack) {
-		var isNeedleInHaystack = function (list) {
+		if (needle === '..') {
 			return A2(
-				$elm$core$List$any,
-				function (child) {
-					var data = $zwilias$elm_rosetree$Tree$label(child);
-					return _Utils_eq(data.label, needle);
-				},
-				list);
-		};
-		return function (children) {
-			return isNeedleInHaystack(children) ? A2(
 				$elm$core$Result$fromMaybe,
-				'THIS ERROR SHOULD BE IMPOSSIBLE',
-				A2(
-					$zwilias$elm_rosetree$Tree$Zipper$findNext,
-					function (x) {
-						return _Utils_eq(x.label, needle);
+				'Error: Cannot go back any further',
+				$zwilias$elm_rosetree$Tree$Zipper$backward(haystack));
+		} else {
+			var isNeedleInHaystack = function (list) {
+				return A2(
+					$elm$core$List$any,
+					function (child) {
+						var data = $zwilias$elm_rosetree$Tree$label(child);
+						return _Utils_eq(data.label, needle);
 					},
-					haystack)) : $elm$core$Result$Err('Directory not found');
-		}(
-			$zwilias$elm_rosetree$Tree$Zipper$children(haystack));
+					list);
+			};
+			return function (children) {
+				return isNeedleInHaystack(children) ? A2(
+					$elm$core$Result$fromMaybe,
+					'THIS ERROR SHOULD BE IMPOSSIBLE',
+					A2(
+						$zwilias$elm_rosetree$Tree$Zipper$findNext,
+						function (x) {
+							return _Utils_eq(x.label, needle);
+						},
+						haystack)) : $elm$core$Result$Err('Directory not found');
+			}(
+				$zwilias$elm_rosetree$Tree$Zipper$children(haystack));
+		}
 	});
 var $author$project$AlternativeSolutions$DirectoryParser$CD = function (a) {
 	return {$: 'CD', a: a};
@@ -8905,6 +8980,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$Touch = F2(
 	function (a, b) {
 		return {$: 'Touch', a: a, b: b};
 	});
+var $elm$parser$Parser$UnexpectedChar = {$: 'UnexpectedChar'};
 var $elm$parser$Parser$Advanced$Bad = F2(
 	function (a, b) {
 		return {$: 'Bad', a: a, b: b};
@@ -8916,6 +8992,124 @@ var $elm$parser$Parser$Advanced$Good = F3(
 var $elm$parser$Parser$Advanced$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
+var $elm$parser$Parser$Advanced$AddRight = F2(
+	function (a, b) {
+		return {$: 'AddRight', a: a, b: b};
+	});
+var $elm$parser$Parser$Advanced$DeadEnd = F4(
+	function (row, col, problem, contextStack) {
+		return {col: col, contextStack: contextStack, problem: problem, row: row};
+	});
+var $elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
+var $elm$parser$Parser$Advanced$fromState = F2(
+	function (s, x) {
+		return A2(
+			$elm$parser$Parser$Advanced$AddRight,
+			$elm$parser$Parser$Advanced$Empty,
+			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
+	});
+var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$parser$Parser$Advanced$chompIf = F2(
+	function (isGood, expecting) {
+		return $elm$parser$Parser$Advanced$Parser(
+			function (s) {
+				var newOffset = A3($elm$parser$Parser$Advanced$isSubChar, isGood, s.offset, s.src);
+				return _Utils_eq(newOffset, -1) ? A2(
+					$elm$parser$Parser$Advanced$Bad,
+					false,
+					A2($elm$parser$Parser$Advanced$fromState, s, expecting)) : (_Utils_eq(newOffset, -2) ? A3(
+					$elm$parser$Parser$Advanced$Good,
+					true,
+					_Utils_Tuple0,
+					{col: 1, context: s.context, indent: s.indent, offset: s.offset + 1, row: s.row + 1, src: s.src}) : A3(
+					$elm$parser$Parser$Advanced$Good,
+					true,
+					_Utils_Tuple0,
+					{col: s.col + 1, context: s.context, indent: s.indent, offset: newOffset, row: s.row, src: s.src}));
+			});
+	});
+var $elm$parser$Parser$chompIf = function (isGood) {
+	return A2($elm$parser$Parser$Advanced$chompIf, isGood, $elm$parser$Parser$UnexpectedChar);
+};
+var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
+	function (isGood, offset, row, col, s0) {
+		chompWhileHelp:
+		while (true) {
+			var newOffset = A3($elm$parser$Parser$Advanced$isSubChar, isGood, offset, s0.src);
+			if (_Utils_eq(newOffset, -1)) {
+				return A3(
+					$elm$parser$Parser$Advanced$Good,
+					_Utils_cmp(s0.offset, offset) < 0,
+					_Utils_Tuple0,
+					{col: col, context: s0.context, indent: s0.indent, offset: offset, row: row, src: s0.src});
+			} else {
+				if (_Utils_eq(newOffset, -2)) {
+					var $temp$isGood = isGood,
+						$temp$offset = offset + 1,
+						$temp$row = row + 1,
+						$temp$col = 1,
+						$temp$s0 = s0;
+					isGood = $temp$isGood;
+					offset = $temp$offset;
+					row = $temp$row;
+					col = $temp$col;
+					s0 = $temp$s0;
+					continue chompWhileHelp;
+				} else {
+					var $temp$isGood = isGood,
+						$temp$offset = newOffset,
+						$temp$row = row,
+						$temp$col = col + 1,
+						$temp$s0 = s0;
+					isGood = $temp$isGood;
+					offset = $temp$offset;
+					row = $temp$row;
+					col = $temp$col;
+					s0 = $temp$s0;
+					continue chompWhileHelp;
+				}
+			}
+		}
+	});
+var $elm$parser$Parser$Advanced$chompWhile = function (isGood) {
+	return $elm$parser$Parser$Advanced$Parser(
+		function (s) {
+			return A5($elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.offset, s.row, s.col, s);
+		});
+};
+var $elm$parser$Parser$chompWhile = $elm$parser$Parser$Advanced$chompWhile;
+var $elm$parser$Parser$Advanced$mapChompedString = F2(
+	function (func, _v0) {
+		var parse = _v0.a;
+		return $elm$parser$Parser$Advanced$Parser(
+			function (s0) {
+				var _v1 = parse(s0);
+				if (_v1.$ === 'Bad') {
+					var p = _v1.a;
+					var x = _v1.b;
+					return A2($elm$parser$Parser$Advanced$Bad, p, x);
+				} else {
+					var p = _v1.a;
+					var a = _v1.b;
+					var s1 = _v1.c;
+					return A3(
+						$elm$parser$Parser$Advanced$Good,
+						p,
+						A2(
+							func,
+							A3($elm$core$String$slice, s0.offset, s1.offset, s0.src),
+							a),
+						s1);
+				}
+			});
+	});
+var $elm$parser$Parser$Advanced$getChompedString = function (parser) {
+	return A2($elm$parser$Parser$Advanced$mapChompedString, $elm$core$Basics$always, parser);
+};
+var $elm$parser$Parser$getChompedString = $elm$parser$Parser$Advanced$getChompedString;
 var $elm$parser$Parser$Advanced$map2 = F3(
 	function (func, _v0, _v1) {
 		var parseA = _v0.a;
@@ -8954,6 +9148,31 @@ var $elm$parser$Parser$Advanced$ignorer = F2(
 		return A3($elm$parser$Parser$Advanced$map2, $elm$core$Basics$always, keepParser, ignoreParser);
 	});
 var $elm$parser$Parser$ignorer = $elm$parser$Parser$Advanced$ignorer;
+var $elm$parser$Parser$Advanced$succeed = function (a) {
+	return $elm$parser$Parser$Advanced$Parser(
+		function (s) {
+			return A3($elm$parser$Parser$Advanced$Good, false, a, s);
+		});
+};
+var $elm$parser$Parser$succeed = $elm$parser$Parser$Advanced$succeed;
+var $author$project$AlternativeSolutions$DirectoryParser$dirWord = $elm$parser$Parser$getChompedString(
+	A2(
+		$elm$parser$Parser$ignorer,
+		A2(
+			$elm$parser$Parser$ignorer,
+			$elm$parser$Parser$succeed(_Utils_Tuple0),
+			$elm$parser$Parser$chompIf(
+				function (c) {
+					return $elm$core$Char$isAlphaNum(c) || _Utils_eq(
+						c,
+						_Utils_chr('.'));
+				})),
+		$elm$parser$Parser$chompWhile(
+			function (c) {
+				return $elm$core$Char$isAlphaNum(c) || _Utils_eq(
+					c,
+					_Utils_chr('.'));
+			})));
 var $elm$parser$Parser$ExpectingInt = {$: 'ExpectingInt'};
 var $elm$parser$Parser$Advanced$consumeBase = _Parser_consumeBase;
 var $elm$parser$Parser$Advanced$consumeBase16 = _Parser_consumeBase16;
@@ -8963,9 +9182,6 @@ var $elm$parser$Parser$Advanced$bumpOffset = F2(
 	});
 var $elm$parser$Parser$Advanced$chompBase10 = _Parser_chompBase10;
 var $elm$parser$Parser$Advanced$isAsciiCode = _Parser_isAsciiCode;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$parser$Parser$Advanced$consumeExp = F2(
 	function (offset, src) {
 		if (A3($elm$parser$Parser$Advanced$isAsciiCode, 101, offset, src) || A3($elm$parser$Parser$Advanced$isAsciiCode, 69, offset, src)) {
@@ -8983,22 +9199,6 @@ var $elm$parser$Parser$Advanced$consumeDotAndExp = F2(
 			$elm$parser$Parser$Advanced$consumeExp,
 			A2($elm$parser$Parser$Advanced$chompBase10, offset + 1, src),
 			src) : A2($elm$parser$Parser$Advanced$consumeExp, offset, src);
-	});
-var $elm$parser$Parser$Advanced$AddRight = F2(
-	function (a, b) {
-		return {$: 'AddRight', a: a, b: b};
-	});
-var $elm$parser$Parser$Advanced$DeadEnd = F4(
-	function (row, col, problem, contextStack) {
-		return {col: col, contextStack: contextStack, problem: problem, row: row};
-	});
-var $elm$parser$Parser$Advanced$Empty = {$: 'Empty'};
-var $elm$parser$Parser$Advanced$fromState = F2(
-	function (s, x) {
-		return A2(
-			$elm$parser$Parser$Advanced$AddRight,
-			$elm$parser$Parser$Advanced$Empty,
-			A4($elm$parser$Parser$Advanced$DeadEnd, s.row, s.col, x, s.context));
 	});
 var $elm$parser$Parser$Advanced$finalizeInt = F5(
 	function (invalid, handler, startOffset, _v0, s) {
@@ -9147,7 +9347,6 @@ var $elm$parser$Parser$Advanced$Token = F2(
 	function (a, b) {
 		return {$: 'Token', a: a, b: b};
 	});
-var $elm$parser$Parser$Advanced$isSubChar = _Parser_isSubChar;
 var $elm$parser$Parser$Advanced$isSubString = _Parser_isSubString;
 var $elm$parser$Parser$Advanced$keyword = function (_v0) {
 	var kwd = _v0.a;
@@ -9227,52 +9426,6 @@ var $elm$parser$Parser$Advanced$oneOf = function (parsers) {
 		});
 };
 var $elm$parser$Parser$oneOf = $elm$parser$Parser$Advanced$oneOf;
-var $elm$parser$Parser$Advanced$chompWhileHelp = F5(
-	function (isGood, offset, row, col, s0) {
-		chompWhileHelp:
-		while (true) {
-			var newOffset = A3($elm$parser$Parser$Advanced$isSubChar, isGood, offset, s0.src);
-			if (_Utils_eq(newOffset, -1)) {
-				return A3(
-					$elm$parser$Parser$Advanced$Good,
-					_Utils_cmp(s0.offset, offset) < 0,
-					_Utils_Tuple0,
-					{col: col, context: s0.context, indent: s0.indent, offset: offset, row: row, src: s0.src});
-			} else {
-				if (_Utils_eq(newOffset, -2)) {
-					var $temp$isGood = isGood,
-						$temp$offset = offset + 1,
-						$temp$row = row + 1,
-						$temp$col = 1,
-						$temp$s0 = s0;
-					isGood = $temp$isGood;
-					offset = $temp$offset;
-					row = $temp$row;
-					col = $temp$col;
-					s0 = $temp$s0;
-					continue chompWhileHelp;
-				} else {
-					var $temp$isGood = isGood,
-						$temp$offset = newOffset,
-						$temp$row = row,
-						$temp$col = col + 1,
-						$temp$s0 = s0;
-					isGood = $temp$isGood;
-					offset = $temp$offset;
-					row = $temp$row;
-					col = $temp$col;
-					s0 = $temp$s0;
-					continue chompWhileHelp;
-				}
-			}
-		}
-	});
-var $elm$parser$Parser$Advanced$chompWhile = function (isGood) {
-	return $elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			return A5($elm$parser$Parser$Advanced$chompWhileHelp, isGood, s.offset, s.row, s.col, s);
-		});
-};
 var $elm$parser$Parser$Advanced$spaces = $elm$parser$Parser$Advanced$chompWhile(
 	function (c) {
 		return _Utils_eq(
@@ -9284,74 +9437,22 @@ var $elm$parser$Parser$Advanced$spaces = $elm$parser$Parser$Advanced$chompWhile(
 			_Utils_chr('\r')));
 	});
 var $elm$parser$Parser$spaces = $elm$parser$Parser$Advanced$spaces;
-var $elm$parser$Parser$Advanced$succeed = function (a) {
-	return $elm$parser$Parser$Advanced$Parser(
-		function (s) {
-			return A3($elm$parser$Parser$Advanced$Good, false, a, s);
-		});
-};
-var $elm$parser$Parser$succeed = $elm$parser$Parser$Advanced$succeed;
-var $elm$parser$Parser$UnexpectedChar = {$: 'UnexpectedChar'};
-var $elm$parser$Parser$Advanced$chompIf = F2(
-	function (isGood, expecting) {
-		return $elm$parser$Parser$Advanced$Parser(
-			function (s) {
-				var newOffset = A3($elm$parser$Parser$Advanced$isSubChar, isGood, s.offset, s.src);
-				return _Utils_eq(newOffset, -1) ? A2(
-					$elm$parser$Parser$Advanced$Bad,
-					false,
-					A2($elm$parser$Parser$Advanced$fromState, s, expecting)) : (_Utils_eq(newOffset, -2) ? A3(
-					$elm$parser$Parser$Advanced$Good,
-					true,
-					_Utils_Tuple0,
-					{col: 1, context: s.context, indent: s.indent, offset: s.offset + 1, row: s.row + 1, src: s.src}) : A3(
-					$elm$parser$Parser$Advanced$Good,
-					true,
-					_Utils_Tuple0,
-					{col: s.col + 1, context: s.context, indent: s.indent, offset: newOffset, row: s.row, src: s.src}));
-			});
-	});
-var $elm$parser$Parser$chompIf = function (isGood) {
-	return A2($elm$parser$Parser$Advanced$chompIf, isGood, $elm$parser$Parser$UnexpectedChar);
-};
-var $elm$parser$Parser$chompWhile = $elm$parser$Parser$Advanced$chompWhile;
-var $elm$parser$Parser$Advanced$mapChompedString = F2(
-	function (func, _v0) {
-		var parse = _v0.a;
-		return $elm$parser$Parser$Advanced$Parser(
-			function (s0) {
-				var _v1 = parse(s0);
-				if (_v1.$ === 'Bad') {
-					var p = _v1.a;
-					var x = _v1.b;
-					return A2($elm$parser$Parser$Advanced$Bad, p, x);
-				} else {
-					var p = _v1.a;
-					var a = _v1.b;
-					var s1 = _v1.c;
-					return A3(
-						$elm$parser$Parser$Advanced$Good,
-						p,
-						A2(
-							func,
-							A3($elm$core$String$slice, s0.offset, s1.offset, s0.src),
-							a),
-						s1);
-				}
-			});
-	});
-var $elm$parser$Parser$Advanced$getChompedString = function (parser) {
-	return A2($elm$parser$Parser$Advanced$mapChompedString, $elm$core$Basics$always, parser);
-};
-var $elm$parser$Parser$getChompedString = $elm$parser$Parser$Advanced$getChompedString;
 var $author$project$AlternativeSolutions$DirectoryParser$word = $elm$parser$Parser$getChompedString(
 	A2(
 		$elm$parser$Parser$ignorer,
 		A2(
 			$elm$parser$Parser$ignorer,
 			$elm$parser$Parser$succeed(_Utils_Tuple0),
-			$elm$parser$Parser$chompIf($elm$core$Char$isAlphaNum)),
-		$elm$parser$Parser$chompWhile($elm$core$Char$isAlphaNum)));
+			$elm$parser$Parser$chompIf(
+				function (c) {
+					return $elm$core$Char$isAlphaNum(c);
+				})),
+		$elm$parser$Parser$chompWhile(
+			function (c) {
+				return $elm$core$Char$isAlphaNum(c) || _Utils_eq(
+					c,
+					_Utils_chr('.'));
+			})));
 var $author$project$AlternativeSolutions$DirectoryParser$commandParser = A2(
 	$elm$parser$Parser$keeper,
 	$elm$parser$Parser$succeed($elm$core$Basics$identity),
@@ -9367,7 +9468,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$commandParser = A2(
 						$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$CD),
 						$elm$parser$Parser$keyword('cd')),
 					$elm$parser$Parser$spaces),
-				$author$project$AlternativeSolutions$DirectoryParser$word),
+				$author$project$AlternativeSolutions$DirectoryParser$dirWord),
 				A2(
 				$elm$parser$Parser$ignorer,
 				$elm$parser$Parser$succeed($author$project$AlternativeSolutions$DirectoryParser$LS),
@@ -9398,6 +9499,25 @@ var $author$project$AlternativeSolutions$DirectoryParser$commandParser = A2(
 			])));
 var $elm$parser$Parser$deadEndsToString = function (deadEnds) {
 	return 'TODO deadEndsToString';
+};
+var $author$project$Utilities$DirectoryTree$listDir = function (directory) {
+	var directories = A2(
+		$elm$core$List$map,
+		function (dir) {
+			return dir.label + ' (DIR)';
+		},
+		A2(
+			$elm$core$List$map,
+			$zwilias$elm_rosetree$Tree$label,
+			$zwilias$elm_rosetree$Tree$Zipper$children(directory)));
+	var data = $zwilias$elm_rosetree$Tree$Zipper$label(directory);
+	var files = A2(
+		$elm$core$List$map,
+		function (file) {
+			return file.label + (' ' + ($elm$core$String$fromInt(file.size) + ' (File)'));
+		},
+		data.files);
+	return A2($elm$core$List$append, directories, files);
 };
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
@@ -9509,8 +9629,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$update = F2(
 									terminalOutput: A2(
 										$elm$core$List$append,
 										model.terminalOutput,
-										_List_fromArray(
-											['List']))
+										$author$project$Utilities$DirectoryTree$listDir(model.directoryTree))
 								});
 						case 'MakeDir':
 							var name = command.a;
@@ -9854,7 +9973,7 @@ var $author$project$AlternativeSolutions$DirectoryParser$view = function (_v0) {
 							_List_Nil,
 							_List_fromArray(
 								[
-									$elm$html$Html$text('> ' + line)
+									$elm$html$Html$text(line)
 								]));
 					},
 					terminalOutput)),
