@@ -1,7 +1,8 @@
 module Advent7 exposing (..)
 
 import Advent7Data
-import Html exposing (Html)
+import Html exposing (Html, p, text)
+import Html.Attributes exposing (class)
 import Parser exposing (..)
 import Tree exposing (tree)
 import Tree.Zipper as Zipper
@@ -52,34 +53,47 @@ toListItems label children =
 
 main : Html msg
 main =
-    demoTree
-        |> Zipper.fromTree
-        |> Zipper.mapTree
-            (addFolder
-                (tree (Directory "home" []) [])
+    Advent7Data.testInput
+        |> String.lines
+        |> List.map (Parser.run commandParser)
+        |> List.map
+            (\line ->
+                p [ class "command-line" ] [ text (Debug.toString line) ]
             )
-        |> Zipper.mapTree
-            (addFolder
-                (tree (Directory "var" []) [])
-            )
-        |> Zipper.findNext
-            (\x ->
-                x.label == "home"
-            )
-        |> Maybe.withDefault (Zipper.fromTree demoTree)
-        |> Zipper.mapTree
-            (addFolder
-                (tree (Directory "foo" []) [])
-            )
-        |> Zipper.mapTree
-            (addFolder
-                (tree (Directory "bar" []) [])
-            )
-        |> Zipper.toTree
-        -- |> Debug.toString
-        -- |> Html.text
-        |> Tree.restructure directoryToHtml toListItems
-        |> (\root -> Html.ul [] [ root ])
+        |> (\list ->
+                Html.div []
+                    list
+           )
+
+
+
+-- Html.text "foo"
+-- demoTree
+--     |> Zipper.fromTree
+--     |> Zipper.mapTree
+--         (addFolder
+--             (tree (Directory "home" []) [])
+--         )
+--     |> Zipper.mapTree
+--         (addFolder
+--             (tree (Directory "var" []) [])
+--         )
+--     |> Zipper.findNext
+--         (\x ->
+--             x.label == "home"
+--         )
+--     |> Maybe.withDefault (Zipper.fromTree demoTree)
+--     |> Zipper.mapTree
+--         (addFolder
+--             (tree (Directory "foo" []) [])
+--         )
+--     |> Zipper.mapTree
+--         (addFolder
+--             (tree (Directory "bar" []) [])
+--         )
+--     |> Zipper.toTree
+--     |> Tree.restructure directoryToHtml toListItems
+--     |> (\root -> Html.ul [] [ root ])
 
 
 changeDirectory : String -> Zipper.Zipper Directory -> Maybe (Zipper.Zipper Directory)
@@ -125,10 +139,6 @@ addFolder child parent =
                 parent
 
 
-
--- addChildToDirectory : Zipper.Zipper Directory -> Directory
-
-
 addChildToDirectory parent child =
     let
         data =
@@ -149,101 +159,46 @@ type TerminalEntry
 
 
 type Command
-    = CD
+    = CD String
     | LS
+    | MakeDir
+
+
+
+-- commandParser : Parser Command
+-- commandParser =
+--     succeed identity
+--         |. symbol "$"
+--         |. spaces
+--         |= oneOf
+--             [ succeed CD
+--                 |. keyword "cd"
+--             , succeed LS
+--                 |. keyword "ls"
+--             ]
+
+
+dirWord : Parser String
+dirWord =
+    getChompedString <|
+        succeed ()
+            |. chompIf (\c -> Char.isAlphaNum c || c == '.')
+            |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
 
 
 commandParser : Parser Command
 commandParser =
     succeed identity
-        |. symbol "$"
-        |. spaces
         |= oneOf
-            [ succeed CD
-                |. keyword "cd"
-            , succeed LS
-                |. keyword "ls"
+            [ succeed identity
+                |. symbol "$"
+                |. spaces
+                |= oneOf
+                    [ succeed CD
+                        |. keyword "cd"
+                        |. spaces
+                        |= dirWord
+                    , succeed LS
+                        |. keyword "ls"
+                    ]
             ]
-
-
-fileSizeParser : Parser Int
-fileSizeParser =
-    succeed identity
-        |= int
-
-
-
--- lineParser : Parser a
--- lineParser =
---     succeed TerminalEntry
---         |= oneOf
---             [ commandParser
---             , fileSizeParser
---             ]
--- type Directory
---     = Empty String Int
---     | Node String Int (List Directory)
--- -- type File
--- --     = File Int String
--- -- type Directory
--- --     = Directory String
--- -- type FileType
--- --     = DirectoryObject Directory
--- --     | FileObject File
--- -- type alias DirectoryContent =
--- --     { files : List File
--- --     , directories : List Directory
--- --     }
--- -- fileParser : Parser DirectoryContent
--- -- fileParser =
--- --     succeed identity
--- --         |
--- -- commandParser : Parser Command
--- -- commandParser =
--- --     oneOf
--- --         [ map (\_ -> CD) (keyword "cd")
--- --         , map (\_ -> LS) (keyword "ls")
--- --         ]
--- -- commandParser : Parser Command
--- -- commandParser =
--- --     oneOf
--- --         [ map (\_ -> CD) (keyword "CD")
--- --         , map (\_ -> LS) (keyword "LS")
--- --         ]
--- -- commandParser : Parser Command
--- -- commandParser =
--- --     succeed Command
--- --         |= oneOf
--- --             [ succeed CD
--- --                 |. keyword "CD"
--- --             ]
--- -- day7PartOne : String -> Int
--- day7PartOne input =
---     input
---         |> String.lines
--- directoryA : Directory
--- directoryA =
---     Node "/"
---         56
---         [ Node "a"
---             2
---             [ Empty "b1" 5
---             , Empty "b2" 15
---             , Node "b3"
---                 23
---                 [ Empty "c1" 3 ]
---             ]
---         ]
--- type alias State =
---     { currentDir : String
---     , size : Int
---     , children : List Directory
---     }
--- -- createDirectory
--- testFunction : List String -> String
--- testFunction entries =
---     let
---         finish entry next =
---             next (entry :: entries)
---     in
---     "abc"
