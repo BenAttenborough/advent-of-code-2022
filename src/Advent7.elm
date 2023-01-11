@@ -1,11 +1,13 @@
 module Advent7 exposing (..)
 
 import Advent7Data
+import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (class)
 import Parser exposing (..)
 import Tree exposing (tree)
 import Tree.Zipper as Zipper
+import Utilities.Utilities exposing (linesDebugToHtml, linesToHtml)
 
 
 type alias Directory =
@@ -54,19 +56,20 @@ toListItems label children =
 main : Html msg
 main =
     Advent7Data.testInput
-        |> String.lines
+        |> String.split "$ "
         |> List.map (Parser.run commandParser)
-        |> List.map
-            (\line ->
-                p [ class "command-line" ] [ text (Debug.toString line) ]
-            )
-        |> (\list ->
-                Html.div []
-                    list
-           )
+        |> linesDebugToHtml
 
 
 
+-- |> List.map
+--     (\line ->
+--         p [ class "command-line" ] [ text (Debug.toString line) ]
+--     )
+-- |> (\list ->
+--         Html.div []
+--             list
+--    )
 -- Html.text "foo"
 -- demoTree
 --     |> Zipper.fromTree
@@ -160,22 +163,9 @@ type TerminalEntry
 
 type Command
     = CD String
-    | LS
-    | MakeDir
-
-
-
--- commandParser : Parser Command
--- commandParser =
---     succeed identity
---         |. symbol "$"
---         |. spaces
---         |= oneOf
---             [ succeed CD
---                 |. keyword "cd"
---             , succeed LS
---                 |. keyword "ls"
---             ]
+    | LS String
+    | Home
+    | UpDir
 
 
 dirWord : Parser String
@@ -186,19 +176,31 @@ dirWord =
             |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
 
 
+word : Parser String
+word =
+    getChompedString <|
+        succeed ()
+            |. chompIf (\c -> Char.isAlphaNum c)
+            |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
+
+
 commandParser : Parser Command
 commandParser =
     succeed identity
         |= oneOf
             [ succeed identity
-                |. symbol "$"
+                |. keyword "cd"
                 |. spaces
                 |= oneOf
                     [ succeed CD
-                        |. keyword "cd"
-                        |. spaces
                         |= dirWord
-                    , succeed LS
-                        |. keyword "ls"
+                    , succeed Home
+                        |. keyword "/"
+                    , succeed UpDir
+                        |. keyword ".."
                     ]
+            , succeed LS
+                |. keyword "ls"
+                |. spaces
+                |= word
             ]
