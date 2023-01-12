@@ -163,9 +163,14 @@ type TerminalEntry
 
 type Command
     = CD String
-    | LS (List String)
+    | LS (List ItemType)
     | Home
     | UpDir
+
+
+type ItemType
+    = Dir String
+    | FileType Int
 
 
 dirWord : Parser String
@@ -184,15 +189,37 @@ word =
             |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
 
 
-statement : Parser String
-statement =
+stringParser : Parser String
+stringParser =
     getChompedString <|
         succeed ()
             |. chompIf (\c -> c /= '\n')
             |. chompWhile (\c -> c /= '\n')
 
 
-statementsHelper : List String -> Parser (Step (List String) (List String))
+fileNameParser : Parser String
+fileNameParser =
+    getChompedString <|
+        succeed ()
+            |. chompIf (\c -> Char.isAlphaNum c)
+            |. chompWhile (\c -> Char.isAlphaNum c || c == '.')
+
+
+statement : Parser ItemType
+statement =
+    oneOf
+        [ succeed Dir
+            |. keyword "dir"
+            |. spaces
+            |= stringParser
+        , succeed FileType
+            |= int
+            |. spaces
+            |. fileNameParser
+        ]
+
+
+statementsHelper : List ItemType -> Parser (Step (List ItemType) (List ItemType))
 statementsHelper strings =
     oneOf
         [ succeed (\s -> Loop (s :: strings))
@@ -203,7 +230,7 @@ statementsHelper strings =
         ]
 
 
-statements : Parser (List String)
+statements : Parser (List ItemType)
 statements =
     loop [] statementsHelper
 
