@@ -1,4 +1,4 @@
-// elm-watch hot {"version":"1.1.1","targetName":"My target name","webSocketPort":49497}
+// elm-watch hot {"version":"1.1.1","targetName":"My target name","webSocketPort":34737}
 "use strict";
 (() => {
   // node_modules/tiny-decoders/index.mjs
@@ -604,11 +604,11 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1672185113899"
+    "1672755098798"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
-  var WEBSOCKET_PORT = "49497";
+  var WEBSOCKET_PORT = "34737";
   var CONTAINER_ID = "elm-watch";
   var DEBUG = String("false") === "true";
   var BROWSER_UI_MOVED_EVENT = "BROWSER_UI_MOVED_EVENT";

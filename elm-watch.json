@@ -1,10 +1,8 @@
 {
     "targets": {
         "My target name": {
-            "inputs": [
-                "src/AlternativeSolutions/DirectoryParser.elm"
-            ],
-            "output": "html/directoryParser.js"
+            "inputs": ["src/Advent7.elm"],
+            "output": "html/advent7.js"
         }
     }
 }
