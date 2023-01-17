@@ -5,8 +5,9 @@ import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (class)
 import Parser exposing (..)
-import Tree exposing (tree)
+import Tree exposing (Tree, tree)
 import Tree.Zipper as Zipper
+import Utilities.DirectoryTree as DirectoryTree
 import Utilities.Utilities exposing (linesDebugToHtml, linesToHtml)
 
 
@@ -22,8 +23,8 @@ type alias File =
     }
 
 
-demoTree : Tree.Tree Directory
-demoTree =
+emptyDirectory : Tree.Tree Directory
+emptyDirectory =
     Tree.singleton (Directory "root" [])
 
 
@@ -40,6 +41,12 @@ directoryToHtml dir =
         ]
 
 
+
+-- treeToHtml : Tree.Tree Directory -> Html Msg
+-- treeToHtml tree =
+--     tree
+
+
 toListItems : Html msg -> List (Html msg) -> Html msg
 toListItems label children =
     case children of
@@ -53,12 +60,36 @@ toListItems label children =
                 ]
 
 
-main : Html msg
-main =
-    Advent7Data.testInput
+updateDirectory : Tree.Tree Directory -> Tree.Tree Directory
+updateDirectory dir =
+    dir
+
+
+getCommands : String -> List Command
+getCommands commands =
+    commands
         |> String.split "$ "
         |> List.map (Parser.run commandParser)
-        |> linesDebugToHtml
+        |> List.map (Result.withDefault NoOp)
+
+
+main : Html msg
+main =
+    let
+        commands =
+            getCommands Advent7Data.testInput
+    in
+    -- commands
+    --     |> linesDebugToHtml
+    emptyDirectory
+        |> Zipper.fromTree
+        |> (\tree ->
+                List.foldl
+                    (\x y -> y)
+                    tree
+                    commands
+           )
+        |> DirectoryTree.toHtml
 
 
 
@@ -166,6 +197,7 @@ type Command
     | LS (List ItemType)
     | Home
     | UpDir
+    | NoOp
 
 
 type ItemType
