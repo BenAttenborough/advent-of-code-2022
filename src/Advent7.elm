@@ -85,49 +85,39 @@ main =
         |> Zipper.fromTree
         |> (\tree ->
                 List.foldl
-                    (\x y -> y)
+                    (\command newList ->
+                        case command of
+                            Home ->
+                                Zipper.root newList
+
+                            LS items ->
+                                let
+                                    size =
+                                        items
+                                            |> List.map
+                                                (\item ->
+                                                    case item of
+                                                        FileType val ->
+                                                            val
+
+                                                        _ ->
+                                                            0
+                                                )
+                                            |> List.foldl (+) 0
+                                in
+                                newList
+
+                            -- Add size to directory
+                            CD _ ->
+                                newList
+
+                            _ ->
+                                newList
+                    )
                     tree
                     commands
            )
         |> DirectoryTree.toHtml
-
-
-
--- |> List.map
---     (\line ->
---         p [ class "command-line" ] [ text (Debug.toString line) ]
---     )
--- |> (\list ->
---         Html.div []
---             list
---    )
--- Html.text "foo"
--- demoTree
---     |> Zipper.fromTree
---     |> Zipper.mapTree
---         (addFolder
---             (tree (Directory "home" []) [])
---         )
---     |> Zipper.mapTree
---         (addFolder
---             (tree (Directory "var" []) [])
---         )
---     |> Zipper.findNext
---         (\x ->
---             x.label == "home"
---         )
---     |> Maybe.withDefault (Zipper.fromTree demoTree)
---     |> Zipper.mapTree
---         (addFolder
---             (tree (Directory "foo" []) [])
---         )
---     |> Zipper.mapTree
---         (addFolder
---             (tree (Directory "bar" []) [])
---         )
---     |> Zipper.toTree
---     |> Tree.restructure directoryToHtml toListItems
---     |> (\root -> Html.ul [] [ root ])
 
 
 changeDirectory : String -> Zipper.Zipper Directory -> Maybe (Zipper.Zipper Directory)
