@@ -23,9 +23,9 @@ type alias File =
     }
 
 
-emptyDirectory : Tree.Tree Directory
+emptyDirectory : Zipper.Zipper DirectoryTree.Directory
 emptyDirectory =
-    Tree.singleton (Directory "root" [])
+    DirectoryTree.singleton (Directory "root" [])
 
 
 directoryToHtml : Directory -> Html msg
@@ -82,7 +82,6 @@ main =
     -- commands
     --     |> linesDebugToHtml
     emptyDirectory
-        |> Zipper.fromTree
         |> (\tree ->
                 List.foldl
                     (\command newList ->
@@ -111,7 +110,7 @@ main =
                                                 (\item ->
                                                     case item of
                                                         Dir name ->
-                                                            Just (DirectoryTree.Directory name)
+                                                            Just (Tree.tree (Directory name []))
 
                                                         _ ->
                                                             Nothing
@@ -120,6 +119,13 @@ main =
                                 in
                                 newList
                                     |> DirectoryTree.addFiles files
+                                    |> (\dirs directoryTree ->
+                                            List.foldl
+                                                addFolder
+                                                directoryTree
+                                                dirs
+                                       )
+                                        directories
 
                             CD _ ->
                                 newList
