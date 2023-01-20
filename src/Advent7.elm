@@ -92,22 +92,35 @@ main =
 
                             LS items ->
                                 let
-                                    size =
+                                    files =
                                         items
                                             |> List.map
                                                 (\item ->
                                                     case item of
-                                                        FileType val ->
-                                                            val
+                                                        FileType size name ->
+                                                            Just (DirectoryTree.File name size)
 
                                                         _ ->
-                                                            0
+                                                            Nothing
                                                 )
-                                            |> List.foldl (+) 0
+                                            |> List.filterMap identity
+
+                                    directories =
+                                        items
+                                            |> List.map
+                                                (\item ->
+                                                    case item of
+                                                        Dir name ->
+                                                            Just (DirectoryTree.Directory name)
+
+                                                        _ ->
+                                                            Nothing
+                                                )
+                                            |> List.filterMap identity
                                 in
                                 newList
+                                    |> DirectoryTree.addFiles files
 
-                            -- Add size to directory
                             CD _ ->
                                 newList
 
@@ -192,7 +205,7 @@ type Command
 
 type ItemType
     = Dir String
-    | FileType Int
+    | FileType Int String
 
 
 dirWord : Parser String
@@ -237,7 +250,7 @@ statement =
         , succeed FileType
             |= int
             |. spaces
-            |. fileNameParser
+            |= fileNameParser
         ]
 
 

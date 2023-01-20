@@ -1,4 +1,4 @@
-// elm-watch hot {"version":"1.1.1","targetName":"My target name","webSocketPort":49497}
+// elm-watch hot {"version":"1.1.1","targetName":"My target name","webSocketPort":34737}
 "use strict";
 (() => {
   // node_modules/tiny-decoders/index.mjs
@@ -604,11 +604,11 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1674164230125"
+    "1674233745997"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
-  var WEBSOCKET_PORT = "49497";
+  var WEBSOCKET_PORT = "34737";
   var CONTAINER_ID = "elm-watch";
   var DEBUG = String("false") === "true";
   var BROWSER_UI_MOVED_EVENT = "BROWSER_UI_MOVED_EVENT";
@@ -7648,25 +7648,243 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var $author$project$Advent7$Directory = F2(
+var $author$project$Utilities$DirectoryTree$Directory = F2(
 	function (label, files) {
 		return {files: files, label: label};
+	});
+var $author$project$Utilities$DirectoryTree$File = F2(
+	function (label, size) {
+		return {label: label, size: size};
+	});
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $zwilias$elm_rosetree$Tree$label = function (_v0) {
+	var v = _v0.a;
+	return v;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
+	var focus = _v0.a.focus;
+	return focus;
+};
+var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
+	return $zwilias$elm_rosetree$Tree$label(
+		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
+};
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
 	});
 var $zwilias$elm_rosetree$Tree$Tree = F2(
 	function (a, b) {
 		return {$: 'Tree', a: a, b: b};
 	});
-var $zwilias$elm_rosetree$Tree$singleton = function (v) {
-	return A2($zwilias$elm_rosetree$Tree$Tree, v, _List_Nil);
-};
-var $author$project$Advent7$emptyDirectory = $zwilias$elm_rosetree$Tree$singleton(
-	A2($author$project$Advent7$Directory, 'root', _List_Nil));
+var $zwilias$elm_rosetree$Tree$mapLabel = F2(
+	function (f, _v0) {
+		var v = _v0.a;
+		var cs = _v0.b;
+		return A2(
+			$zwilias$elm_rosetree$Tree$Tree,
+			f(v),
+			cs);
+	});
 var $elm$core$Basics$identity = function (x) {
 	return x;
 };
 var $zwilias$elm_rosetree$Tree$Zipper$Zipper = function (a) {
 	return {$: 'Zipper', a: a};
 };
+var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
+	function (f, _v0) {
+		var zipper = _v0.a;
+		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
+			_Utils_update(
+				zipper,
+				{
+					focus: f(zipper.focus)
+				}));
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$mapLabel = F2(
+	function (f, zipper) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$mapTree,
+			$zwilias$elm_rosetree$Tree$mapLabel(f),
+			zipper);
+	});
+var $zwilias$elm_rosetree$Tree$Zipper$replaceLabel = F2(
+	function (l, zipper) {
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$mapLabel,
+			$elm$core$Basics$always(l),
+			zipper);
+	});
+var $author$project$Utilities$DirectoryTree$addFiles = F2(
+	function (files, directory) {
+		var data = $zwilias$elm_rosetree$Tree$Zipper$label(directory);
+		var exisitingFiles = data.files;
+		var usedLabels = A2(
+			$elm$core$List$map,
+			function ($) {
+				return $.label;
+			},
+			exisitingFiles);
+		var filesToAppend = A2(
+			$elm$core$List$filter,
+			function (l) {
+				return !A2($elm$core$List$member, l.label, usedLabels);
+			},
+			files);
+		var appendableFiles = A2($elm$core$List$append, exisitingFiles, filesToAppend);
+		return A2(
+			$zwilias$elm_rosetree$Tree$Zipper$replaceLabel,
+			_Utils_update(
+				data,
+				{files: appendableFiles}),
+			directory);
+	});
+var $author$project$Advent7$Directory = F2(
+	function (label, files) {
+		return {files: files, label: label};
+	});
+var $zwilias$elm_rosetree$Tree$singleton = function (v) {
+	return A2($zwilias$elm_rosetree$Tree$Tree, v, _List_Nil);
+};
+var $author$project$Advent7$emptyDirectory = $zwilias$elm_rosetree$Tree$singleton(
+	A2($author$project$Advent7$Directory, 'root', _List_Nil));
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
 var $zwilias$elm_rosetree$Tree$Zipper$fromTree = function (t) {
 	return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
 		{after: _List_Nil, before: _List_Nil, crumbs: _List_Nil, focus: t});
@@ -7781,10 +7999,6 @@ var $elm$parser$Parser$Advanced$chompWhile = function (isGood) {
 		});
 };
 var $elm$parser$Parser$chompWhile = $elm$parser$Parser$Advanced$chompWhile;
-var $elm$core$Basics$always = F2(
-	function (a, _v0) {
-		return a;
-	});
 var $elm$core$String$slice = _String_slice;
 var $elm$parser$Parser$Advanced$mapChompedString = F2(
 	function (func, _v0) {
@@ -7894,7 +8108,6 @@ var $elm$core$String$isEmpty = function (string) {
 	return string === '';
 };
 var $elm$parser$Parser$Advanced$isSubString = _Parser_isSubString;
-var $elm$core$Basics$not = _Basics_not;
 var $elm$parser$Parser$Advanced$keyword = function (_v0) {
 	var kwd = _v0.a;
 	var expecting = _v0.b;
@@ -8083,9 +8296,10 @@ var $elm$parser$Parser$Loop = function (a) {
 var $author$project$Advent7$Dir = function (a) {
 	return {$: 'Dir', a: a};
 };
-var $author$project$Advent7$FileType = function (a) {
-	return {$: 'FileType', a: a};
-};
+var $author$project$Advent7$FileType = F2(
+	function (a, b) {
+		return {$: 'FileType', a: a, b: b};
+	});
 var $author$project$Advent7$fileNameParser = $elm$parser$Parser$getChompedString(
 	A2(
 		$elm$parser$Parser$ignorer,
@@ -8298,11 +8512,11 @@ var $author$project$Advent7$statement = $elm$parser$Parser$oneOf(
 			$author$project$Advent7$stringParser),
 			A2(
 			$elm$parser$Parser$keeper,
-			$elm$parser$Parser$succeed($author$project$Advent7$FileType),
 			A2(
-				$elm$parser$Parser$ignorer,
-				A2($elm$parser$Parser$ignorer, $elm$parser$Parser$int, $elm$parser$Parser$spaces),
-				$author$project$Advent7$fileNameParser))
+				$elm$parser$Parser$keeper,
+				$elm$parser$Parser$succeed($author$project$Advent7$FileType),
+				A2($elm$parser$Parser$ignorer, $elm$parser$Parser$int, $elm$parser$Parser$spaces)),
+			$author$project$Advent7$fileNameParser)
 		]));
 var $elm$parser$Parser$ExpectingSymbol = function (a) {
 	return {$: 'ExpectingSymbol', a: a};
@@ -8402,75 +8616,6 @@ var $author$project$Advent7$commandParser = A2(
 					$elm$parser$Parser$spaces),
 				$author$project$Advent7$statements)
 			])));
-var $elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							$elm$core$List$foldl,
-							fn,
-							acc,
-							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var $elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
 		return {col: col, problem: problem, row: row};
@@ -8789,10 +8934,6 @@ var $elm$core$Basics$composeL = F3(
 		return g(
 			f(x));
 	});
-var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
-	var focus = _v0.a.focus;
-	return focus;
-};
 var $zwilias$elm_rosetree$Tree$Zipper$toTree = A2($elm$core$Basics$composeL, $zwilias$elm_rosetree$Tree$Zipper$tree, $zwilias$elm_rosetree$Tree$Zipper$root);
 var $author$project$Utilities$DirectoryTree$toHtml = function (dir) {
 	return function (root) {
@@ -8821,22 +8962,38 @@ var $author$project$Advent7$main = function () {
 								return $zwilias$elm_rosetree$Tree$Zipper$root(newList);
 							case 'LS':
 								var items = command.a;
-								var size = A3(
-									$elm$core$List$foldl,
-									$elm$core$Basics$add,
-									0,
+								var files = A2(
+									$elm$core$List$filterMap,
+									$elm$core$Basics$identity,
 									A2(
 										$elm$core$List$map,
 										function (item) {
 											if (item.$ === 'FileType') {
-												var val = item.a;
-												return val;
+												var size = item.a;
+												var name = item.b;
+												return $elm$core$Maybe$Just(
+													A2($author$project$Utilities$DirectoryTree$File, name, size));
 											} else {
-												return 0;
+												return $elm$core$Maybe$Nothing;
 											}
 										},
 										items));
-								return newList;
+								var directories = A2(
+									$elm$core$List$filterMap,
+									$elm$core$Basics$identity,
+									A2(
+										$elm$core$List$map,
+										function (item) {
+											if (item.$ === 'Dir') {
+												var name = item.a;
+												return $elm$core$Maybe$Just(
+													$author$project$Utilities$DirectoryTree$Directory(name));
+											} else {
+												return $elm$core$Maybe$Nothing;
+											}
+										},
+										items));
+								return A2($author$project$Utilities$DirectoryTree$addFiles, files, newList);
 							case 'CD':
 								return newList;
 							default:
