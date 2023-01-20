@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1674234798718"
+    "1674235936896"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -7858,10 +7858,6 @@ var $author$project$Utilities$DirectoryTree$addFiles = F2(
 				{files: appendableFiles}),
 			directory);
 	});
-var $author$project$Advent7$Directory = F2(
-	function (label, files) {
-		return {files: files, label: label};
-	});
 var $zwilias$elm_rosetree$Tree$Zipper$fromTree = function (t) {
 	return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
 		{after: _List_Nil, before: _List_Nil, crumbs: _List_Nil, focus: t});
@@ -7874,7 +7870,7 @@ var $author$project$Utilities$DirectoryTree$singleton = function (directory) {
 		$zwilias$elm_rosetree$Tree$singleton(directory));
 };
 var $author$project$Advent7$emptyDirectory = $author$project$Utilities$DirectoryTree$singleton(
-	A2($author$project$Advent7$Directory, 'root', _List_Nil));
+	A2($author$project$Utilities$DirectoryTree$Directory, 'root', _List_Nil));
 var $elm$core$List$maybeCons = F3(
 	function (f, mx, xs) {
 		var _v0 = f(mx);
@@ -8991,7 +8987,8 @@ var $author$project$Advent7$main = function () {
 											if (item.$ === 'Dir') {
 												var name = item.a;
 												return $elm$core$Maybe$Just(
-													A2($author$project$Utilities$DirectoryTree$Directory, name, _List_Nil));
+													$zwilias$elm_rosetree$Tree$tree(
+														A2($author$project$Utilities$DirectoryTree$Directory, name, _List_Nil)));
 											} else {
 												return $elm$core$Maybe$Nothing;
 											}
