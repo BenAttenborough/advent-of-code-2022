@@ -30,64 +30,8 @@ main =
         commands =
             getCommands Advent7Data.testInput
     in
-    -- commands
-    --     |> linesDebugToHtml
-    emptyDirectory
-        |> (\tree ->
-                List.foldl
-                    (\command newList ->
-                        case command of
-                            Home ->
-                                Zipper.root newList
-
-                            LS items ->
-                                let
-                                    files =
-                                        items
-                                            |> List.map
-                                                (\item ->
-                                                    case item of
-                                                        FileType size name ->
-                                                            Just (File name size)
-
-                                                        _ ->
-                                                            Nothing
-                                                )
-                                            |> List.filterMap identity
-
-                                    directories =
-                                        items
-                                            |> List.map
-                                                (\item ->
-                                                    case item of
-                                                        Dir name ->
-                                                            Just (Tree.tree (Directory name []))
-
-                                                        _ ->
-                                                            Nothing
-                                                )
-                                            |> List.filterMap identity
-                                in
-                                newList
-                                    |> addFiles files
-
-                            -- |> (\dirs directoryTree ->
-                            --         List.foldl
-                            --             addFolder
-                            --             directoryTree
-                            --             dirs
-                            --    )
-                            --     directories
-                            CD _ ->
-                                newList
-
-                            _ ->
-                                newList
-                    )
-                    tree
-                    commands
-           )
-        |> toHtml
+    commands
+        |> linesDebugToHtml
 
 
 type Command
@@ -99,8 +43,8 @@ type Command
 
 
 type ItemType
-    = Dir String
-    | FileType Int String
+    = Dir Directory
+    | FileType File
 
 
 dirWord : Parser String
@@ -138,11 +82,11 @@ fileNameParser =
 statement : Parser ItemType
 statement =
     oneOf
-        [ succeed Dir
+        [ succeed (\x -> Dir (Directory x []))
             |. keyword "dir"
             |. spaces
             |= stringParser
-        , succeed FileType
+        , succeed (\a b -> FileType (File b a))
             |= int
             |. spaces
             |= fileNameParser
@@ -173,12 +117,12 @@ commandParser =
                 |. keyword "cd"
                 |. spaces
                 |= oneOf
-                    [ succeed CD
-                        |= dirWord
+                    [ succeed UpDir
+                        |. keyword ".."
                     , succeed Home
                         |. keyword "/"
-                    , succeed UpDir
-                        |. keyword ".."
+                    , succeed CD
+                        |= dirWord
                     ]
             , succeed LS
                 |. keyword "ls"

@@ -604,7 +604,7 @@ ${variant}`;
   var VERSION = "1.1.1";
   var TARGET_NAME = "My target name";
   var INITIAL_ELM_COMPILED_TIMESTAMP = Number(
-    "1674235936896"
+    "1674316781925"
   );
   var ORIGINAL_COMPILATION_MODE = "standard";
   var ORIGINAL_BROWSER_UI_POSITION = "BottomLeft";
@@ -2952,6 +2952,271 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
 
 
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	/**/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = $elm$core$Set$toList(x);
+		y = $elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**_UNUSED/
+	if (x.$ < 0)
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**_UNUSED/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
+
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
+
+
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -3397,271 +3662,6 @@ function _Debug_regionToString(region)
 	}
 	return 'on lines ' + region.start.line + ' through ' + region.end.line;
 }
-
-
-
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	/**/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = $elm$core$Set$toList(x);
-		y = $elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**_UNUSED/
-	if (x.$ < 0)
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**_UNUSED/
-	if (typeof x.$ === 'undefined')
-	//*/
-	/**/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
-
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -7158,31 +7158,10 @@ var _Parser_findSubString = F5(function(smallString, offset, row, col, bigString
 
 	return _Utils_Tuple3(newOffset, row, col);
 });
+var $elm$core$Basics$EQ = {$: 'EQ'};
+var $elm$core$Basics$GT = {$: 'GT'};
+var $elm$core$Basics$LT = {$: 'LT'};
 var $elm$core$List$cons = _List_cons;
-var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var $elm$core$Array$foldr = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
-				}
-			});
-		return A3(
-			$elm$core$Elm$JsArray$foldr,
-			helper,
-			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
-	});
-var $elm$core$Array$toList = function (array) {
-	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
-};
 var $elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -7235,9 +7214,30 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$keys(dict);
 };
-var $elm$core$Basics$EQ = {$: 'EQ'};
-var $elm$core$Basics$GT = {$: 'GT'};
-var $elm$core$Basics$LT = {$: 'LT'};
+var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var $elm$core$Array$foldr = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldr,
+			helper,
+			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
+var $elm$core$Array$toList = function (array) {
+	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
+};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -7648,247 +7648,6 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var $author$project$Utilities$DirectoryTree$Directory = F2(
-	function (label, files) {
-		return {files: files, label: label};
-	});
-var $author$project$Utilities$DirectoryTree$File = F2(
-	function (label, size) {
-		return {label: label, size: size};
-	});
-var $elm$core$List$foldrHelper = F4(
-	function (fn, acc, ctr, ls) {
-		if (!ls.b) {
-			return acc;
-		} else {
-			var a = ls.a;
-			var r1 = ls.b;
-			if (!r1.b) {
-				return A2(fn, a, acc);
-			} else {
-				var b = r1.a;
-				var r2 = r1.b;
-				if (!r2.b) {
-					return A2(
-						fn,
-						a,
-						A2(fn, b, acc));
-				} else {
-					var c = r2.a;
-					var r3 = r2.b;
-					if (!r3.b) {
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(fn, c, acc)));
-					} else {
-						var d = r3.a;
-						var r4 = r3.b;
-						var res = (ctr > 500) ? A3(
-							$elm$core$List$foldl,
-							fn,
-							acc,
-							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
-						return A2(
-							fn,
-							a,
-							A2(
-								fn,
-								b,
-								A2(
-									fn,
-									c,
-									A2(fn, d, res))));
-					}
-				}
-			}
-		}
-	});
-var $elm$core$List$foldr = F3(
-	function (fn, acc, ls) {
-		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
-	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $zwilias$elm_rosetree$Tree$label = function (_v0) {
-	var v = _v0.a;
-	return v;
-};
-var $zwilias$elm_rosetree$Tree$Zipper$tree = function (_v0) {
-	var focus = _v0.a.focus;
-	return focus;
-};
-var $zwilias$elm_rosetree$Tree$Zipper$label = function (zipper) {
-	return $zwilias$elm_rosetree$Tree$label(
-		$zwilias$elm_rosetree$Tree$Zipper$tree(zipper));
-};
-var $elm$core$List$map = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, acc) {
-					return A2(
-						$elm$core$List$cons,
-						f(x),
-						acc);
-				}),
-			_List_Nil,
-			xs);
-	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $elm$core$Basics$not = _Basics_not;
-var $elm$core$Basics$always = F2(
-	function (a, _v0) {
-		return a;
-	});
-var $zwilias$elm_rosetree$Tree$Tree = F2(
-	function (a, b) {
-		return {$: 'Tree', a: a, b: b};
-	});
-var $zwilias$elm_rosetree$Tree$mapLabel = F2(
-	function (f, _v0) {
-		var v = _v0.a;
-		var cs = _v0.b;
-		return A2(
-			$zwilias$elm_rosetree$Tree$Tree,
-			f(v),
-			cs);
-	});
-var $elm$core$Basics$identity = function (x) {
-	return x;
-};
-var $zwilias$elm_rosetree$Tree$Zipper$Zipper = function (a) {
-	return {$: 'Zipper', a: a};
-};
-var $zwilias$elm_rosetree$Tree$Zipper$mapTree = F2(
-	function (f, _v0) {
-		var zipper = _v0.a;
-		return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
-			_Utils_update(
-				zipper,
-				{
-					focus: f(zipper.focus)
-				}));
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$mapLabel = F2(
-	function (f, zipper) {
-		return A2(
-			$zwilias$elm_rosetree$Tree$Zipper$mapTree,
-			$zwilias$elm_rosetree$Tree$mapLabel(f),
-			zipper);
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$replaceLabel = F2(
-	function (l, zipper) {
-		return A2(
-			$zwilias$elm_rosetree$Tree$Zipper$mapLabel,
-			$elm$core$Basics$always(l),
-			zipper);
-	});
-var $author$project$Utilities$DirectoryTree$addFiles = F2(
-	function (files, directory) {
-		var data = $zwilias$elm_rosetree$Tree$Zipper$label(directory);
-		var exisitingFiles = data.files;
-		var usedLabels = A2(
-			$elm$core$List$map,
-			function ($) {
-				return $.label;
-			},
-			exisitingFiles);
-		var filesToAppend = A2(
-			$elm$core$List$filter,
-			function (l) {
-				return !A2($elm$core$List$member, l.label, usedLabels);
-			},
-			files);
-		var appendableFiles = A2($elm$core$List$append, exisitingFiles, filesToAppend);
-		return A2(
-			$zwilias$elm_rosetree$Tree$Zipper$replaceLabel,
-			_Utils_update(
-				data,
-				{files: appendableFiles}),
-			directory);
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$fromTree = function (t) {
-	return $zwilias$elm_rosetree$Tree$Zipper$Zipper(
-		{after: _List_Nil, before: _List_Nil, crumbs: _List_Nil, focus: t});
-};
-var $zwilias$elm_rosetree$Tree$singleton = function (v) {
-	return A2($zwilias$elm_rosetree$Tree$Tree, v, _List_Nil);
-};
-var $author$project$Utilities$DirectoryTree$singleton = function (directory) {
-	return $zwilias$elm_rosetree$Tree$Zipper$fromTree(
-		$zwilias$elm_rosetree$Tree$singleton(directory));
-};
-var $author$project$Advent7$emptyDirectory = $author$project$Utilities$DirectoryTree$singleton(
-	A2($author$project$Utilities$DirectoryTree$Directory, 'root', _List_Nil));
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
 var $author$project$Advent7$NoOp = {$: 'NoOp'};
 var $author$project$Advent7$CD = function (a) {
 	return {$: 'CD', a: a};
@@ -7907,6 +7666,9 @@ var $elm$parser$Parser$Advanced$Good = F3(
 	function (a, b, c) {
 		return {$: 'Good', a: a, b: b, c: c};
 	});
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
 var $elm$parser$Parser$Advanced$Parser = function (a) {
 	return {$: 'Parser', a: a};
 };
@@ -7999,6 +7761,10 @@ var $elm$parser$Parser$Advanced$chompWhile = function (isGood) {
 		});
 };
 var $elm$parser$Parser$chompWhile = $elm$parser$Parser$Advanced$chompWhile;
+var $elm$core$Basics$always = F2(
+	function (a, _v0) {
+		return a;
+	});
 var $elm$core$String$slice = _String_slice;
 var $elm$parser$Parser$Advanced$mapChompedString = F2(
 	function (func, _v0) {
@@ -8108,6 +7874,7 @@ var $elm$core$String$isEmpty = function (string) {
 	return string === '';
 };
 var $elm$parser$Parser$Advanced$isSubString = _Parser_isSubString;
+var $elm$core$Basics$not = _Basics_not;
 var $elm$parser$Parser$Advanced$keyword = function (_v0) {
 	var kwd = _v0.a;
 	var expecting = _v0.b;
@@ -8296,10 +8063,17 @@ var $elm$parser$Parser$Loop = function (a) {
 var $author$project$Advent7$Dir = function (a) {
 	return {$: 'Dir', a: a};
 };
-var $author$project$Advent7$FileType = F2(
-	function (a, b) {
-		return {$: 'FileType', a: a, b: b};
+var $author$project$Utilities$DirectoryTree$Directory = F2(
+	function (label, files) {
+		return {files: files, label: label};
 	});
+var $author$project$Utilities$DirectoryTree$File = F2(
+	function (label, size) {
+		return {label: label, size: size};
+	});
+var $author$project$Advent7$FileType = function (a) {
+	return {$: 'FileType', a: a};
+};
 var $author$project$Advent7$fileNameParser = $elm$parser$Parser$getChompedString(
 	A2(
 		$elm$parser$Parser$ignorer,
@@ -8506,7 +8280,11 @@ var $author$project$Advent7$statement = $elm$parser$Parser$oneOf(
 				$elm$parser$Parser$ignorer,
 				A2(
 					$elm$parser$Parser$ignorer,
-					$elm$parser$Parser$succeed($author$project$Advent7$Dir),
+					$elm$parser$Parser$succeed(
+						function (x) {
+							return $author$project$Advent7$Dir(
+								A2($author$project$Utilities$DirectoryTree$Directory, x, _List_Nil));
+						}),
 					$elm$parser$Parser$keyword('dir')),
 				$elm$parser$Parser$spaces),
 			$author$project$Advent7$stringParser),
@@ -8514,7 +8292,12 @@ var $author$project$Advent7$statement = $elm$parser$Parser$oneOf(
 			$elm$parser$Parser$keeper,
 			A2(
 				$elm$parser$Parser$keeper,
-				$elm$parser$Parser$succeed($author$project$Advent7$FileType),
+				$elm$parser$Parser$succeed(
+					F2(
+						function (a, b) {
+							return $author$project$Advent7$FileType(
+								A2($author$project$Utilities$DirectoryTree$File, b, a));
+						})),
 				A2($elm$parser$Parser$ignorer, $elm$parser$Parser$int, $elm$parser$Parser$spaces)),
 			$author$project$Advent7$fileNameParser)
 		]));
@@ -8593,17 +8376,17 @@ var $author$project$Advent7$commandParser = A2(
 					_List_fromArray(
 						[
 							A2(
-							$elm$parser$Parser$keeper,
-							$elm$parser$Parser$succeed($author$project$Advent7$CD),
-							$author$project$Advent7$dirWord),
+							$elm$parser$Parser$ignorer,
+							$elm$parser$Parser$succeed($author$project$Advent7$UpDir),
+							$elm$parser$Parser$keyword('..')),
 							A2(
 							$elm$parser$Parser$ignorer,
 							$elm$parser$Parser$succeed($author$project$Advent7$Home),
 							$elm$parser$Parser$keyword('/')),
 							A2(
-							$elm$parser$Parser$ignorer,
-							$elm$parser$Parser$succeed($author$project$Advent7$UpDir),
-							$elm$parser$Parser$keyword('..'))
+							$elm$parser$Parser$keeper,
+							$elm$parser$Parser$succeed($author$project$Advent7$CD),
+							$author$project$Advent7$dirWord)
 						]))),
 				A2(
 				$elm$parser$Parser$keeper,
@@ -8616,6 +8399,75 @@ var $author$project$Advent7$commandParser = A2(
 					$elm$parser$Parser$spaces),
 				$author$project$Advent7$statements)
 			])));
+var $elm$core$List$foldrHelper = F4(
+	function (fn, acc, ctr, ls) {
+		if (!ls.b) {
+			return acc;
+		} else {
+			var a = ls.a;
+			var r1 = ls.b;
+			if (!r1.b) {
+				return A2(fn, a, acc);
+			} else {
+				var b = r1.a;
+				var r2 = r1.b;
+				if (!r2.b) {
+					return A2(
+						fn,
+						a,
+						A2(fn, b, acc));
+				} else {
+					var c = r2.a;
+					var r3 = r2.b;
+					if (!r3.b) {
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(fn, c, acc)));
+					} else {
+						var d = r3.a;
+						var r4 = r3.b;
+						var res = (ctr > 500) ? A3(
+							$elm$core$List$foldl,
+							fn,
+							acc,
+							$elm$core$List$reverse(r4)) : A4($elm$core$List$foldrHelper, fn, acc, ctr + 1, r4);
+						return A2(
+							fn,
+							a,
+							A2(
+								fn,
+								b,
+								A2(
+									fn,
+									c,
+									A2(fn, d, res))));
+					}
+				}
+			}
+		}
+	});
+var $elm$core$List$foldr = F3(
+	function (fn, acc, ls) {
+		return A4($elm$core$List$foldrHelper, fn, acc, 0, ls);
+	});
+var $elm$core$List$map = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, acc) {
+					return A2(
+						$elm$core$List$cons,
+						f(x),
+						acc);
+				}),
+			_List_Nil,
+			xs);
+	});
 var $elm$parser$Parser$DeadEnd = F3(
 	function (row, col, problem) {
 		return {col: col, problem: problem, row: row};
@@ -8693,316 +8545,44 @@ var $author$project$Advent7$getCommands = function (commands) {
 			$elm$parser$Parser$run($author$project$Advent7$commandParser),
 			A2($elm$core$String$split, '$ ', commands)));
 };
-var $zwilias$elm_rosetree$Tree$Zipper$previousSibling = function (_v0) {
-	var zipper = _v0.a;
-	var _v1 = zipper.before;
-	if (!_v1.b) {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var previous = _v1.a;
-		var rest = _v1.b;
-		return $elm$core$Maybe$Just(
-			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
-				{
-					after: A2($elm$core$List$cons, zipper.focus, zipper.after),
-					before: rest,
-					crumbs: zipper.crumbs,
-					focus: previous
-				}));
-	}
-};
-var $zwilias$elm_rosetree$Tree$Zipper$firstSibling = function (zipper) {
-	firstSibling:
-	while (true) {
-		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$previousSibling(zipper);
-		if (_v0.$ === 'Nothing') {
-			return zipper;
-		} else {
-			var z = _v0.a;
-			var $temp$zipper = z;
-			zipper = $temp$zipper;
-			continue firstSibling;
-		}
-	}
-};
-var $zwilias$elm_rosetree$Tree$tree = $zwilias$elm_rosetree$Tree$Tree;
-var $zwilias$elm_rosetree$Tree$Zipper$reconstruct = F4(
-	function (focus, before, after, l) {
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
 		return A2(
-			$zwilias$elm_rosetree$Tree$tree,
-			l,
-			_Utils_ap(
-				$elm$core$List$reverse(before),
-				_Utils_ap(
-					_List_fromArray(
-						[focus]),
-					after)));
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
 	});
-var $zwilias$elm_rosetree$Tree$Zipper$parent = function (_v0) {
-	var zipper = _v0.a;
-	var _v1 = zipper.crumbs;
-	if (!_v1.b) {
-		return $elm$core$Maybe$Nothing;
-	} else {
-		var crumb = _v1.a;
-		var rest = _v1.b;
-		return $elm$core$Maybe$Just(
-			$zwilias$elm_rosetree$Tree$Zipper$Zipper(
-				{
-					after: crumb.after,
-					before: crumb.before,
-					crumbs: rest,
-					focus: A4($zwilias$elm_rosetree$Tree$Zipper$reconstruct, zipper.focus, zipper.before, zipper.after, crumb.label)
-				}));
-	}
-};
-var $zwilias$elm_rosetree$Tree$Zipper$root = function (zipper) {
-	root:
-	while (true) {
-		var _v0 = $zwilias$elm_rosetree$Tree$Zipper$parent(zipper);
-		if (_v0.$ === 'Nothing') {
-			return $zwilias$elm_rosetree$Tree$Zipper$firstSibling(zipper);
-		} else {
-			var z = _v0.a;
-			var $temp$zipper = z;
-			zipper = $temp$zipper;
-			continue root;
-		}
-	}
-};
-var $author$project$Advent7Data$testInput = '$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k';
+var $elm$html$Html$Attributes$class = $elm$html$Html$Attributes$stringProperty('className');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$li = _VirtualDom_node('li');
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$html$Html$ul = _VirtualDom_node('ul');
-var $author$project$Utilities$DirectoryTree$directoryToHtml = function (dir) {
-	return A2(
-		$elm$html$Html$div,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$p,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text(dir.label + ' (DIR)')
-					])),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$ul,
-						_List_Nil,
-						A2(
-							$elm$core$List$map,
-							function (file) {
-								return A2(
-									$elm$html$Html$li,
-									_List_Nil,
-									_List_fromArray(
-										[
-											$elm$html$Html$text(
-											file.label + (' (' + ($elm$core$String$fromInt(file.size) + ')')))
-										]));
-							},
-							dir.files))
-					]))
-			]));
-};
-var $zwilias$elm_rosetree$Tree$restructureHelp = F4(
-	function (fLabel, fTree, acc, stack) {
-		restructureHelp:
-		while (true) {
-			var _v0 = acc.todo;
-			if (!_v0.b) {
-				var node = A2(
-					fTree,
-					acc.label,
-					$elm$core$List$reverse(acc.done));
-				if (!stack.b) {
-					return node;
-				} else {
-					var top = stack.a;
-					var rest = stack.b;
-					var $temp$fLabel = fLabel,
-						$temp$fTree = fTree,
-						$temp$acc = _Utils_update(
-						top,
-						{
-							done: A2($elm$core$List$cons, node, top.done)
-						}),
-						$temp$stack = rest;
-					fLabel = $temp$fLabel;
-					fTree = $temp$fTree;
-					acc = $temp$acc;
-					stack = $temp$stack;
-					continue restructureHelp;
-				}
-			} else {
-				if (!_v0.a.b.b) {
-					var _v2 = _v0.a;
-					var l = _v2.a;
-					var rest = _v0.b;
-					var $temp$fLabel = fLabel,
-						$temp$fTree = fTree,
-						$temp$acc = _Utils_update(
-						acc,
-						{
-							done: A2(
-								$elm$core$List$cons,
-								A2(
-									fTree,
-									fLabel(l),
-									_List_Nil),
-								acc.done),
-							todo: rest
-						}),
-						$temp$stack = stack;
-					fLabel = $temp$fLabel;
-					fTree = $temp$fTree;
-					acc = $temp$acc;
-					stack = $temp$stack;
-					continue restructureHelp;
-				} else {
-					var _v3 = _v0.a;
-					var l = _v3.a;
-					var cs = _v3.b;
-					var rest = _v0.b;
-					var $temp$fLabel = fLabel,
-						$temp$fTree = fTree,
-						$temp$acc = {
-						done: _List_Nil,
-						label: fLabel(l),
-						todo: cs
-					},
-						$temp$stack = A2(
-						$elm$core$List$cons,
-						_Utils_update(
-							acc,
-							{todo: rest}),
-						stack);
-					fLabel = $temp$fLabel;
-					fTree = $temp$fTree;
-					acc = $temp$acc;
-					stack = $temp$stack;
-					continue restructureHelp;
-				}
-			}
-		}
-	});
-var $zwilias$elm_rosetree$Tree$restructure = F3(
-	function (convertLabel, convertTree, _v0) {
-		var l = _v0.a;
-		var c = _v0.b;
-		return A4(
-			$zwilias$elm_rosetree$Tree$restructureHelp,
-			convertLabel,
-			convertTree,
-			{
-				done: _List_Nil,
-				label: convertLabel(l),
-				todo: c
-			},
-			_List_Nil);
-	});
-var $author$project$Utilities$DirectoryTree$toListItems = F2(
-	function (label, children) {
-		if (!children.b) {
-			return A2(
-				$elm$html$Html$li,
-				_List_Nil,
-				_List_fromArray(
-					[label]));
-		} else {
-			return A2(
-				$elm$html$Html$li,
-				_List_Nil,
-				_List_fromArray(
-					[
-						label,
-						A2($elm$html$Html$ul, _List_Nil, children)
-					]));
-		}
-	});
-var $elm$core$Basics$composeL = F3(
-	function (g, f, x) {
-		return g(
-			f(x));
-	});
-var $zwilias$elm_rosetree$Tree$Zipper$toTree = A2($elm$core$Basics$composeL, $zwilias$elm_rosetree$Tree$Zipper$tree, $zwilias$elm_rosetree$Tree$Zipper$root);
-var $author$project$Utilities$DirectoryTree$toHtml = function (dir) {
-	return function (root) {
-		return A2(
-			$elm$html$Html$ul,
-			_List_Nil,
-			_List_fromArray(
-				[root]));
+var $elm$core$Debug$toString = _Debug_toString;
+var $author$project$Utilities$Utilities$linesDebugToHtml = function (list) {
+	return function (l) {
+		return A2($elm$html$Html$div, _List_Nil, l);
 	}(
-		A3(
-			$zwilias$elm_rosetree$Tree$restructure,
-			$author$project$Utilities$DirectoryTree$directoryToHtml,
-			$author$project$Utilities$DirectoryTree$toListItems,
-			$zwilias$elm_rosetree$Tree$Zipper$toTree(dir)));
+		A2(
+			$elm$core$List$map,
+			function (line) {
+				return A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$class('command-line')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(
+							$elm$core$Debug$toString(line))
+						]));
+			},
+			list));
 };
+var $author$project$Advent7Data$testInput = '$ cd /\n$ ls\ndir a\n14848514 b.txt\n8504156 c.dat\ndir d\n$ cd a\n$ ls\ndir e\n29116 f\n2557 g\n62596 h.lst\n$ cd e\n$ ls\n584 i\n$ cd ..\n$ cd ..\n$ cd d\n$ ls\n4060174 j\n8033020 d.log\n5626152 d.ext\n7214296 k';
 var $author$project$Advent7$main = function () {
 	var commands = $author$project$Advent7$getCommands($author$project$Advent7Data$testInput);
-	return $author$project$Utilities$DirectoryTree$toHtml(
-		function (tree) {
-			return A3(
-				$elm$core$List$foldl,
-				F2(
-					function (command, newList) {
-						switch (command.$) {
-							case 'Home':
-								return $zwilias$elm_rosetree$Tree$Zipper$root(newList);
-							case 'LS':
-								var items = command.a;
-								var files = A2(
-									$elm$core$List$filterMap,
-									$elm$core$Basics$identity,
-									A2(
-										$elm$core$List$map,
-										function (item) {
-											if (item.$ === 'FileType') {
-												var size = item.a;
-												var name = item.b;
-												return $elm$core$Maybe$Just(
-													A2($author$project$Utilities$DirectoryTree$File, name, size));
-											} else {
-												return $elm$core$Maybe$Nothing;
-											}
-										},
-										items));
-								var directories = A2(
-									$elm$core$List$filterMap,
-									$elm$core$Basics$identity,
-									A2(
-										$elm$core$List$map,
-										function (item) {
-											if (item.$ === 'Dir') {
-												var name = item.a;
-												return $elm$core$Maybe$Just(
-													$zwilias$elm_rosetree$Tree$tree(
-														A2($author$project$Utilities$DirectoryTree$Directory, name, _List_Nil)));
-											} else {
-												return $elm$core$Maybe$Nothing;
-											}
-										},
-										items));
-								return A2($author$project$Utilities$DirectoryTree$addFiles, files, newList);
-							case 'CD':
-								return newList;
-							default:
-								return newList;
-						}
-					}),
-				tree,
-				commands);
-		}($author$project$Advent7$emptyDirectory));
+	return $author$project$Utilities$Utilities$linesDebugToHtml(commands);
 }();
 _Platform_export({'Advent7':{'init':_VirtualDom_init($author$project$Advent7$main)(0)(0)}});}(this));
