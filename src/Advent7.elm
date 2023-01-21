@@ -83,6 +83,11 @@ main =
                                 newList
                                     |> changeDirectory name
 
+                            UpDir ->
+                                newList
+                                    |> Zipper.backward
+                                    |> Maybe.withDefault newList
+
                             _ ->
                                 newList
                     )
