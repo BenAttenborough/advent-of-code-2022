@@ -19,6 +19,7 @@ emptyDirectory =
 getCommands : String -> List Command
 getCommands commands =
     commands
+        |> (\x -> String.append x "\n")
         |> String.split "$ "
         |> List.map (Parser.run commandParser)
         |> List.map (Result.withDefault NoOp)
@@ -30,8 +31,65 @@ main =
         commands =
             getCommands Advent7Data.testInput
     in
-    commands
-        |> linesDebugToHtml
+    -- commands
+    --     |> linesDebugToHtml
+    emptyDirectory
+        |> (\tree ->
+                List.foldl
+                    (\command newList ->
+                        case command of
+                            Home ->
+                                Zipper.root newList
+
+                            LS items ->
+                                let
+                                    files =
+                                        items
+                                            |> List.map
+                                                (\item ->
+                                                    case item of
+                                                        FileType file ->
+                                                            Just file
+
+                                                        _ ->
+                                                            Nothing
+                                                )
+                                            |> List.filterMap identity
+
+                                    directories =
+                                        items
+                                            |> List.map
+                                                (\item ->
+                                                    case item of
+                                                        Dir directory ->
+                                                            Just directory
+
+                                                        _ ->
+                                                            Nothing
+                                                )
+                                            |> List.filterMap identity
+                                in
+                                newList
+                                    |> addFiles files
+                                    |> (\dirs directoryTree ->
+                                            List.foldl
+                                                addFolder
+                                                directoryTree
+                                                dirs
+                                       )
+                                        directories
+
+                            CD name ->
+                                newList
+                                    |> changeDirectory name
+
+                            _ ->
+                                newList
+                    )
+                    tree
+                    commands
+           )
+        |> toHtml
 
 
 type Command
