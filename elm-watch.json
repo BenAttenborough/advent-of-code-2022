@@ -2,7 +2,7 @@
     "targets": {
         "My target name": {
             "inputs": ["src/Advent7.elm"],
-            "output": "html/advent7.js"
+            "output": "js_compiled/advent7.js"
         }
     }
 }
