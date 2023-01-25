@@ -46,7 +46,7 @@ singleton directory =
 toHtml : Zipper.Zipper Directory -> Html msg
 toHtml dir =
     dir
-        |> Zipper.toTree
+        |> Zipper.tree
         |> Tree.restructure directoryToHtml toListItems
         |> (\root -> Html.ul [] [ root ])
 

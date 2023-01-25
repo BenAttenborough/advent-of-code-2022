@@ -4,6 +4,7 @@ import Advent7Data
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (class)
+import Json.Decode exposing (maybe)
 import Parser exposing (..)
 import Tree exposing (Tree, tree)
 import Tree.Zipper as Zipper
@@ -94,7 +95,32 @@ main =
                     tree
                     commands
            )
-        |> toHtml
+        |> Zipper.root
+        -- |> goForward
+        -- |> goChangeDir "a"
+        |> Zipper.children
+        -- Need to recursively map over every item
+        |> Debug.toString
+        |> Html.text
+
+
+
+-- |> toHtml
+
+
+goForward x =
+    x
+        |> Zipper.forward
+        |> Maybe.withDefault x
+
+
+goChangeDir needle haystack =
+    Zipper.findNext
+        (\x ->
+            x.label == needle
+        )
+        haystack
+        |> Maybe.withDefault haystack
 
 
 type Command
