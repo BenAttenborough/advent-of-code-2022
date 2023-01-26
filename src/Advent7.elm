@@ -86,14 +86,14 @@ main =
                                 Zipper.replaceLabel
                                     { data | size = size }
                                     newList
+                                    |> (\dirs directoryTree ->
+                                            List.foldl
+                                                addFolder
+                                                directoryTree
+                                                dirs
+                                       )
+                                        directories
 
-                            --     |> (\dirs directoryTree ->
-                            --             List.foldl
-                            --                 addFolder
-                            --                 directoryTree
-                            --                 dirs
-                            --        )
-                            --         directories
                             CD name ->
                                 newList
                                     |> changeDirectory name
@@ -116,6 +116,45 @@ main =
 
 
 -- |> toHtml
+
+
+childLabelConflictsWithExisting : Tree Directory -> List (Tree Directory) -> Bool
+childLabelConflictsWithExisting child children =
+    let
+        childData =
+            Tree.label child
+
+        childrenLabels =
+            List.map (\x -> Tree.label x) children
+    in
+    List.any (\item -> item.label == childData.label) childrenLabels
+
+
+addFolderInternal : Tree.Tree Directory -> Tree.Tree Directory -> Tree.Tree Directory
+addFolderInternal child parent =
+    case Tree.children parent of
+        [] ->
+            Tree.replaceChildren
+                [ child ]
+                parent
+
+        children ->
+            if childLabelConflictsWithExisting child children then
+                parent
+
+            else
+                Tree.prependChild
+                    child
+                    parent
+
+
+addFolder : Directory -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+addFolder folder parent =
+    parent
+        |> Zipper.mapTree
+            (addFolderInternal
+                (tree folder [])
+            )
 
 
 changeDirectory : String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
