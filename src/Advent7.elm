@@ -52,7 +52,7 @@ main =
 
                             LS items ->
                                 let
-                                    files =
+                                    size =
                                         items
                                             |> List.map
                                                 (\item ->
@@ -78,11 +78,15 @@ main =
                                                             Nothing
                                                 )
                                             |> List.filterMap identity
-                                in
-                                newList
 
-                            -- Zipper.replaceLabel
-                            --     { (Zipper.label directory) | size = files } newList
+                                    data =
+                                        Zipper.label tree
+                                in
+                                -- newList
+                                Zipper.replaceLabel
+                                    { data | size = size }
+                                    newList
+
                             --     |> (\dirs directoryTree ->
                             --             List.foldl
                             --                 addFolder
