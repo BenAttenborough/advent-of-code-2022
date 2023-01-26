@@ -1,5 +1,7 @@
 module Advent7 exposing (..)
 
+-- import Utilities.DirectoryTree exposing (..)
+
 import Advent7Data
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
@@ -8,13 +10,19 @@ import Json.Decode exposing (maybe)
 import Parser exposing (..)
 import Tree exposing (Tree, tree)
 import Tree.Zipper as Zipper
-import Utilities.DirectoryTree exposing (..)
 import Utilities.Utilities exposing (linesDebugToHtml, linesToHtml)
+
+
+type alias Directory =
+    { label : String
+    , size : Int
+    }
 
 
 emptyDirectory : Zipper.Zipper Directory
 emptyDirectory =
-    singleton (Directory "root" [])
+    Tree.singleton (Directory "root" 0)
+        |> Zipper.fromTree
 
 
 getCommands : String -> List Command
@@ -56,6 +64,7 @@ main =
                                                             Nothing
                                                 )
                                             |> List.filterMap identity
+                                            |> List.sum
 
                                     directories =
                                         items
@@ -71,15 +80,16 @@ main =
                                             |> List.filterMap identity
                                 in
                                 newList
-                                    |> addFiles files
-                                    |> (\dirs directoryTree ->
-                                            List.foldl
-                                                addFolder
-                                                directoryTree
-                                                dirs
-                                       )
-                                        directories
 
+                            -- Zipper.replaceLabel
+                            --     { (Zipper.label directory) | size = files } newList
+                            --     |> (\dirs directoryTree ->
+                            --             List.foldl
+                            --                 addFolder
+                            --                 directoryTree
+                            --                 dirs
+                            --        )
+                            --         directories
                             CD name ->
                                 newList
                                     |> changeDirectory name
@@ -96,16 +106,42 @@ main =
                     commands
            )
         |> Zipper.root
-        -- |> goForward
-        -- |> goChangeDir "a"
-        |> Zipper.children
-        -- Need to recursively map over every item
         |> Debug.toString
         |> Html.text
 
 
 
 -- |> toHtml
+
+
+changeDirectory : String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+changeDirectory needle haystack =
+    let
+        isNeedleInHaystack list =
+            list
+                |> List.any
+                    (\child ->
+                        let
+                            data =
+                                Tree.label child
+                        in
+                        data.label == needle
+                    )
+    in
+    haystack
+        |> Zipper.children
+        |> (\children ->
+                if isNeedleInHaystack children then
+                    Zipper.findNext
+                        (\x ->
+                            x.label == needle
+                        )
+                        haystack
+                        |> Maybe.withDefault haystack
+
+                else
+                    haystack
+           )
 
 
 goForward x =
@@ -133,7 +169,7 @@ type Command
 
 type ItemType
     = Dir Directory
-    | FileType File
+    | FileType Int
 
 
 dirWord : Parser String
@@ -171,14 +207,14 @@ fileNameParser =
 statement : Parser ItemType
 statement =
     oneOf
-        [ succeed (\x -> Dir (Directory x []))
+        [ succeed (\x -> Dir (Directory x 0))
             |. keyword "dir"
             |. spaces
             |= stringParser
-        , succeed (\a b -> FileType (File b a))
+        , succeed FileType
             |= int
             |. spaces
-            |= fileNameParser
+            |. fileNameParser
         ]
 
 
