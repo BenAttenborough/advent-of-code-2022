@@ -5,7 +5,7 @@ module Advent7 exposing (..)
 import Advent7Data
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Json.Decode exposing (maybe)
 import Parser exposing (..)
 import Tree exposing (Tree, tree)
@@ -82,10 +82,9 @@ main =
                                     data =
                                         Zipper.label tree
                                 in
-                                -- newList
-                                Zipper.replaceLabel
-                                    { data | size = size }
-                                    newList
+                                newList
+                                    |> Zipper.replaceLabel
+                                        { data | size = size }
                                     |> (\dirs directoryTree ->
                                             List.foldl
                                                 addFolder
@@ -110,12 +109,68 @@ main =
                     commands
            )
         |> Zipper.root
-        |> Debug.toString
-        |> Html.text
+        -- |> Debug.toString
+        -- |> Html.text
+        |> toHtml
 
 
+toListItems : Html msg -> List (Html msg) -> Html msg
+toListItems label children =
+    case children of
+        [] ->
+            Html.li [] [ label ]
 
--- |> toHtml
+        _ ->
+            Html.li []
+                [ label
+                , Html.ul [] children
+                ]
+
+
+toHtml : Zipper.Zipper Directory -> Html msg
+toHtml dir =
+    let
+        directoryStructure =
+            dir
+                |> Zipper.tree
+                |> Tree.restructure directoryToHtml toListItems
+                |> (\root -> Html.ul [] [ root ])
+    in
+    Html.div
+        [ style "display" "grid"
+        , style "grid-template-columns" "1fr 1fr 1fr"
+        , style "height" "100vh"
+        ]
+        [ Html.div
+            [ style "border" "solid 2px green"
+            , style "padding" "0.5rem"
+            ]
+            [ Html.text "Commands" ]
+        , Html.div
+            [ style "border" "solid 2px green"
+            , style "border-left" "none"
+            , style "border-right" "none"
+            , style "padding" "0.5rem"
+            ]
+            [ Html.text "Directory tree"
+            , directoryStructure
+            ]
+        , Html.div
+            [ style "border" "solid 2px green"
+            , style "padding" "0.5rem"
+            ]
+            [ Html.text "Debug" ]
+        ]
+
+
+directoryToHtml : Directory -> Html msg
+directoryToHtml dir =
+    Html.div []
+        [ Html.p []
+            [ Html.text (dir.label ++ " (DIR)") ]
+        , Html.div []
+            [ Html.text (String.fromInt dir.size) ]
+        ]
 
 
 childLabelConflictsWithExisting : Tree Directory -> List (Tree Directory) -> Bool
