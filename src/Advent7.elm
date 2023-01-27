@@ -72,6 +72,10 @@ main =
                                                 (\item ->
                                                     case item of
                                                         Dir directory ->
+                                                            let
+                                                                _ =
+                                                                    Debug.log "dirfffff" directory
+                                                            in
                                                             Just directory
 
                                                         _ ->
@@ -79,12 +83,15 @@ main =
                                                 )
                                             |> List.filterMap identity
 
+                                    -- |> Debug.log "f"
                                     data =
                                         Zipper.label tree
                                 in
                                 newList
+                                    -- |> Debug.log "WTFxxxxxxxxxxx"
                                     |> Zipper.replaceLabel
                                         { data | size = size }
+                                    -- |> Debug.log "WTF"
                                     |> (\dirs directoryTree ->
                                             List.foldl
                                                 addFolder
@@ -134,7 +141,11 @@ toHtml dir =
             dir
                 |> Zipper.tree
                 |> Tree.restructure directoryToHtml toListItems
+                |> Debug.log "g"
                 |> (\root -> Html.ul [] [ root ])
+
+        commands =
+            getCommands Advent7Data.testInput
     in
     Html.div
         [ style "display" "grid"
@@ -145,7 +156,9 @@ toHtml dir =
             [ style "border" "solid 2px green"
             , style "padding" "0.5rem"
             ]
-            [ Html.text "Commands" ]
+            [ Html.text "Commands"
+            , linesDebugToHtml commands
+            ]
         , Html.div
             [ style "border" "solid 2px green"
             , style "border-left" "none"
@@ -165,6 +178,10 @@ toHtml dir =
 
 directoryToHtml : Directory -> Html msg
 directoryToHtml dir =
+    let
+        _ =
+            Debug.log "Directory" dir
+    in
     Html.div []
         [ Html.p []
             [ Html.text (dir.label ++ " (DIR)") ]
