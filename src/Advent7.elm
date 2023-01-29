@@ -14,7 +14,7 @@ import Utilities.Utilities exposing (linesDebugToHtml, linesToHtml)
 
 
 type alias Directory =
-    { label : String
+    { name : String
     , size : Int
     }
 
@@ -72,10 +72,6 @@ main =
                                                 (\item ->
                                                     case item of
                                                         Dir directory ->
-                                                            let
-                                                                _ =
-                                                                    Debug.log "dirfffff" directory
-                                                            in
                                                             Just directory
 
                                                         _ ->
@@ -83,15 +79,12 @@ main =
                                                 )
                                             |> List.filterMap identity
 
-                                    -- |> Debug.log "f"
                                     data =
-                                        Zipper.label tree
+                                        Zipper.label newList
                                 in
                                 newList
-                                    -- |> Debug.log "WTFxxxxxxxxxxx"
                                     |> Zipper.replaceLabel
                                         { data | size = size }
-                                    -- |> Debug.log "WTF"
                                     |> (\dirs directoryTree ->
                                             List.foldl
                                                 addFolder
@@ -116,8 +109,6 @@ main =
                     commands
            )
         |> Zipper.root
-        -- |> Debug.toString
-        -- |> Html.text
         |> toHtml
 
 
@@ -141,7 +132,6 @@ toHtml dir =
             dir
                 |> Zipper.tree
                 |> Tree.restructure directoryToHtml toListItems
-                |> Debug.log "g"
                 |> (\root -> Html.ul [] [ root ])
 
         commands =
@@ -178,13 +168,9 @@ toHtml dir =
 
 directoryToHtml : Directory -> Html msg
 directoryToHtml dir =
-    let
-        _ =
-            Debug.log "Directory" dir
-    in
     Html.div []
         [ Html.p []
-            [ Html.text (dir.label ++ " (DIR)") ]
+            [ Html.text (dir.name ++ " (DIR)") ]
         , Html.div []
             [ Html.text (String.fromInt dir.size) ]
         ]
@@ -199,7 +185,7 @@ childLabelConflictsWithExisting child children =
         childrenLabels =
             List.map (\x -> Tree.label x) children
     in
-    List.any (\item -> item.label == childData.label) childrenLabels
+    List.any (\item -> item.name == childData.name) childrenLabels
 
 
 addFolderInternal : Tree.Tree Directory -> Tree.Tree Directory -> Tree.Tree Directory
@@ -240,7 +226,7 @@ changeDirectory needle haystack =
                             data =
                                 Tree.label child
                         in
-                        data.label == needle
+                        data.name == needle
                     )
     in
     haystack
@@ -249,7 +235,7 @@ changeDirectory needle haystack =
                 if isNeedleInHaystack children then
                     Zipper.findNext
                         (\x ->
-                            x.label == needle
+                            x.name == needle
                         )
                         haystack
                         |> Maybe.withDefault haystack
@@ -268,7 +254,7 @@ goForward x =
 goChangeDir needle haystack =
     Zipper.findNext
         (\x ->
-            x.label == needle
+            x.name == needle
         )
         haystack
         |> Maybe.withDefault haystack
