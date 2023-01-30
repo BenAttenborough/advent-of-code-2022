@@ -115,30 +115,25 @@ addListedItems items newList =
                     dirs
            )
             directories
+        |> addSizeToParentDirectory size []
 
 
-
--- The problem with this function is that the zipper we end up with will be at the route
--- Maybe you could have an extra parameter as an empty list. If we are successful at finding a
--- parent we add the current folder name to the list and then at the end cd into each list
--- addSizeToParentDirectory : List String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
--- addSizeToParentDirectory directoriesVisited directory =
-
-
-addSizeToParentDirectory : Zipper.Zipper Directory -> Zipper.Zipper Directory
-addSizeToParentDirectory directory =
+addSizeToParentDirectory : Int -> List String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+addSizeToParentDirectory newSize directoriesVisited directory =
     case Zipper.parent directory of
         Nothing ->
-            directory
+            -- |> foldr with directoriesVisited, CD on each element and return zipper in it's original state
+            List.foldl
+                (\dirString dir ->
+                    changeDirectory dirString dir
+                )
+                directory
+                directoriesVisited
 
-        -- |> foldr with directoriesVisited, CD on each element and return zipper in it's original state
         Just dir ->
             let
                 childData =
                     Zipper.label directory
-
-                childSize =
-                    childData.size
 
                 childName =
                     childData.name
@@ -149,9 +144,8 @@ addSizeToParentDirectory directory =
                 parentSize =
                     parentData.size
             in
-            Zipper.replaceLabel { parentData | size = childSize + parentSize } dir
-                -- |> addSizeToParentDirectory (directoriesVisited :: childName)
-                |> addSizeToParentDirectory
+            Zipper.replaceLabel { parentData | size = parentSize + newSize } dir
+                |> addSizeToParentDirectory newSize (childName :: directoriesVisited)
 
 
 toListItems : Html msg -> List (Html msg) -> Html msg
