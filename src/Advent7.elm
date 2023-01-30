@@ -5,7 +5,7 @@ module Advent7 exposing (..)
 import Advent7Data
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
-import Html.Attributes exposing (class, style)
+import Html.Attributes exposing (class, dir, style)
 import Json.Decode exposing (maybe)
 import Parser exposing (..)
 import Tree exposing (Tree, tree)
@@ -51,47 +51,7 @@ main =
                                 Zipper.root newList
 
                             LS items ->
-                                let
-                                    size =
-                                        items
-                                            |> List.map
-                                                (\item ->
-                                                    case item of
-                                                        FileType file ->
-                                                            Just file
-
-                                                        _ ->
-                                                            Nothing
-                                                )
-                                            |> List.filterMap identity
-                                            |> List.sum
-
-                                    directories =
-                                        items
-                                            |> List.map
-                                                (\item ->
-                                                    case item of
-                                                        Dir directory ->
-                                                            Just directory
-
-                                                        _ ->
-                                                            Nothing
-                                                )
-                                            |> List.filterMap identity
-
-                                    data =
-                                        Zipper.label newList
-                                in
-                                newList
-                                    |> Zipper.replaceLabel
-                                        { data | size = size }
-                                    |> (\dirs directoryTree ->
-                                            List.foldl
-                                                addFolder
-                                                directoryTree
-                                                dirs
-                                       )
-                                        directories
+                                addListedItems items newList
 
                             CD name ->
                                 newList
@@ -110,6 +70,88 @@ main =
            )
         |> Zipper.root
         |> toHtml
+
+
+addListedItems : List ItemType -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+addListedItems items newList =
+    let
+        size =
+            items
+                |> List.map
+                    (\item ->
+                        case item of
+                            FileType file ->
+                                Just file
+
+                            _ ->
+                                Nothing
+                    )
+                |> List.filterMap identity
+                |> List.sum
+
+        directories =
+            items
+                |> List.map
+                    (\item ->
+                        case item of
+                            Dir directory ->
+                                Just directory
+
+                            _ ->
+                                Nothing
+                    )
+                |> List.filterMap identity
+
+        data =
+            Zipper.label newList
+    in
+    newList
+        |> Zipper.replaceLabel
+            { data | size = size }
+        |> (\dirs directoryTree ->
+                List.foldl
+                    addFolder
+                    directoryTree
+                    dirs
+           )
+            directories
+
+
+
+-- The problem with this function is that the zipper we end up with will be at the route
+-- Maybe you could have an extra parameter as an empty list. If we are successful at finding a
+-- parent we add the current folder name to the list and then at the end cd into each list
+-- addSizeToParentDirectory : List String -> Zipper.Zipper Directory -> Zipper.Zipper Directory
+-- addSizeToParentDirectory directoriesVisited directory =
+
+
+addSizeToParentDirectory : Zipper.Zipper Directory -> Zipper.Zipper Directory
+addSizeToParentDirectory directory =
+    case Zipper.parent directory of
+        Nothing ->
+            directory
+
+        -- |> foldr with directoriesVisited, CD on each element and return zipper in it's original state
+        Just dir ->
+            let
+                childData =
+                    Zipper.label directory
+
+                childSize =
+                    childData.size
+
+                childName =
+                    childData.name
+
+                parentData =
+                    Zipper.label dir
+
+                parentSize =
+                    parentData.size
+            in
+            Zipper.replaceLabel { parentData | size = childSize + parentSize } dir
+                -- |> addSizeToParentDirectory (directoriesVisited :: childName)
+                |> addSizeToParentDirectory
 
 
 toListItems : Html msg -> List (Html msg) -> Html msg
