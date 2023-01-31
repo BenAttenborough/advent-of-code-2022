@@ -5,7 +5,7 @@ module Advent7 exposing (..)
 import Advent7Data
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Html exposing (Html, p, text)
-import Html.Attributes exposing (class, dir, style)
+import Html.Attributes exposing (class, dir, size, style, value)
 import Json.Decode exposing (maybe)
 import Parser exposing (..)
 import Tree exposing (Tree, tree)
@@ -38,10 +38,8 @@ main : Html msg
 main =
     let
         commands =
-            getCommands Advent7Data.testInput
+            getCommands Advent7Data.realInput
     in
-    -- commands
-    --     |> linesDebugToHtml
     emptyDirectory
         |> (\tree ->
                 List.foldl
@@ -70,6 +68,51 @@ main =
            )
         |> Zipper.root
         |> toHtml
+
+
+
+-- |> Zipper.toTree
+-- |> Tree.foldl
+--     (\data acc ->
+--         if data.size <= 100000 then
+--             acc + data.size
+--         else
+--             acc
+--     )
+--     0
+-- |> (\x ->
+--         let
+--             rootSize =
+--                 Tree.label x
+--                     |> .size
+--                     |> Debug.log "root size"
+--             fileSysSize =
+--                 70000000
+--             spaceRequired =
+--                 30000000
+--             unusedSpace =
+--                 fileSysSize
+--                     - rootSize
+--                     |> Debug.log "unusedSpace"
+--             spaceNeededToFreeUp =
+--                 spaceRequired
+--                     - unusedSpace
+--                     |> Debug.log "spaceNeededToFreeUp"
+--         in
+--         x
+--             |> Tree.foldl
+--                 (\data acc ->
+--                     if data.size >= spaceNeededToFreeUp && data.size < acc then
+--                         data.size
+--                     else
+--                         acc
+--                 )
+--                 rootSize
+--    )
+-- |> Debug.toString
+-- |> (\output -> Html.div [] [ Html.text output ])
+-- case cur of
+-- getRecursiveValues (currentValue + cur.size) rest
 
 
 addListedItems : List ItemType -> Zipper.Zipper Directory -> Zipper.Zipper Directory
