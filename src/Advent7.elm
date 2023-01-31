@@ -39,35 +39,85 @@ main =
     let
         commands =
             getCommands Advent7Data.realInput
-    in
-    emptyDirectory
-        |> (\tree ->
-                List.foldl
-                    (\command newList ->
-                        case command of
-                            Home ->
-                                Zipper.root newList
 
-                            LS items ->
-                                addListedItems items newList
+        directoryTree =
+            emptyDirectory
+                |> (\tree ->
+                        List.foldl
+                            (\command newList ->
+                                case command of
+                                    Home ->
+                                        Zipper.root newList
 
-                            CD name ->
-                                newList
-                                    |> changeDirectory name
+                                    LS items ->
+                                        addListedItems items newList
 
-                            UpDir ->
-                                newList
-                                    |> Zipper.backward
-                                    |> Maybe.withDefault newList
+                                    CD name ->
+                                        newList
+                                            |> changeDirectory name
 
-                            _ ->
-                                newList
+                                    UpDir ->
+                                        newList
+                                            |> Zipper.backward
+                                            |> Maybe.withDefault newList
+
+                                    _ ->
+                                        newList
+                            )
+                            tree
+                            commands
+                   )
+                |> Zipper.root
+
+        debug =
+            [ directoryTree
+                |> Zipper.toTree
+                |> Tree.foldl
+                    (\data acc ->
+                        if data.size <= 100000 then
+                            acc + data.size
+
+                        else
+                            acc
                     )
-                    tree
-                    commands
-           )
-        |> Zipper.root
-        |> toHtml
+                    0
+                |> Debug.toString
+            , directoryTree
+                |> Zipper.toTree
+                |> (\x ->
+                        let
+                            rootSize =
+                                Tree.label x
+                                    |> .size
+
+                            fileSysSize =
+                                70000000
+
+                            spaceRequired =
+                                30000000
+
+                            unusedSpace =
+                                fileSysSize
+                                    - rootSize
+
+                            spaceNeededToFreeUp =
+                                spaceRequired - unusedSpace
+                        in
+                        x
+                            |> Tree.foldl
+                                (\data acc ->
+                                    if data.size >= spaceNeededToFreeUp && data.size < acc then
+                                        data.size
+
+                                    else
+                                        acc
+                                )
+                                rootSize
+                   )
+                |> Debug.toString
+            ]
+    in
+    toHtml commands debug directoryTree
 
 
 
@@ -204,17 +254,14 @@ toListItems label children =
                 ]
 
 
-toHtml : Zipper.Zipper Directory -> Html msg
-toHtml dir =
+toHtml : List Command -> List String -> Zipper.Zipper Directory -> Html msg
+toHtml commands debug dir =
     let
         directoryStructure =
             dir
                 |> Zipper.tree
                 |> Tree.restructure directoryToHtml toListItems
                 |> (\root -> Html.ul [] [ root ])
-
-        commands =
-            getCommands Advent7Data.testInput
     in
     Html.div
         [ style "display" "grid"
@@ -241,7 +288,13 @@ toHtml dir =
             [ style "border" "solid 2px green"
             , style "padding" "0.5rem"
             ]
-            [ Html.text "Debug" ]
+            [ Html.p []
+                (Html.p [] [ Html.text "Debug" ]
+                    :: List.map
+                        (\item -> Html.p [] [ Html.text item ])
+                        debug
+                )
+            ]
         ]
 
 
