@@ -14,30 +14,51 @@ type Command
     | Right Int
 
 
-type alias TailPosition =
-    { x : Int
-    , y : Int
-    }
+
+-- type alias TailPosition =
+--     { x : Int
+--     , y : Int
+--     }
+-- type alias HeadRelativePosition =
+--     { x : Int
+--     , y : Int
+--     }
+-- initialHeadRelativePosition =
+--     HeadRelativePosition 0 0
 
 
-type alias HeadRelativePosition =
-    { x : Int
-    , y : Int
-    }
+type Coordinates
+    = Coordinates Int Int
 
 
-tailPosition : ( Int, Int )
+tailPosition : Coordinates
 tailPosition =
-    ( 0, 0 )
+    Coordinates 0 0
 
 
-relativeHeadPosition : ( Int, Int )
+relativeHeadPosition : Coordinates
 relativeHeadPosition =
-    ( 0, 0 )
+    Coordinates 0 0
 
 
-initialHeadRelativePosition =
-    HeadRelativePosition 0 0
+positionsTailVisited : List Coordinates
+positionsTailVisited =
+    [ Coordinates 0 0 ]
+
+
+type alias Rope =
+    { tailPosition : Coordinates
+    , relativeHeadPosition : Coordinates
+    , positionsTailVisited : List Coordinates
+    }
+
+
+initialRopeState : Rope
+initialRopeState =
+    { tailPosition = Coordinates 0 0
+    , relativeHeadPosition = Coordinates 0 0
+    , positionsTailVisited = [ Coordinates 0 0 ]
+    }
 
 
 main : Html msg
@@ -45,22 +66,19 @@ main =
     testInput
         |> parseCommandsFromInput
         |> List.foldl
-            (\command position ->
+            (\command (Coordinates x y) ->
                 case command of
                     Up distance ->
-                        -- let
-                        --     relativePosition
-                        -- in
-                        { position | y = position.y + distance }
+                        Coordinates x (y + distance)
 
-                    Down distance ->
-                        { position | y = position.y - distance }
-
-                    Right distance ->
-                        { position | x = position.x + distance }
-
-                    Left distance ->
-                        { position | x = position.x - distance }
+                    _ ->
+                        Coordinates x y
+             -- Down distance ->
+             --     { position | y = position.y - distance }
+             -- Right distance ->
+             --     { position | x = position.x + distance }
+             -- Left distance ->
+             --     { position | x = position.x - distance }
             )
             tailPosition
         |> Debug.toString
