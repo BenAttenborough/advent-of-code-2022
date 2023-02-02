@@ -1,5 +1,7 @@
 # advent-of-code-2022
 
+See the code challenges here: https://adventofcode.com/2022
+
 You can import files and run functions `elm repl`
 E.g. `import Advent1`
 
@@ -24,24 +26,24 @@ A minimum setup might be:
 ```html
 <!DOCTYPE html>
 <html>
-  <head>
-    <link
-      rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-    />
-    <link rel="stylesheet" href="base.css" />
-  </head>
+    <head>
+        <link
+            rel="stylesheet"
+            href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" href="base.css" />
+    </head>
 
-  <body>
-    <div id="elm-app-is-loaded-here"></div>
+    <body>
+        <div id="elm-app-is-loaded-here"></div>
 
-    <script src="advent8.js"></script>
-    <script>
-      var app = Elm.Advent8.init({
-        node: document.getElementById("elm-app-is-loaded-here"),
-      });
-    </script>
-  </body>
+        <script src="advent8.js"></script>
+        <script>
+            var app = Elm.Advent8.init({
+                node: document.getElementById("elm-app-is-loaded-here"),
+            });
+        </script>
+    </body>
 </html>
 ```
 
@@ -49,12 +51,12 @@ elm-watch.json
 
 ```json
 {
-  "targets": {
-    "My target name": {
-      "inputs": ["src/Advent8.elm"],
-      "output": "html/advent8.js"
+    "targets": {
+        "My target name": {
+            "inputs": ["src/Advent8.elm"],
+            "output": "html/advent8.js"
+        }
     }
-  }
 }
 ```
 
