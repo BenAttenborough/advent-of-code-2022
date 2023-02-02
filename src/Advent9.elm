@@ -14,10 +14,55 @@ type Command
     | Right Int
 
 
+type alias TailPosition =
+    { x : Int
+    , y : Int
+    }
+
+
+type alias HeadRelativePosition =
+    { x : Int
+    , y : Int
+    }
+
+
+tailPosition : ( Int, Int )
+tailPosition =
+    ( 0, 0 )
+
+
+relativeHeadPosition : ( Int, Int )
+relativeHeadPosition =
+    ( 0, 0 )
+
+
+initialHeadRelativePosition =
+    HeadRelativePosition 0 0
+
+
 main : Html msg
 main =
     testInput
         |> parseCommandsFromInput
+        |> List.foldl
+            (\command position ->
+                case command of
+                    Up distance ->
+                        -- let
+                        --     relativePosition
+                        -- in
+                        { position | y = position.y + distance }
+
+                    Down distance ->
+                        { position | y = position.y - distance }
+
+                    Right distance ->
+                        { position | x = position.x + distance }
+
+                    Left distance ->
+                        { position | x = position.x - distance }
+            )
+            tailPosition
         |> Debug.toString
         |> Html.text
 
