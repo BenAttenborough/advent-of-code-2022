@@ -14,19 +14,6 @@ type Command
     | Right Int
 
 
-
--- type alias TailPosition =
---     { x : Int
---     , y : Int
---     }
--- type alias HeadRelativePosition =
---     { x : Int
---     , y : Int
---     }
--- initialHeadRelativePosition =
---     HeadRelativePosition 0 0
-
-
 type Coordinates
     = Coordinates Int Int
 
@@ -47,18 +34,32 @@ positionsTailVisited =
 
 
 type alias Rope =
-    { tailPosition : Coordinates
-    , relativeHeadPosition : Coordinates
-    , positionsTailVisited : List Coordinates
+    { tail : Coordinates
+    , head : Coordinates
+    , visited : List Coordinates
     }
 
 
 initialRopeState : Rope
 initialRopeState =
-    { tailPosition = Coordinates 0 0
-    , relativeHeadPosition = Coordinates 0 0
-    , positionsTailVisited = [ Coordinates 0 0 ]
+    { tail = Coordinates 0 0
+    , head = Coordinates 0 0
+    , visited = [ Coordinates 0 0 ]
     }
+
+
+coordinatesX : Coordinates -> Int
+coordinatesX coords =
+    case coords of
+        Coordinates x _ ->
+            x
+
+
+coordinatesY : Coordinates -> Int
+coordinatesY coords =
+    case coords of
+        Coordinates _ y ->
+            y
 
 
 main : Html msg
@@ -66,23 +67,100 @@ main =
     testInput
         |> parseCommandsFromInput
         |> List.foldl
-            (\command (Coordinates x y) ->
+            (\command rope ->
+                let
+                    tailX =
+                        coordinatesX rope.tail
+
+                    tailY =
+                        coordinatesY rope.tail
+
+                    relHeadPos =
+                        case command of
+                            Up distance ->
+                                Coordinates
+                                    (coordinatesX rope.head)
+                                    (coordinatesY rope.head + distance)
+
+                            Down distance ->
+                                Coordinates
+                                    (coordinatesX rope.head)
+                                    (coordinatesY rope.head - distance)
+
+                            Left distance ->
+                                Coordinates
+                                    (coordinatesX rope.head - distance)
+                                    (coordinatesY rope.head)
+
+                            Right distance ->
+                                Coordinates
+                                    (coordinatesX rope.head + distance)
+                                    (coordinatesY rope.head)
+                in
                 case command of
                     Up distance ->
-                        Coordinates x (y + distance)
+                        { rope | tail = Coordinates tailX (tailY + distance) }
 
-                    _ ->
-                        Coordinates x y
-             -- Down distance ->
-             --     { position | y = position.y - distance }
-             -- Right distance ->
-             --     { position | x = position.x + distance }
-             -- Left distance ->
-             --     { position | x = position.x - distance }
+                    Down distance ->
+                        { rope | tail = Coordinates tailX (tailY - distance) }
+
+                    Right distance ->
+                        { rope | tail = Coordinates (tailX + distance) tailY }
+
+                    Left distance ->
+                        { rope | tail = Coordinates (tailX - distance) tailY }
             )
-            tailPosition
+            initialRopeState
         |> Debug.toString
         |> Html.text
+
+
+tailLocationsVisited : Command -> Coordinates -> List Coordinates -> List Coordinates
+tailLocationsVisited command currentLocation visitedLocations =
+    case command of
+        Up distance ->
+            if distance <= 1 then
+                visitedLocations
+
+            else
+                let
+                    newCoordinates =
+                        Coordinates 0 (coordinatesX currentLocation + 1)
+                in
+                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+
+        Down distance ->
+            if distance <= 1 then
+                visitedLocations
+
+            else
+                let
+                    newCoordinates =
+                        Coordinates 0 (coordinatesX currentLocation - 1)
+                in
+                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+
+        Right distance ->
+            if distance <= 1 then
+                visitedLocations
+
+            else
+                let
+                    newCoordinates =
+                        Coordinates (coordinatesX currentLocation + 1) 0
+                in
+                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+
+        Left distance ->
+            if distance <= 1 then
+                visitedLocations
+
+            else
+                let
+                    newCoordinates =
+                        Coordinates (coordinatesX currentLocation - 1) 0
+                in
+                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
 
 
 parseCommandsFromInput : String -> List Command
