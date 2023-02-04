@@ -72,6 +72,54 @@ main =
         |> Html.text
 
 
+intermediateRelativeHeadPosition : Command -> Rope -> Coordinates
+intermediateRelativeHeadPosition command rope =
+    case command of
+        Up distance ->
+            Coordinates
+                (coordinatesX rope.headRel)
+                (coordinatesY rope.headRel + distance)
+
+        Down distance ->
+            Coordinates
+                (coordinatesX rope.headRel)
+                (coordinatesY rope.headRel - distance)
+
+        Left distance ->
+            Coordinates
+                (coordinatesX rope.headRel - distance)
+                (coordinatesY rope.headRel)
+
+        Right distance ->
+            Coordinates
+                (coordinatesX rope.headRel + distance)
+                (coordinatesY rope.headRel)
+
+
+finalRelativeHeadPosition : Command -> Rope -> Coordinates
+finalRelativeHeadPosition command rope =
+    case command of
+        Up distance ->
+            Coordinates
+                (coordinatesX rope.headRel)
+                (min 1 (coordinatesY rope.headRel + distance))
+
+        Down distance ->
+            Coordinates
+                (coordinatesX rope.headRel)
+                (min -1 (coordinatesY rope.headRel - distance))
+
+        Left distance ->
+            Coordinates
+                (coordinatesX rope.headRel - distance)
+                (min -1 (coordinatesY rope.headRel))
+
+        Right distance ->
+            Coordinates
+                (min 1 (coordinatesX rope.headRel + distance))
+                (coordinatesY rope.headRel)
+
+
 applyCommandsToRopeState : Command -> Rope -> Rope
 applyCommandsToRopeState command rope =
     let
@@ -86,28 +134,6 @@ applyCommandsToRopeState command rope =
 
         headRelY =
             coordinatesY rope.headRel
-
-        intermediateRelativeHeadPosition =
-            case command of
-                Up distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel)
-                        (coordinatesY rope.headRel + distance)
-
-                Down distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel)
-                        (coordinatesY rope.headRel - distance)
-
-                Left distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel - distance)
-                        (coordinatesY rope.headRel)
-
-                Right distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel + distance)
-                        (coordinatesY rope.headRel)
 
         relHeadPos =
             -- this is not right
@@ -133,7 +159,7 @@ applyCommandsToRopeState command rope =
                         (coordinatesY rope.headRel)
     in
     { tail = Coordinates 0 0
-    , headRel = relHeadPos
+    , headRel = finalRelativeHeadPosition command rope
     , visited = tailLocationsVisited command rope.tail rope.visited
     }
 
