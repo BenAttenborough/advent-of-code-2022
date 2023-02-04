@@ -107,12 +107,12 @@ finalRelativeHeadPosition command rope =
         Down distance ->
             Coordinates
                 (coordinatesX rope.headRel)
-                (min -1 (coordinatesY rope.headRel - distance))
+                (max -1 (coordinatesY rope.headRel - distance))
 
         Left distance ->
             Coordinates
                 (coordinatesX rope.headRel - distance)
-                (min -1 (coordinatesY rope.headRel))
+                (max -1 (coordinatesY rope.headRel))
 
         Right distance ->
             Coordinates
@@ -122,50 +122,10 @@ finalRelativeHeadPosition command rope =
 
 applyCommandsToRopeState : Command -> Rope -> Rope
 applyCommandsToRopeState command rope =
-    let
-        tailX =
-            coordinatesX rope.tail
-
-        tailY =
-            coordinatesY rope.tail
-
-        headRelX =
-            coordinatesX rope.headRel
-
-        headRelY =
-            coordinatesY rope.headRel
-
-        relHeadPos =
-            -- this is not right
-            case command of
-                Up distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel)
-                        (coordinatesY rope.headRel + distance)
-
-                Down distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel)
-                        (coordinatesY rope.headRel - distance)
-
-                Left distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel - distance)
-                        (coordinatesY rope.headRel)
-
-                Right distance ->
-                    Coordinates
-                        (coordinatesX rope.headRel + distance)
-                        (coordinatesY rope.headRel)
-    in
-    { tail = Coordinates 0 0
+    { tail = Tuple.first (tailLocationsVisited command rope.tail rope.visited)
     , headRel = finalRelativeHeadPosition command rope
-    , visited = tailLocationsVisited command rope.tail rope.visited
+    , visited = Tuple.second (tailLocationsVisited command rope.tail rope.visited)
     }
-
-
-
--- Needs working on
 
 
 calcTailPos : Coordinates -> Coordinates -> Coordinates
@@ -173,50 +133,50 @@ calcTailPos current headPos =
     Coordinates 0 0
 
 
-tailLocationsVisited : Command -> Coordinates -> List Coordinates -> List Coordinates
+tailLocationsVisited : Command -> Coordinates -> List Coordinates -> ( Coordinates, List Coordinates )
 tailLocationsVisited command currentLocation visitedLocations =
     case command of
         Up distance ->
             if distance <= 1 then
-                visitedLocations
+                ( currentLocation, visitedLocations )
 
             else
                 let
                     newCoordinates =
-                        Coordinates 0 (coordinatesX currentLocation + 1)
+                        Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation + 1)
                 in
                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
 
         Down distance ->
             if distance <= 1 then
-                visitedLocations
+                ( currentLocation, visitedLocations )
 
             else
                 let
                     newCoordinates =
-                        Coordinates 0 (coordinatesX currentLocation - 1)
+                        Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation - 1)
                 in
                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
 
         Right distance ->
             if distance <= 1 then
-                visitedLocations
+                ( currentLocation, visitedLocations )
 
             else
                 let
                     newCoordinates =
-                        Coordinates (coordinatesX currentLocation + 1) 0
+                        Coordinates (coordinatesX currentLocation + 1) (coordinatesY currentLocation)
                 in
                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
 
         Left distance ->
             if distance <= 1 then
-                visitedLocations
+                ( currentLocation, visitedLocations )
 
             else
                 let
                     newCoordinates =
-                        Coordinates (coordinatesX currentLocation - 1) 0
+                        Coordinates (coordinatesX currentLocation - 1) (coordinatesY currentLocation)
                 in
                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
 

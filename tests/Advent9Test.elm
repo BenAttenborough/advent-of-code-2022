@@ -56,7 +56,13 @@ suite =
             , test "finalRelativeHeadPosition down 3 decomes Coordinated 0 -1" <|
                 \_ ->
                     Expect.equal
-                        (finalRelativeHeadPosition (Up 3) initialRopeState)
-                        (Coordinates 0 1)
+                        (finalRelativeHeadPosition (Down 3) initialRopeState)
+                        (Coordinates 0 -1)
+
+            -- , test "calcTailPos (Coordinates 0 0) (Coordinates 3 0) becomes Coordinated 2 0" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (calcTailPos (Coordinates 0 0) (Coordinates 3 0))
+            --             (Coordinates 2 0)
             ]
         ]
