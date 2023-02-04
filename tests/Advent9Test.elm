@@ -27,27 +27,28 @@ suite =
                     Expect.equal
                         (parseCommandsFromInput testInput)
                         [ Right 4, Up 4, Left 3, Down 1, Right 4, Down 1, Left 5, Right 2 ]
-            , test "intermediateRelativeHeadPosition updates relative head position correctly" <|
-                \_ ->
-                    Expect.equal
-                        (intermediateRelativeHeadPosition (Up 3) initialRopeState)
-                        (Coordinates 0 3)
-            , test "intermediateRelativeHeadPosition works for down" <|
-                \_ ->
-                    Expect.equal
-                        (intermediateRelativeHeadPosition (Down 3) initialRopeState)
-                        (Coordinates 0 -3)
-            , test "intermediateRelativeHeadPosition down 4 from up 1" <|
-                \_ ->
-                    Expect.equal
-                        (intermediateRelativeHeadPosition
-                            (Down 4)
-                            { tail = Coordinates 0 0
-                            , headRel = Coordinates 0 1
-                            , visited = [ Coordinates 0 0 ]
-                            }
-                        )
-                        (Coordinates 0 -3)
+
+            -- , test "intermediateRelativeHeadPosition updates relative head position correctly" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (intermediateRelativeHeadPosition (Up 3) initialRopeState)
+            --             (Coordinates 0 3)
+            -- , test "intermediateRelativeHeadPosition works for down" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (intermediateRelativeHeadPosition (Down 3) initialRopeState)
+            --             (Coordinates 0 -3)
+            -- , test "intermediateRelativeHeadPosition down 4 from up 1" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (intermediateRelativeHeadPosition
+            --                 (Down 4)
+            --                 { tail = Coordinates 0 0
+            --                 , headRel = Coordinates 0 1
+            --                 , visited = [ Coordinates 0 0 ]
+            --                 }
+            --             )
+            --             (Coordinates 0 -3)
             , test "finalRelativeHeadPosition updates relative head position correctly" <|
                 \_ ->
                     Expect.equal
@@ -58,6 +59,16 @@ suite =
                     Expect.equal
                         (finalRelativeHeadPosition (Down 3) initialRopeState)
                         (Coordinates 0 -1)
+            , test "finalRelativeHeadPosition left 3 decomes Coordinated -1 0" <|
+                \_ ->
+                    Expect.equal
+                        (finalRelativeHeadPosition (Left 3) initialRopeState)
+                        (Coordinates -1 0)
+            , test "finalRelativeHeadPosition right 3 decomes Coordinated 1 0" <|
+                \_ ->
+                    Expect.equal
+                        (finalRelativeHeadPosition (Right 3) initialRopeState)
+                        (Coordinates 1 0)
 
             -- , test "calcTailPos (Coordinates 0 0) (Coordinates 3 0) becomes Coordinated 2 0" <|
             --     \_ ->

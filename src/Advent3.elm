@@ -36,6 +36,7 @@ charToInt char =
         Char.toCode char - 96
 
 
+dayThreePartOne : String -> Int
 dayThreePartOne input =
     input
         |> String.lines
@@ -45,6 +46,10 @@ dayThreePartOne input =
         |> List.concat
         |> List.map charToInt
         |> List.sum
+
+
+
+-- splitStringInTwo : String -> Set.Set String
 
 
 splitStringInTwo string =
@@ -79,8 +84,6 @@ splitListBy n newList list =
 
                 b =
                     List.drop n list
-
-                -- |> Debug.log "newList"
             in
             splitListBy n (List.append [ a ] newList) b
 

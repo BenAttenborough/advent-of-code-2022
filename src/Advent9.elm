@@ -18,19 +18,16 @@ type Coordinates
     = Coordinates Int Int
 
 
-tailPosition : Coordinates
-tailPosition =
-    Coordinates 0 0
 
-
-relativeHeadPosition : Coordinates
-relativeHeadPosition =
-    Coordinates 0 0
-
-
-positionsTailVisited : List Coordinates
-positionsTailVisited =
-    [ Coordinates 0 0 ]
+-- tailPosition : Coordinates
+-- tailPosition =
+--     Coordinates 0 0
+-- relativeHeadPosition : Coordinates
+-- relativeHeadPosition =
+--     Coordinates 0 0
+-- positionsTailVisited : List Coordinates
+-- positionsTailVisited =
+--     [ Coordinates 0 0 ]
 
 
 type alias Rope =
@@ -72,28 +69,38 @@ main =
         |> Html.text
 
 
-intermediateRelativeHeadPosition : Command -> Rope -> Coordinates
-intermediateRelativeHeadPosition command rope =
-    case command of
-        Up distance ->
-            Coordinates
-                (coordinatesX rope.headRel)
-                (coordinatesY rope.headRel + distance)
+applyCommandsToRopeState : Command -> Rope -> Rope
+applyCommandsToRopeState command rope =
+    { tail = Coordinates 0 0
+    , headRel = finalRelativeHeadPosition command rope
+    , visited = []
+    }
 
-        Down distance ->
-            Coordinates
-                (coordinatesX rope.headRel)
-                (coordinatesY rope.headRel - distance)
 
-        Left distance ->
-            Coordinates
-                (coordinatesX rope.headRel - distance)
-                (coordinatesY rope.headRel)
 
-        Right distance ->
-            Coordinates
-                (coordinatesX rope.headRel + distance)
-                (coordinatesY rope.headRel)
+-- { tail = Tuple.first (tailLocationsVisited command rope.tail rope.visited)
+--     , headRel = finalRelativeHeadPosition command rope
+--     , visited = Tuple.second (tailLocationsVisited command rope.tail rope.visited)
+--     }
+-- intermediateRelativeHeadPosition : Command -> Rope -> Coordinates
+-- intermediateRelativeHeadPosition command rope =
+--     case command of
+--         Up distance ->
+--             Coordinates
+--                 (coordinatesX rope.headRel)
+--                 (coordinatesY rope.headRel + distance)
+--         Down distance ->
+--             Coordinates
+--                 (coordinatesX rope.headRel)
+--                 (coordinatesY rope.headRel - distance)
+--         Left distance ->
+--             Coordinates
+--                 (coordinatesX rope.headRel - distance)
+--                 (coordinatesY rope.headRel)
+--         Right distance ->
+--             Coordinates
+--                 (coordinatesX rope.headRel + distance)
+--                 (coordinatesY rope.headRel)
 
 
 finalRelativeHeadPosition : Command -> Rope -> Coordinates
@@ -111,74 +118,64 @@ finalRelativeHeadPosition command rope =
 
         Left distance ->
             Coordinates
-                (coordinatesX rope.headRel - distance)
-                (max -1 (coordinatesY rope.headRel))
+                (max -1 (coordinatesY rope.headRel - distance))
+                (coordinatesX rope.headRel)
 
         Right distance ->
             Coordinates
-                (min 1 (coordinatesX rope.headRel + distance))
-                (coordinatesY rope.headRel)
+                (min 1 (coordinatesY rope.headRel + distance))
+                (coordinatesX rope.headRel)
 
 
-applyCommandsToRopeState : Command -> Rope -> Rope
-applyCommandsToRopeState command rope =
-    { tail = Tuple.first (tailLocationsVisited command rope.tail rope.visited)
-    , headRel = finalRelativeHeadPosition command rope
-    , visited = Tuple.second (tailLocationsVisited command rope.tail rope.visited)
-    }
 
-
-calcTailPos : Coordinates -> Coordinates -> Coordinates
-calcTailPos current headPos =
-    Coordinates 0 0
-
-
-tailLocationsVisited : Command -> Coordinates -> List Coordinates -> ( Coordinates, List Coordinates )
-tailLocationsVisited command currentLocation visitedLocations =
-    case command of
-        Up distance ->
-            if distance <= 1 then
-                ( currentLocation, visitedLocations )
-
-            else
-                let
-                    newCoordinates =
-                        Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation + 1)
-                in
-                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
-
-        Down distance ->
-            if distance <= 1 then
-                ( currentLocation, visitedLocations )
-
-            else
-                let
-                    newCoordinates =
-                        Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation - 1)
-                in
-                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
-
-        Right distance ->
-            if distance <= 1 then
-                ( currentLocation, visitedLocations )
-
-            else
-                let
-                    newCoordinates =
-                        Coordinates (coordinatesX currentLocation + 1) (coordinatesY currentLocation)
-                in
-                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
-
-        Left distance ->
-            if distance <= 1 then
-                ( currentLocation, visitedLocations )
-
-            else
-                let
-                    newCoordinates =
-                        Coordinates (coordinatesX currentLocation - 1) (coordinatesY currentLocation)
-                in
-                tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+-- applyCommandsToRopeState : Command -> Rope -> Rope
+-- applyCommandsToRopeState command rope =
+--     { tail = Tuple.first (tailLocationsVisited command rope.tail rope.visited)
+--     , headRel = finalRelativeHeadPosition command rope
+--     , visited = Tuple.second (tailLocationsVisited command rope.tail rope.visited)
+--     }
+-- calcTailPos : Coordinates -> Coordinates -> Coordinates
+-- calcTailPos current headPos =
+--     Coordinates 0 0
+-- tailLocationsVisited : Command -> Coordinates -> List Coordinates -> ( Coordinates, List Coordinates )
+-- tailLocationsVisited command currentLocation visitedLocations =
+--     case command of
+--         Up distance ->
+--             if distance <= 1 then
+--                 ( currentLocation, visitedLocations )
+--             else
+--                 let
+--                     newCoordinates =
+--                         Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation + 1)
+--                 in
+--                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+--         Down distance ->
+--             if distance <= 1 then
+--                 ( currentLocation, visitedLocations )
+--             else
+--                 let
+--                     newCoordinates =
+--                         Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation - 1)
+--                 in
+--                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+--         Right distance ->
+--             if distance <= 1 then
+--                 ( currentLocation, visitedLocations )
+--             else
+--                 let
+--                     newCoordinates =
+--                         Coordinates (coordinatesX currentLocation + 1) (coordinatesY currentLocation)
+--                 in
+--                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
+--         Left distance ->
+--             if distance <= 1 then
+--                 ( currentLocation, visitedLocations )
+--             else
+--                 let
+--                     newCoordinates =
+--                         Coordinates (coordinatesX currentLocation - 1) (coordinatesY currentLocation)
+--                 in
+--                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
 
 
 parseCommandsFromInput : String -> List Command

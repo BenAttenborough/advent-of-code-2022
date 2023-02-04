@@ -1,6 +1,7 @@
 module Advent3Data exposing (..)
 
 
+day3Input : String
 day3Input =
     """QtGHnGlcwQGvHwMHGnnGfRFCJnRBfVVJRVBfCFBh
 qsDjzNWhmspNNqVrfjVfjJCbBVfB
