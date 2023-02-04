@@ -66,46 +66,76 @@ main : Html msg
 main =
     testInput
         |> parseCommandsFromInput
-        |> List.foldl
-            (\command rope ->
-                let
-                    tailX =
-                        coordinatesX rope.tail
-
-                    tailY =
-                        coordinatesY rope.tail
-
-                    relHeadPos =
-                        -- this is not right
-                        case command of
-                            Up distance ->
-                                Coordinates
-                                    (coordinatesX rope.headRel)
-                                    (coordinatesY rope.headRel + distance)
-
-                            Down distance ->
-                                Coordinates
-                                    (coordinatesX rope.headRel)
-                                    (coordinatesY rope.headRel - distance)
-
-                            Left distance ->
-                                Coordinates
-                                    (coordinatesX rope.headRel - distance)
-                                    (coordinatesY rope.headRel)
-
-                            Right distance ->
-                                Coordinates
-                                    (coordinatesX rope.headRel + distance)
-                                    (coordinatesY rope.headRel)
-                in
-                { tail = Coordinates 0 0
-                , headRel = relHeadPos
-                , visited = tailLocationsVisited command rope.tail rope.visited
-                }
-            )
+        |> List.foldl applyCommandsToRopeState
             initialRopeState
         |> Debug.toString
         |> Html.text
+
+
+applyCommandsToRopeState : Command -> Rope -> Rope
+applyCommandsToRopeState command rope =
+    let
+        tailX =
+            coordinatesX rope.tail
+
+        tailY =
+            coordinatesY rope.tail
+
+        headRelX =
+            coordinatesX rope.headRel
+
+        headRelY =
+            coordinatesY rope.headRel
+
+        intermediateRelativeHeadPosition =
+            case command of
+                Up distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel)
+                        (coordinatesY rope.headRel + distance)
+
+                Down distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel)
+                        (coordinatesY rope.headRel - distance)
+
+                Left distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel - distance)
+                        (coordinatesY rope.headRel)
+
+                Right distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel + distance)
+                        (coordinatesY rope.headRel)
+
+        relHeadPos =
+            -- this is not right
+            case command of
+                Up distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel)
+                        (coordinatesY rope.headRel + distance)
+
+                Down distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel)
+                        (coordinatesY rope.headRel - distance)
+
+                Left distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel - distance)
+                        (coordinatesY rope.headRel)
+
+                Right distance ->
+                    Coordinates
+                        (coordinatesX rope.headRel + distance)
+                        (coordinatesY rope.headRel)
+    in
+    { tail = Coordinates 0 0
+    , headRel = relHeadPos
+    , visited = tailLocationsVisited command rope.tail rope.visited
+    }
 
 
 

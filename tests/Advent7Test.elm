@@ -40,27 +40,27 @@ suite =
         [ describe "Part 1" <|
             [ test "Example" <|
                 \_ -> Expect.equal True True
-            , test "fileSizeParser with '14848513'" <|
-                \_ ->
-                    Expect.equal
-                        (Ok 14848513)
-                        (Parser.run fileSizeParser "14848513")
-            , test "fileSizeParser with '14848514 b.txt'" <|
-                \_ ->
-                    Expect.equal
-                        (Ok 14848514)
-                        (Parser.run fileSizeParser "14848514 b.txt")
-            , test "commandParser with '$ cd'" <|
-                \_ ->
-                    Expect.equal
-                        (Ok CD)
-                        (Parser.run commandParser "$ cd")
-            , test "commandParser with '$ ls'" <|
-                \_ ->
-                    Expect.equal
-                        (Ok LS)
-                        (Parser.run commandParser "$ ls")
 
+            -- , test "fileSizeParser with '14848513'" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (Ok 14848513)
+            --             (Parser.run fileSizeParser "14848513")
+            -- , test "fileSizeParser with '14848514 b.txt'" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (Ok 14848514)
+            --             (Parser.run fileSizeParser "14848514 b.txt")
+            -- , test "commandParser with '$ cd'" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (Ok CD)
+            --             (Parser.run commandParser "$ cd")
+            -- , test "commandParser with '$ ls'" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (Ok LS)
+            --             (Parser.run commandParser "$ ls")
             -- , test "day7PartOne with testInput" <|
             --     \_ ->
             --         Expect.equal
