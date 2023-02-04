@@ -35,7 +35,7 @@ positionsTailVisited =
 
 type alias Rope =
     { tail : Coordinates
-    , head : Coordinates
+    , headRel : Coordinates
     , visited : List Coordinates
     }
 
@@ -43,7 +43,7 @@ type alias Rope =
 initialRopeState : Rope
 initialRopeState =
     { tail = Coordinates 0 0
-    , head = Coordinates 0 0
+    , headRel = Coordinates 0 0
     , visited = [ Coordinates 0 0 ]
     }
 
@@ -76,43 +76,45 @@ main =
                         coordinatesY rope.tail
 
                     relHeadPos =
+                        -- this is not right
                         case command of
                             Up distance ->
                                 Coordinates
-                                    (coordinatesX rope.head)
-                                    (coordinatesY rope.head + distance)
+                                    (coordinatesX rope.headRel)
+                                    (coordinatesY rope.headRel + distance)
 
                             Down distance ->
                                 Coordinates
-                                    (coordinatesX rope.head)
-                                    (coordinatesY rope.head - distance)
+                                    (coordinatesX rope.headRel)
+                                    (coordinatesY rope.headRel - distance)
 
                             Left distance ->
                                 Coordinates
-                                    (coordinatesX rope.head - distance)
-                                    (coordinatesY rope.head)
+                                    (coordinatesX rope.headRel - distance)
+                                    (coordinatesY rope.headRel)
 
                             Right distance ->
                                 Coordinates
-                                    (coordinatesX rope.head + distance)
-                                    (coordinatesY rope.head)
+                                    (coordinatesX rope.headRel + distance)
+                                    (coordinatesY rope.headRel)
                 in
-                case command of
-                    Up distance ->
-                        { rope | tail = Coordinates tailX (tailY + distance) }
-
-                    Down distance ->
-                        { rope | tail = Coordinates tailX (tailY - distance) }
-
-                    Right distance ->
-                        { rope | tail = Coordinates (tailX + distance) tailY }
-
-                    Left distance ->
-                        { rope | tail = Coordinates (tailX - distance) tailY }
+                { tail = Coordinates 0 0
+                , headRel = relHeadPos
+                , visited = tailLocationsVisited command rope.tail rope.visited
+                }
             )
             initialRopeState
         |> Debug.toString
         |> Html.text
+
+
+
+-- Needs working on
+
+
+calcTailPos : Coordinates -> Coordinates -> Coordinates
+calcTailPos current headPos =
+    Coordinates 0 0
 
 
 tailLocationsVisited : Command -> Coordinates -> List Coordinates -> List Coordinates
