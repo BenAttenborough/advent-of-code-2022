@@ -13,67 +13,65 @@ exampleCommand =
     "U 10"
 
 
+ropeStateZero : Rope
+ropeStateZero =
+    { tail = ( 0, 0 )
+    , headRel = ( 0, 0 )
+    , visited = [ ( 0, 0 ) ]
+    }
+
+
+ropeStateUpFromZero : Rope
+ropeStateUpFromZero =
+    { tail = ( 0, 0 )
+    , headRel = ( 0, 1 )
+    , visited = [ ( 0, 0 ) ]
+    }
+
+
 suite : Test
 suite =
     describe "Advent Day 9"
         [ describe "Part 1" <|
-            [ test "Expect commandParser exampleCommand to equal Up 10" <|
+            [ -- test "Expect commandParser exampleCommand to equal Up 10" <|
+              --     \_ ->
+              --         Expect.equal
+              --             (Parser.run commandParser exampleCommand)
+              --             (Ok (Up 10))
+              -- , test "Parsing test input gives expected output" <|
+              --     \_ ->
+              --         Expect.equal
+              --             (parseCommandsFromInput testInput)
+              --             [ Right 4, Up 4, Left 3, Down 1, Right 4, Down 1, Left 5, Right 2 ]
+              test "createNCommands creates 3 UP comands with appropriate input" <|
                 \_ ->
                     Expect.equal
-                        (Parser.run commandParser exampleCommand)
-                        (Ok (Up 10))
-            , test "Parsing test input gives expected output" <|
+                        (createNCommands 3 Up [])
+                        [ Up, Up, Up ]
+            , test "createNCommands creates 1 UP comands with appropriate input" <|
                 \_ ->
                     Expect.equal
-                        (parseCommandsFromInput testInput)
-                        [ Right 4, Up 4, Left 3, Down 1, Right 4, Down 1, Left 5, Right 2 ]
-
-            -- , test "intermediateRelativeHeadPosition updates relative head position correctly" <|
-            --     \_ ->
-            --         Expect.equal
-            --             (intermediateRelativeHeadPosition (Up 3) initialRopeState)
-            --             (Coordinates 0 3)
-            -- , test "intermediateRelativeHeadPosition works for down" <|
-            --     \_ ->
-            --         Expect.equal
-            --             (intermediateRelativeHeadPosition (Down 3) initialRopeState)
-            --             (Coordinates 0 -3)
-            -- , test "intermediateRelativeHeadPosition down 4 from up 1" <|
-            --     \_ ->
-            --         Expect.equal
-            --             (intermediateRelativeHeadPosition
-            --                 (Down 4)
-            --                 { tail = Coordinates 0 0
-            --                 , headRel = Coordinates 0 1
-            --                 , visited = [ Coordinates 0 0 ]
-            --                 }
-            --             )
-            --             (Coordinates 0 -3)
-            , test "finalRelativeHeadPosition updates relative head position correctly" <|
+                        (createNCommands 1 Up [])
+                        [ Up ]
+            , test "createNCommands creates 0 comands with 0 input" <|
                 \_ ->
                     Expect.equal
-                        (finalRelativeHeadPosition (Up 3) initialRopeState)
-                        (Coordinates 0 1)
-            , test "finalRelativeHeadPosition down 3 decomes Coordinated 0 -1" <|
+                        (createNCommands 0 Up [])
+                        []
+            , test "createNCommands creates 0 comands with negative input" <|
                 \_ ->
                     Expect.equal
-                        (finalRelativeHeadPosition (Down 3) initialRopeState)
-                        (Coordinates 0 -1)
-            , test "finalRelativeHeadPosition left 3 decomes Coordinated -1 0" <|
+                        (createNCommands -1 Up [])
+                        []
+            , test "commandParser Up 3 creates 3 UP comands" <|
                 \_ ->
                     Expect.equal
-                        (finalRelativeHeadPosition (Left 3) initialRopeState)
-                        (Coordinates -1 0)
-            , test "finalRelativeHeadPosition right 3 decomes Coordinated 1 0" <|
+                        (Parser.run commandParser "U 3")
+                        (Ok [ Up, Up, Up ])
+            , test "applyCommandsToRopeState moves rope correctly up" <|
                 \_ ->
                     Expect.equal
-                        (finalRelativeHeadPosition (Right 3) initialRopeState)
-                        (Coordinates 1 0)
-
-            -- , test "calcTailPos (Coordinates 0 0) (Coordinates 3 0) becomes Coordinated 2 0" <|
-            --     \_ ->
-            --         Expect.equal
-            --             (calcTailPos (Coordinates 0 0) (Coordinates 3 0))
-            --             (Coordinates 2 0)
+                        (applyCommandsToRopeState Up ropeStateZero)
+                        ropeStateUpFromZero
             ]
         ]

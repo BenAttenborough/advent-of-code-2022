@@ -2,61 +2,78 @@ module Advent9 exposing (..)
 
 import Advent9Data exposing (testInput)
 import Html exposing (Html, p, text)
-import Json.Decode exposing (oneOf)
+import Json.Decode exposing (list, oneOf)
 import Maybe.Extra exposing (isJust)
 import Parser exposing (..)
 
 
 type Command
-    = Up Int
-    | Down Int
-    | Left Int
-    | Right Int
-
-
-type Coordinates
-    = Coordinates Int Int
-
-
-
--- tailPosition : Coordinates
--- tailPosition =
---     Coordinates 0 0
--- relativeHeadPosition : Coordinates
--- relativeHeadPosition =
---     Coordinates 0 0
--- positionsTailVisited : List Coordinates
--- positionsTailVisited =
---     [ Coordinates 0 0 ]
+    = Up
+    | Down
+    | Left
+    | Right
 
 
 type alias Rope =
-    { tail : Coordinates
-    , headRel : Coordinates
-    , visited : List Coordinates
+    { tail : ( Int, Int )
+    , headRel : ( Int, Int )
+    , visited : List ( Int, Int )
     }
 
 
 initialRopeState : Rope
 initialRopeState =
-    { tail = Coordinates 0 0
-    , headRel = Coordinates 0 0
-    , visited = [ Coordinates 0 0 ]
+    { tail = ( 0, 0 )
+    , headRel = ( 0, 0 )
+    , visited = [ ( 0, 0 ) ]
     }
 
 
-coordinatesX : Coordinates -> Int
+coordinatesX : ( Int, Int ) -> Int
 coordinatesX coords =
-    case coords of
-        Coordinates x _ ->
-            x
+    Tuple.first coords
 
 
-coordinatesY : Coordinates -> Int
+coordinatesY : ( Int, Int ) -> Int
 coordinatesY coords =
-    case coords of
-        Coordinates _ y ->
-            y
+    Tuple.second coords
+
+
+applyCommandsToRopeState : Command -> Rope -> Rope
+applyCommandsToRopeState command initialState =
+    case command of
+        Up ->
+            let
+                relHeadPos =
+                    ( coordinatesX initialState.headRel
+                    , min 1 (coordinatesY initialState.headRel + 1)
+                    )
+
+                tailPos =
+                    if (coordinatesY initialState.headRel + 1) > 1 then
+                        ( coordinatesX initialState.headRel
+                        , coordinatesY initialState.tail + 1
+                        )
+
+                    else
+                        initialState.tail
+
+                visitedLocations =
+                    tailPos :: initialState.visited
+            in
+            { tail = tailPos
+            , headRel = relHeadPos
+            , visited = visitedLocations
+            }
+
+        Down ->
+            initialState
+
+        Left ->
+            initialState
+
+        Right ->
+            initialState
 
 
 main : Html msg
@@ -69,115 +86,6 @@ main =
         |> Html.text
 
 
-applyCommandsToRopeState : Command -> Rope -> Rope
-applyCommandsToRopeState command rope =
-    { tail = Coordinates 0 0
-    , headRel = finalRelativeHeadPosition command rope
-    , visited = []
-    }
-
-
-
--- { tail = Tuple.first (tailLocationsVisited command rope.tail rope.visited)
---     , headRel = finalRelativeHeadPosition command rope
---     , visited = Tuple.second (tailLocationsVisited command rope.tail rope.visited)
---     }
--- intermediateRelativeHeadPosition : Command -> Rope -> Coordinates
--- intermediateRelativeHeadPosition command rope =
---     case command of
---         Up distance ->
---             Coordinates
---                 (coordinatesX rope.headRel)
---                 (coordinatesY rope.headRel + distance)
---         Down distance ->
---             Coordinates
---                 (coordinatesX rope.headRel)
---                 (coordinatesY rope.headRel - distance)
---         Left distance ->
---             Coordinates
---                 (coordinatesX rope.headRel - distance)
---                 (coordinatesY rope.headRel)
---         Right distance ->
---             Coordinates
---                 (coordinatesX rope.headRel + distance)
---                 (coordinatesY rope.headRel)
-
-
-finalRelativeHeadPosition : Command -> Rope -> Coordinates
-finalRelativeHeadPosition command rope =
-    case command of
-        Up distance ->
-            Coordinates
-                (coordinatesX rope.headRel)
-                (min 1 (coordinatesY rope.headRel + distance))
-
-        Down distance ->
-            Coordinates
-                (coordinatesX rope.headRel)
-                (max -1 (coordinatesY rope.headRel - distance))
-
-        Left distance ->
-            Coordinates
-                (max -1 (coordinatesY rope.headRel - distance))
-                (coordinatesX rope.headRel)
-
-        Right distance ->
-            Coordinates
-                (min 1 (coordinatesY rope.headRel + distance))
-                (coordinatesX rope.headRel)
-
-
-
--- applyCommandsToRopeState : Command -> Rope -> Rope
--- applyCommandsToRopeState command rope =
---     { tail = Tuple.first (tailLocationsVisited command rope.tail rope.visited)
---     , headRel = finalRelativeHeadPosition command rope
---     , visited = Tuple.second (tailLocationsVisited command rope.tail rope.visited)
---     }
--- calcTailPos : Coordinates -> Coordinates -> Coordinates
--- calcTailPos current headPos =
---     Coordinates 0 0
--- tailLocationsVisited : Command -> Coordinates -> List Coordinates -> ( Coordinates, List Coordinates )
--- tailLocationsVisited command currentLocation visitedLocations =
---     case command of
---         Up distance ->
---             if distance <= 1 then
---                 ( currentLocation, visitedLocations )
---             else
---                 let
---                     newCoordinates =
---                         Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation + 1)
---                 in
---                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
---         Down distance ->
---             if distance <= 1 then
---                 ( currentLocation, visitedLocations )
---             else
---                 let
---                     newCoordinates =
---                         Coordinates (coordinatesX currentLocation) (coordinatesY currentLocation - 1)
---                 in
---                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
---         Right distance ->
---             if distance <= 1 then
---                 ( currentLocation, visitedLocations )
---             else
---                 let
---                     newCoordinates =
---                         Coordinates (coordinatesX currentLocation + 1) (coordinatesY currentLocation)
---                 in
---                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
---         Left distance ->
---             if distance <= 1 then
---                 ( currentLocation, visitedLocations )
---             else
---                 let
---                     newCoordinates =
---                         Coordinates (coordinatesX currentLocation - 1) (coordinatesY currentLocation)
---                 in
---                 tailLocationsVisited command newCoordinates (currentLocation :: visitedLocations)
-
-
 parseCommandsFromInput : String -> List Command
 parseCommandsFromInput input =
     input
@@ -185,25 +93,35 @@ parseCommandsFromInput input =
         |> List.map (Parser.run commandParser)
         |> List.map Result.toMaybe
         |> List.filterMap identity
+        |> List.concat
 
 
-commandParser : Parser Command
+createNCommands : Int -> Command -> List Command -> List Command
+createNCommands amount command list =
+    if amount < 1 then
+        list
+
+    else
+        createNCommands (amount - 1) command (command :: list)
+
+
+commandParser : Parser (List Command)
 commandParser =
     succeed identity
         |= Parser.oneOf
-            [ succeed Up
+            [ succeed (\amount -> createNCommands amount Up [])
                 |. keyword "U"
                 |. spaces
                 |= int
-            , succeed Down
+            , succeed (\amount -> createNCommands amount Down [])
                 |. keyword "D"
                 |. spaces
                 |= int
-            , succeed Left
+            , succeed (\amount -> createNCommands amount Left [])
                 |. keyword "L"
                 |. spaces
                 |= int
-            , succeed Right
+            , succeed (\amount -> createNCommands amount Right [])
                 |. keyword "R"
                 |. spaces
                 |= int
