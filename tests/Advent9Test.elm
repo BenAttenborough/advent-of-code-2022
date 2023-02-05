@@ -69,6 +69,8 @@ suite =
                     Expect.equal
                         (Parser.run commandParser "U 3")
                         (Ok [ Up, Up, Up ])
+
+            -- Up
             , test "applyCommandsToRopeState moves rope correctly up" <|
                 \_ ->
                     Expect.equal
@@ -92,5 +94,176 @@ suite =
                     Expect.equal
                         (applyCommandsToRopeState Up initialState)
                         expectedState
+            , test "applyCommandsToRopeState moves rope correctly up when head's rel pos moves beyond boundary and it is offset" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( -1, 1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( 0, 1 )
+                            , tail = ( -1, 1 )
+                            , visited = Set.fromList [ ( 0, 0 ), ( -1, 1 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Up initialState)
+                        expectedState
+            , test "applyCommandsToRopeState moving head up has no affect on tail if it's within the boundary" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( 0, -1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( 0, 0 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.fromList [ ( 0, 0 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Up initialState)
+                        expectedState
+
+            --
+            , test "applyCommandsToRopeState moves rope correctly down" <|
+                \_ ->
+                    let
+                        expectedState =
+                            { headRel = ( 0, -1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.fromList [ ( 0, 0 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Down ropeStateZero)
+                        expectedState
+            , test "applyCommandsToRopeState moves rope correctly down when head's rel pos moves beyond boundary" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( 0, -1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( 0, -1 )
+                            , tail = ( 0, -1 )
+                            , visited = Set.fromList [ ( 0, 0 ), ( 0, -1 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Down initialState)
+                        expectedState
+            , test "applyCommandsToRopeState moves rope correctly down when head's rel pos moves beyond boundary and it is offset" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( 1, -1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( 0, -1 )
+                            , tail = ( 1, -1 )
+                            , visited = Set.fromList [ ( 0, 0 ), ( 1, -1 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Down initialState)
+                        expectedState
+            , test "applyCommandsToRopeState moving head DOWN has no affect on tail if it's within the boundary" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( 0, 1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( 0, 0 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.fromList [ ( 0, 0 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Down initialState)
+                        expectedState
+
+            -- Left
+            , test "applyCommandsToRopeState moves rope correctly left" <|
+                \_ ->
+                    let
+                        expectedState =
+                            { headRel = ( -1, 0 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.fromList [ ( 0, 0 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Left ropeStateZero)
+                        expectedState
+            , test "applyCommandsToRopeState moves rope correctly left when head's rel pos moves beyond boundary" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( -1, 0 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( -1, 0 )
+                            , tail = ( -1, 0 )
+                            , visited = Set.fromList [ ( 0, 0 ), ( -1, 0 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Left initialState)
+                        expectedState
+
+            -- , test "applyCommandsToRopeState moves rope correctly left when head's rel pos moves beyond boundary and it is offset" <|
+            --     \_ ->
+            --         let
+            --             initialState =
+            --                 { headRel = ( -1, 1 )
+            --                 , tail = ( 0, 0 )
+            --                 , visited = Set.singleton ( 0, 0 )
+            --                 }
+            --             expectedState =
+            --                 { headRel = ( -1, 1 )
+            --                 , tail = ( 1, -1 )
+            --                 , visited = Set.fromList [ ( 0, 0 ), ( 1, -1 ) ]
+            --                 }
+            --         in
+            --         Expect.equal
+            --             (applyCommandsToRopeState Down initialState)
+            --             expectedState
+            -- , test "applyCommandsToRopeState moving head DOWN has no affect on tail if it's within the boundary" <|
+            --     \_ ->
+            --         let
+            --             initialState =
+            --                 { headRel = ( 0, 1 )
+            --                 , tail = ( 0, 0 )
+            --                 , visited = Set.singleton ( 0, 0 )
+            --                 }
+            --             expectedState =
+            --                 { headRel = ( 0, 0 )
+            --                 , tail = ( 0, 0 )
+            --                 , visited = Set.fromList [ ( 0, 0 ) ]
+            --                 }
+            --         in
+            --         Expect.equal
+            --             (applyCommandsToRopeState Down initialState)
+            --             expectedState
             ]
         ]

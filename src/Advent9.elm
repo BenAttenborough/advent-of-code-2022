@@ -42,17 +42,26 @@ coordinatesY coords =
 
 applyCommandsToRopeState : Command -> Rope -> Rope
 applyCommandsToRopeState command initialState =
+    let
+        _ =
+            Debug.log "Tail position:" initialState.tail
+    in
     case command of
         Up ->
             let
                 relHeadPos =
-                    ( coordinatesX initialState.headRel
+                    ( if coordinatesX initialState.headRel /= 0 then
+                        -- If
+                        0
+
+                      else
+                        coordinatesX initialState.headRel
                     , min 1 (coordinatesY initialState.headRel + 1)
                     )
 
                 tailPos =
                     if (coordinatesY initialState.headRel + 1) > 1 then
-                        ( coordinatesX initialState.headRel
+                        ( coordinatesX initialState.tail
                         , coordinatesY initialState.tail + 1
                         )
 
@@ -68,13 +77,89 @@ applyCommandsToRopeState command initialState =
             }
 
         Down ->
-            initialState
+            let
+                relHeadPos =
+                    ( if coordinatesX initialState.headRel /= 0 then
+                        -- If
+                        0
+
+                      else
+                        coordinatesX initialState.tail
+                    , max -1 (coordinatesY initialState.headRel - 1)
+                    )
+
+                tailPos =
+                    if (coordinatesY initialState.headRel - 1) < -1 then
+                        ( coordinatesX initialState.headRel
+                        , coordinatesY initialState.tail - 1
+                        )
+
+                    else
+                        initialState.tail
+
+                visitedLocations =
+                    Set.insert tailPos initialState.visited
+            in
+            { tail = tailPos
+            , headRel = relHeadPos
+            , visited = visitedLocations
+            }
 
         Left ->
-            initialState
+            let
+                relHeadPos =
+                    ( max -1 (coordinatesX initialState.headRel - 1)
+                    , if coordinatesY initialState.headRel /= 0 then
+                        0
+
+                      else
+                        coordinatesY initialState.headRel
+                    )
+
+                tailPos =
+                    if (coordinatesX initialState.headRel - 1) < -1 then
+                        ( coordinatesX initialState.tail - 1
+                        , if coordinatesY initialState.headRel /= 0 then
+                            0
+
+                          else
+                            coordinatesY initialState.tail
+                        )
+
+                    else
+                        initialState.tail
+
+                visitedLocations =
+                    Set.insert tailPos initialState.visited
+            in
+            { tail = tailPos
+            , headRel = relHeadPos
+            , visited = visitedLocations
+            }
 
         Right ->
-            initialState
+            let
+                relHeadPos =
+                    ( min 1 (coordinatesX initialState.headRel + 1)
+                    , coordinatesY initialState.tail
+                    )
+
+                tailPos =
+                    if (coordinatesX initialState.headRel + 1) > 1 then
+                        ( coordinatesX initialState.tail + 1
+                        , coordinatesY initialState.headRel
+                        )
+
+                    else
+                        initialState.tail
+
+                visitedLocations =
+                    Set.insert tailPos initialState.visited
+            in
+            { tail = tailPos
+            , headRel = relHeadPos
+            , visited = visitedLocations
+            }
 
 
 main : Html msg
