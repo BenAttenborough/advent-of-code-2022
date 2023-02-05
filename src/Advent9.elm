@@ -5,6 +5,7 @@ import Html exposing (Html, p, text)
 import Json.Decode exposing (list, oneOf)
 import Maybe.Extra exposing (isJust)
 import Parser exposing (..)
+import Set exposing (Set)
 
 
 type Command
@@ -17,7 +18,7 @@ type Command
 type alias Rope =
     { tail : ( Int, Int )
     , headRel : ( Int, Int )
-    , visited : List ( Int, Int )
+    , visited : Set ( Int, Int )
     }
 
 
@@ -25,7 +26,7 @@ initialRopeState : Rope
 initialRopeState =
     { tail = ( 0, 0 )
     , headRel = ( 0, 0 )
-    , visited = [ ( 0, 0 ) ]
+    , visited = Set.singleton ( 0, 0 )
     }
 
 
@@ -59,7 +60,7 @@ applyCommandsToRopeState command initialState =
                         initialState.tail
 
                 visitedLocations =
-                    tailPos :: initialState.visited
+                    Set.insert tailPos initialState.visited
             in
             { tail = tailPos
             , headRel = relHeadPos

@@ -5,6 +5,7 @@ import Advent9Data exposing (testInput)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Parser exposing (Parser)
+import Set exposing (Set)
 import Test exposing (..)
 
 
@@ -17,7 +18,7 @@ ropeStateZero : Rope
 ropeStateZero =
     { tail = ( 0, 0 )
     , headRel = ( 0, 0 )
-    , visited = [ ( 0, 0 ) ]
+    , visited = Set.singleton ( 0, 0 )
     }
 
 
@@ -25,7 +26,7 @@ ropeStateUpFromZero : Rope
 ropeStateUpFromZero =
     { tail = ( 0, 0 )
     , headRel = ( 0, 1 )
-    , visited = [ ( 0, 0 ) ]
+    , visited = Set.fromList [ ( 0, 0 ) ]
     }
 
 
@@ -73,5 +74,23 @@ suite =
                     Expect.equal
                         (applyCommandsToRopeState Up ropeStateZero)
                         ropeStateUpFromZero
+            , test "applyCommandsToRopeState moves rope correctly up when head's rel pos moves beyond boundary" <|
+                \_ ->
+                    let
+                        initialState =
+                            { headRel = ( 0, 1 )
+                            , tail = ( 0, 0 )
+                            , visited = Set.singleton ( 0, 0 )
+                            }
+
+                        expectedState =
+                            { headRel = ( 0, 1 )
+                            , tail = ( 0, 1 )
+                            , visited = Set.fromList [ ( 0, 0 ), ( 0, 1 ) ]
+                            }
+                    in
+                    Expect.equal
+                        (applyCommandsToRopeState Up initialState)
+                        expectedState
             ]
         ]
