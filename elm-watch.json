@@ -1,8 +1,8 @@
 {
     "targets": {
         "My target name": {
-            "inputs": ["src/Advent7.elm"],
-            "output": "js_compiled/advent7.js"
+            "inputs": ["src/Advent9.elm"],
+            "output": "js_compiled/advent9.js"
         }
     }
 }
