@@ -1,6 +1,6 @@
 module Advent9 exposing (..)
 
-import Advent9Data exposing (testInput)
+import Advent9Data exposing (realInput, testInput)
 import Html exposing (Html, p, text)
 import Json.Decode exposing (list, oneOf)
 import Maybe.Extra exposing (isJust)
@@ -42,16 +42,19 @@ coordinatesY coords =
 
 applyCommandsToRopeState : Command -> Rope -> Rope
 applyCommandsToRopeState command initialState =
-    let
-        _ =
-            Debug.log "Tail position:" initialState.tail
-    in
+    -- let
+    --     x =
+    --         Debug.log "head rel position:" initialState.headRel
+    --     _ =
+    --         Debug.log "Tail position:" initialState.tail
+    --     y =
+    --         Debug.log "=" "==============="
+    -- in
     case command of
         Up ->
             let
                 relHeadPos =
-                    ( if coordinatesX initialState.headRel /= 0 then
-                        -- If
+                    ( if (coordinatesY initialState.headRel + 1) > 1 then
                         0
 
                       else
@@ -61,7 +64,7 @@ applyCommandsToRopeState command initialState =
 
                 tailPos =
                     if (coordinatesY initialState.headRel + 1) > 1 then
-                        ( coordinatesX initialState.tail
+                        ( coordinatesX initialState.tail + coordinatesX initialState.headRel
                         , coordinatesY initialState.tail + 1
                         )
 
@@ -79,18 +82,17 @@ applyCommandsToRopeState command initialState =
         Down ->
             let
                 relHeadPos =
-                    ( if coordinatesX initialState.headRel /= 0 then
-                        -- If
+                    ( if (coordinatesY initialState.headRel - 1) < -1 then
                         0
 
                       else
-                        coordinatesX initialState.tail
+                        coordinatesX initialState.headRel
                     , max -1 (coordinatesY initialState.headRel - 1)
                     )
 
                 tailPos =
                     if (coordinatesY initialState.headRel - 1) < -1 then
-                        ( coordinatesX initialState.headRel
+                        ( coordinatesX initialState.tail + coordinatesX initialState.headRel
                         , coordinatesY initialState.tail - 1
                         )
 
@@ -109,7 +111,7 @@ applyCommandsToRopeState command initialState =
             let
                 relHeadPos =
                     ( max -1 (coordinatesX initialState.headRel - 1)
-                    , if coordinatesY initialState.headRel /= 0 then
+                    , if (coordinatesX initialState.headRel - 1) < -1 then
                         0
 
                       else
@@ -119,11 +121,7 @@ applyCommandsToRopeState command initialState =
                 tailPos =
                     if (coordinatesX initialState.headRel - 1) < -1 then
                         ( coordinatesX initialState.tail - 1
-                        , if coordinatesY initialState.headRel /= 0 then
-                            0
-
-                          else
-                            coordinatesY initialState.tail
+                        , coordinatesY initialState.tail + coordinatesY initialState.headRel
                         )
 
                     else
@@ -141,13 +139,17 @@ applyCommandsToRopeState command initialState =
             let
                 relHeadPos =
                     ( min 1 (coordinatesX initialState.headRel + 1)
-                    , coordinatesY initialState.tail
+                    , if (coordinatesX initialState.headRel + 1) > 1 then
+                        0
+
+                      else
+                        coordinatesY initialState.headRel
                     )
 
                 tailPos =
                     if (coordinatesX initialState.headRel + 1) > 1 then
                         ( coordinatesX initialState.tail + 1
-                        , coordinatesY initialState.headRel
+                        , coordinatesY initialState.tail + coordinatesY initialState.headRel
                         )
 
                     else
@@ -164,10 +166,13 @@ applyCommandsToRopeState command initialState =
 
 main : Html msg
 main =
-    testInput
+    realInput
         |> parseCommandsFromInput
         |> List.foldl applyCommandsToRopeState
             initialRopeState
+        |> .visited
+        |> Set.toList
+        |> List.length
         |> Debug.toString
         |> Html.text
 

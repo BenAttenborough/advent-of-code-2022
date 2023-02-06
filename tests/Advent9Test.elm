@@ -98,15 +98,15 @@ suite =
                 \_ ->
                     let
                         initialState =
-                            { headRel = ( -1, 1 )
+                            { headRel = ( 1, 1 )
                             , tail = ( 0, 0 )
                             , visited = Set.singleton ( 0, 0 )
                             }
 
                         expectedState =
                             { headRel = ( 0, 1 )
-                            , tail = ( -1, 1 )
-                            , visited = Set.fromList [ ( 0, 0 ), ( -1, 1 ) ]
+                            , tail = ( 1, 1 )
+                            , visited = Set.fromList [ ( 0, 0 ), ( 1, 1 ) ]
                             }
                     in
                     Expect.equal
