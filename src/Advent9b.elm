@@ -38,6 +38,22 @@ makeRope size rope =
         makeRope (size - 1) (( 0, 0 ) :: rope)
 
 
+applyCommandsToRopeState : Command -> ( Int, Int ) -> ( Int, Int )
+applyCommandsToRopeState command ( x, y ) =
+    case command of
+        Up ->
+            ( x, y + 1 )
+
+        Right ->
+            ( x + 1, y )
+
+        Down ->
+            ( x, y - 1 )
+
+        Left ->
+            ( x - 1, y )
+
+
 main : Html msg
 main =
     realInput

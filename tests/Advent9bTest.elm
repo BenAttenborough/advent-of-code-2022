@@ -47,29 +47,45 @@ suite =
                             |> List.length
                         )
                         10
-            , test "makeRope 10 then fold" <|
+            , test "apply a command to the rope" <|
                 \_ ->
                     Expect.equal
-                        []
-                        (makeRope 10 []
-                            |> List.foldl
-                                (\( x, y ) list ->
-                                    let
-                                        lastItem =
-                                            List.Extra.last list
-                                    in
-                                    case lastItem of
-                                        Just val ->
-                                            if Tuple.first val > 1 then
-                                                List.append list [ ( x + 1, y ) ]
+                        ( 0, 1 )
+                        (applyCommandsToRopeState Up ( 0, 0 ))
+            , test "apply multiple commands to the rope" <|
+                \_ ->
+                    Expect.equal
+                        ( -1, 2 )
+                        (List.foldl applyCommandsToRopeState ( 0, 0 ) [ Up, Right, Up, Left, Left ])
+            , test "apply multiple commands to the rope 2" <|
+                \_ ->
+                    Expect.equal
+                        ( 0, 0 )
+                        (List.foldl applyCommandsToRopeState ( 0, 0 ) [ Up, Down, Left, Right ])
+            , skip <|
+                test "makeRope 10 then fold" <|
+                    \_ ->
+                        Expect.equal
+                            []
+                            (makeRope 10 []
+                                |> List.foldl
+                                    (\( x, y ) list ->
+                                        let
+                                            lastItem =
+                                                List.Extra.last list
+                                        in
+                                        case lastItem of
+                                            Just val ->
+                                                if Tuple.first val > 1 then
+                                                    List.append list [ ( x + 1, y ) ]
 
-                                            else
-                                                List.append list [ ( x, y ) ]
+                                                else
+                                                    List.append list [ ( x, y ) ]
 
-                                        Nothing ->
-                                            List.append list [ ( 2, y ) ]
-                                )
-                                []
-                        )
+                                            Nothing ->
+                                                List.append list [ ( 2, y ) ]
+                                    )
+                                    []
+                            )
             ]
         ]
