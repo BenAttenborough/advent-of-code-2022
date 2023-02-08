@@ -19,6 +19,16 @@ type alias Rope =
     List ( Int, Int )
 
 
+getX : ( Int, Int ) -> Int
+getX coords =
+    Tuple.first coords
+
+
+getY : ( Int, Int ) -> Int
+getY coords =
+    Tuple.first coords
+
+
 makeRope : Int -> Rope -> Rope
 makeRope size rope =
     if size < 1 then

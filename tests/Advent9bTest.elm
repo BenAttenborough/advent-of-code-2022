@@ -4,6 +4,8 @@ import Advent9Data exposing (testInput)
 import Advent9b exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
+import Html.Attributes exposing (list)
+import List.Extra
 import Parser exposing (Parser)
 import Set exposing (Set)
 import Test exposing (..)
@@ -45,5 +47,29 @@ suite =
                             |> List.length
                         )
                         10
+            , test "makeRope 10 then fold" <|
+                \_ ->
+                    Expect.equal
+                        []
+                        (makeRope 10 []
+                            |> List.foldl
+                                (\( x, y ) list ->
+                                    let
+                                        lastItem =
+                                            List.Extra.last list
+                                    in
+                                    case lastItem of
+                                        Just val ->
+                                            if Tuple.first val > 1 then
+                                                List.append list [ ( x + 1, y ) ]
+
+                                            else
+                                                List.append list [ ( x, y ) ]
+
+                                        Nothing ->
+                                            List.append list [ ( 2, y ) ]
+                                )
+                                []
+                        )
             ]
         ]
