@@ -67,7 +67,7 @@ applyCommandToRope command rope =
             in
             case tail of
                 [] ->
-                    updatedHead :: tail
+                    [ updatedHead ]
 
                 tailHead :: _ ->
                     let
@@ -113,10 +113,103 @@ applyCommandToRope command rope =
                                 updatedHead :: tail
 
 
+applyCommandToRopeRecordTail : Command -> ( Rope, Set ( Int, Int ) ) -> ( Rope, Set ( Int, Int ) )
+applyCommandToRopeRecordTail command ( rope, visited ) =
+    case rope of
+        [] ->
+            ( rope, visited )
+
+        head :: tail ->
+            let
+                updatedHead =
+                    applyCommandToKnot command head
+            in
+            case tail of
+                [] ->
+                    ( [ updatedHead ], Set.insert updatedHead visited )
+
+                tailHead :: _ ->
+                    let
+                        headX =
+                            Tuple.first updatedHead
+
+                        headY =
+                            Tuple.second updatedHead
+
+                        tailHeadX =
+                            Tuple.first tailHead
+
+                        tailHeadY =
+                            Tuple.second tailHead
+                    in
+                    case command of
+                        Up ->
+                            if (headY - tailHeadY) > 1 then
+                                ( updatedHead :: applyCommandToRope command tail, visited )
+
+                            else
+                                ( updatedHead :: tail, visited )
+
+                        Right ->
+                            if (headX - tailHeadX) > 1 then
+                                ( updatedHead :: applyCommandToRope command tail, visited )
+
+                            else
+                                ( updatedHead :: tail, visited )
+
+                        Down ->
+                            if (tailHeadY - headY) > 1 then
+                                ( updatedHead :: applyCommandToRope command tail, visited )
+
+                            else
+                                ( updatedHead :: tail, visited )
+
+                        Left ->
+                            if (tailHeadX - headX) > 1 then
+                                ( updatedHead :: applyCommandToRope command tail, visited )
+
+                            else
+                                ( updatedHead :: tail, visited )
+
+
+applyCommandsToRope : Rope -> List Command -> Rope
+applyCommandsToRope rope commands =
+    List.foldl
+        (\command knots ->
+            applyCommandToRope command knots
+        )
+        rope
+        commands
+
+
+applyCommandsToRopeRecordTail : Rope -> List Command -> ( Rope, Set ( Int, Int ) )
+applyCommandsToRopeRecordTail rope commands =
+    List.foldl
+        (\command knots ->
+            applyCommandToRopeRecordTail command knots
+        )
+        ( rope, Set.fromList [ ( 0, 0 ) ] )
+        commands
+
+
+output : List Command -> ( Rope, Set ( Int, Int ) )
+output commands =
+    commands
+        |> applyCommandsToRopeRecordTail (makeRope 10 [])
+
+
+outputFromString : String -> ( Rope, Set ( Int, Int ) )
+outputFromString commands =
+    commands
+        |> parseCommandsFromInput
+        |> applyCommandsToRopeRecordTail (makeRope 10 [])
+
+
 main : Html msg
 main =
     realInput
         |> parseCommandsFromInput
+        |> applyCommandsToRope (makeRope 10 [])
         |> Debug.toString
         |> Html.text
 

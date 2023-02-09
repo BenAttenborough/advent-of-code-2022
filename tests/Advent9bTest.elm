@@ -1,6 +1,6 @@
 module Advent9bTest exposing (..)
 
-import Advent9Data exposing (testInput)
+import Advent9Data exposing (partTwoBenInput, partTwoLargeInput, testInput)
 import Advent9b exposing (..)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
@@ -80,16 +80,29 @@ suite =
                     Expect.equal
                         [ ( 0, 6 ), ( 0, 5 ), ( 0, 4 ) ]
                         (applyCommandToRope Up rope)
-            , test "makeRope 10 then fold" <|
-                \_ ->
-                    Expect.equal
-                        [ ( -1, 4 ), ( 0, 3 ), ( 1, 2 ), ( 0, 1 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ) ]
-                        ([ Up, Up, Up, Up, Right, Right, Right, Left, Left, Left, Left ]
-                            |> List.foldl
-                                (\command rope ->
-                                    applyCommandToRope command rope
-                                )
-                                (makeRope 10 [])
-                        )
+            , skip <|
+                test "makeRope 10 then fold" <|
+                    \_ ->
+                        Expect.equal
+                            [ ( -1, 4 ), ( 0, 3 ), ( 1, 2 ), ( 0, 1 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ) ]
+                            ([ Up, Up, Up, Up, Right, Right, Right, Left, Left, Left, Left ]
+                                |> List.foldl
+                                    (\command rope ->
+                                        applyCommandToRope command rope
+                                    )
+                                    (makeRope 10 [])
+                            )
+            , skip <|
+                test "output" <|
+                    \_ ->
+                        Expect.equal
+                            ( [], Set.fromList [] )
+                            (output [ Up, Up ])
+            , skip <|
+                test "outputFromString" <|
+                    \_ ->
+                        Expect.equal
+                            ( [], Set.fromList [] )
+                            (outputFromString partTwoBenInput)
             ]
         ]

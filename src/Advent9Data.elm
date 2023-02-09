@@ -1,4 +1,4 @@
-module Advent9Data exposing (realInput, testInput)
+module Advent9Data exposing (partTwoBenInput, partTwoLargeInput, realInput, testInput)
 
 
 testInput : String
@@ -11,6 +11,24 @@ R 4
 D 1
 L 5
 R 2"""
+
+
+partTwoLargeInput : String
+partTwoLargeInput =
+    """R 5
+U 8
+L 8
+D 3
+R 17
+D 10
+L 25
+U 20"""
+
+
+partTwoBenInput : String
+partTwoBenInput =
+    """R 5
+U 8"""
 
 
 realInput : String
