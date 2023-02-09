@@ -89,7 +89,7 @@ applyCommandToRope command rope =
                                 updatedHead :: applyCommandToRope command tail
 
                             else
-                                rope
+                                updatedHead :: tail
 
                         Right ->
                             if (headX - tailHeadX) > 1 then
@@ -103,14 +103,14 @@ applyCommandToRope command rope =
                                 updatedHead :: applyCommandToRope command tail
 
                             else
-                                rope
+                                updatedHead :: tail
 
                         Left ->
                             if (tailHeadX - headX) > 1 then
                                 updatedHead :: applyCommandToRope command tail
 
                             else
-                                rope
+                                updatedHead :: tail
 
 
 main : Html msg

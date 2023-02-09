@@ -62,7 +62,7 @@ suite =
                     Expect.equal
                         ( 0, 0 )
                         (List.foldl applyCommandToKnot ( 0, 0 ) [ Up, Down, Left, Right ])
-            , test "apply command to rope " <|
+            , test "apply command 'Right' to rope " <|
                 \_ ->
                     let
                         rope =
@@ -71,30 +71,25 @@ suite =
                     Expect.equal
                         [ ( 6, 0 ), ( 5, 0 ), ( 4, 0 ) ]
                         (applyCommandToRope Right rope)
-            , skip <|
-                test "makeRope 10 then fold" <|
-                    \_ ->
-                        Expect.equal
-                            []
-                            (makeRope 10 []
-                                |> List.foldl
-                                    (\( x, y ) list ->
-                                        let
-                                            lastItem =
-                                                List.Extra.last list
-                                        in
-                                        case lastItem of
-                                            Just val ->
-                                                if Tuple.first val > 1 then
-                                                    List.append list [ ( x + 1, y ) ]
-
-                                                else
-                                                    List.append list [ ( x, y ) ]
-
-                                            Nothing ->
-                                                List.append list [ ( 2, y ) ]
-                                    )
-                                    []
-                            )
+            , test "apply command 'Up' to rope " <|
+                \_ ->
+                    let
+                        rope =
+                            [ ( 0, 5 ), ( 0, 4 ), ( 0, 4 ) ]
+                    in
+                    Expect.equal
+                        [ ( 0, 6 ), ( 0, 5 ), ( 0, 4 ) ]
+                        (applyCommandToRope Up rope)
+            , test "makeRope 10 then fold" <|
+                \_ ->
+                    Expect.equal
+                        [ ( -1, 4 ), ( 0, 3 ), ( 1, 2 ), ( 0, 1 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ), ( 0, 0 ) ]
+                        ([ Up, Up, Up, Up, Right, Right, Right, Left, Left, Left, Left ]
+                            |> List.foldl
+                                (\command rope ->
+                                    applyCommandToRope command rope
+                                )
+                                (makeRope 10 [])
+                        )
             ]
         ]
