@@ -51,17 +51,26 @@ suite =
                 \_ ->
                     Expect.equal
                         ( 0, 1 )
-                        (applyCommandsToRopeState Up ( 0, 0 ))
+                        (applyCommandToKnot Up ( 0, 0 ))
             , test "apply multiple commands to the rope" <|
                 \_ ->
                     Expect.equal
                         ( -1, 2 )
-                        (List.foldl applyCommandsToRopeState ( 0, 0 ) [ Up, Right, Up, Left, Left ])
+                        (List.foldl applyCommandToKnot ( 0, 0 ) [ Up, Right, Up, Left, Left ])
             , test "apply multiple commands to the rope 2" <|
                 \_ ->
                     Expect.equal
                         ( 0, 0 )
-                        (List.foldl applyCommandsToRopeState ( 0, 0 ) [ Up, Down, Left, Right ])
+                        (List.foldl applyCommandToKnot ( 0, 0 ) [ Up, Down, Left, Right ])
+            , test "apply command to rope " <|
+                \_ ->
+                    let
+                        rope =
+                            [ ( 5, 0 ), ( 4, 0 ), ( 4, 0 ) ]
+                    in
+                    Expect.equal
+                        [ ( 6, 0 ), ( 5, 0 ), ( 4, 0 ) ]
+                        (applyCommandToRope Right rope)
             , skip <|
                 test "makeRope 10 then fold" <|
                     \_ ->

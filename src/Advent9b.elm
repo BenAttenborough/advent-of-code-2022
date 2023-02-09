@@ -38,8 +38,8 @@ makeRope size rope =
         makeRope (size - 1) (( 0, 0 ) :: rope)
 
 
-applyCommandsToRopeState : Command -> ( Int, Int ) -> ( Int, Int )
-applyCommandsToRopeState command ( x, y ) =
+applyCommandToKnot : Command -> ( Int, Int ) -> ( Int, Int )
+applyCommandToKnot command ( x, y ) =
     case command of
         Up ->
             ( x, y + 1 )
@@ -52,6 +52,65 @@ applyCommandsToRopeState command ( x, y ) =
 
         Left ->
             ( x - 1, y )
+
+
+applyCommandToRope : Command -> Rope -> Rope
+applyCommandToRope command rope =
+    case rope of
+        [] ->
+            rope
+
+        head :: tail ->
+            let
+                updatedHead =
+                    applyCommandToKnot command head
+            in
+            case tail of
+                [] ->
+                    updatedHead :: tail
+
+                tailHead :: _ ->
+                    let
+                        headX =
+                            Tuple.first updatedHead
+
+                        headY =
+                            Tuple.second updatedHead
+
+                        tailHeadX =
+                            Tuple.first tailHead
+
+                        tailHeadY =
+                            Tuple.second tailHead
+                    in
+                    case command of
+                        Up ->
+                            if (headY - tailHeadY) > 1 then
+                                updatedHead :: applyCommandToRope command tail
+
+                            else
+                                rope
+
+                        Right ->
+                            if (headX - tailHeadX) > 1 then
+                                updatedHead :: applyCommandToRope command tail
+
+                            else
+                                updatedHead :: tail
+
+                        Down ->
+                            if (tailHeadY - headY) > 1 then
+                                updatedHead :: applyCommandToRope command tail
+
+                            else
+                                rope
+
+                        Left ->
+                            if (tailHeadX - headX) > 1 then
+                                updatedHead :: applyCommandToRope command tail
+
+                            else
+                                rope
 
 
 main : Html msg
