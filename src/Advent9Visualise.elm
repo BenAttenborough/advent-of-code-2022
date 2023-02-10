@@ -69,20 +69,11 @@ playfieldToText playfield =
 
 updatePlayfield : Int -> Int -> Cell -> Playfield -> Playfield
 updatePlayfield row col cell playfield =
-    let
-        rowToReplace =
-            Array.get row playfield
-
-        updatedRow =
-            rowToReplace
-                |> Maybe.map (Array.set col cell)
-    in
-    case updatedRow of
-        Just value ->
-            Array.set row value playfield
-
-        Nothing ->
-            playfield
+    playfield
+        |> Array.get row
+        |> Maybe.map (Array.set col cell)
+        |> Maybe.map (\replacementRow -> Array.set row replacementRow playfield)
+        |> Maybe.withDefault playfield
 
 
 main : Html msg
