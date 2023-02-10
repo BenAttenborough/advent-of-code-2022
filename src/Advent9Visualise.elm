@@ -1,8 +1,11 @@
 module Advent9Visualise exposing (..)
 
 import Array exposing (Array)
+import Browser
+import Browser.Events exposing (onKeyPress)
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (style)
+import Json.Decode as Decode
 import List exposing (head)
 import Tree.Diff exposing (Tail(..))
 
@@ -16,6 +19,66 @@ type Cell
 
 type alias Playfield =
     Array (Array Cell)
+
+
+type Command
+    = Up
+    | Down
+    | Left
+    | Right
+    | Other
+
+
+type alias Model =
+    { playfield : Playfield }
+
+
+type Msg
+    = KeyPressed
+
+
+main : Program () Model Msg
+main =
+    Browser.element
+        { init = initialModel
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    onKeyPress (Decode.succeed KeyPressed)
+
+
+initialModel : () -> ( Model, Cmd Msg )
+initialModel _ =
+    ( { playfield = makePlayfield 10 10 Array.empty }
+    , Cmd.none
+    )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        KeyPressed ->
+            ( model, Cmd.none )
+
+
+view : Model -> Html Msg
+view { playfield } =
+    playfield
+        |> updatePlayfield 5 5 Head
+        |> playfieldToText
+        |> List.map text
+        |> List.map (\s -> Html.p [ style "margin" "0" ] [ s ])
+        |> Html.div []
+
+
+initialRope : ( Int, Int )
+initialRope =
+    ( 5, 5 )
 
 
 makeRow : Int -> List Cell -> Array Cell
@@ -76,11 +139,25 @@ updatePlayfield row col cell playfield =
         |> Maybe.withDefault playfield
 
 
-main : Html msg
-main =
-    makePlayfield 10 10 Array.empty
-        |> updatePlayfield 2 2 Head
-        |> playfieldToText
-        |> List.map text
-        |> List.map (\s -> Html.p [ style "margin" "0" ] [ s ])
-        |> Html.div []
+keyDecoder : Decode.Decoder Command
+keyDecoder =
+    Decode.map toDirection (Decode.field "key" Decode.string)
+
+
+toDirection : String -> Command
+toDirection string =
+    case string of
+        "ArrowUp" ->
+            Up
+
+        "ArrowDown" ->
+            Down
+
+        "ArrowLeft" ->
+            Left
+
+        "ArrowRight" ->
+            Right
+
+        _ ->
+            Other
