@@ -2,7 +2,7 @@ module Advent9Visualise exposing (..)
 
 import Array exposing (Array)
 import Browser
-import Browser.Events exposing (onKeyPress)
+import Browser.Events exposing (onKeyDown, onKeyPress)
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (style)
 import Json.Decode as Decode
@@ -21,7 +21,7 @@ type alias Playfield =
     Array (Array Cell)
 
 
-type Command
+type Msg
     = Up
     | Down
     | Left
@@ -30,11 +30,9 @@ type Command
 
 
 type alias Model =
-    { playfield : Playfield }
-
-
-type Msg
-    = KeyPressed
+    { playfield : Playfield
+    , head : ( Int, Int )
+    }
 
 
 main : Program () Model Msg
@@ -49,12 +47,14 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    onKeyPress (Decode.succeed KeyPressed)
+    onKeyDown keyDecoder
 
 
 initialModel : () -> ( Model, Cmd Msg )
 initialModel _ =
-    ( { playfield = makePlayfield 10 10 Array.empty }
+    ( { playfield = makePlayfield 10 10 Array.empty
+      , head = ( 5, 5 )
+      }
     , Cmd.none
     )
 
@@ -62,23 +62,38 @@ initialModel _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        KeyPressed ->
+        Up ->
+            ( { model | head = ( Tuple.first model.head - 1, Tuple.second model.head ) }
+            , Cmd.none
+            )
+
+        Down ->
+            ( { model | head = ( Tuple.first model.head + 1, Tuple.second model.head ) }
+            , Cmd.none
+            )
+
+        Left ->
+            ( { model | head = ( Tuple.first model.head, Tuple.second model.head - 1 ) }
+            , Cmd.none
+            )
+
+        Right ->
+            ( { model | head = ( Tuple.first model.head, Tuple.second model.head + 1 ) }
+            , Cmd.none
+            )
+
+        _ ->
             ( model, Cmd.none )
 
 
 view : Model -> Html Msg
-view { playfield } =
+view { playfield, head } =
     playfield
-        |> updatePlayfield 5 5 Head
+        |> updatePlayfield (Tuple.first head) (Tuple.second head) Head
         |> playfieldToText
         |> List.map text
         |> List.map (\s -> Html.p [ style "margin" "0" ] [ s ])
         |> Html.div []
-
-
-initialRope : ( Int, Int )
-initialRope =
-    ( 5, 5 )
 
 
 makeRow : Int -> List Cell -> Array Cell
@@ -139,12 +154,12 @@ updatePlayfield row col cell playfield =
         |> Maybe.withDefault playfield
 
 
-keyDecoder : Decode.Decoder Command
+keyDecoder : Decode.Decoder Msg
 keyDecoder =
     Decode.map toDirection (Decode.field "key" Decode.string)
 
 
-toDirection : String -> Command
+toDirection : String -> Msg
 toDirection string =
     case string of
         "ArrowUp" ->
