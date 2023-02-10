@@ -53,7 +53,7 @@ subscriptions model =
 initialModel : () -> ( Model, Cmd Msg )
 initialModel _ =
     ( { playfield = makePlayfield 10 10 Array.empty
-      , head = ( 5, 5 )
+      , head = ( offSetX, offSetY )
       }
     , Cmd.none
     )
@@ -63,12 +63,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Up ->
-            ( { model | head = ( Tuple.first model.head - 1, Tuple.second model.head ) }
+            ( { model | head = ( Tuple.first model.head + 1, Tuple.second model.head ) }
             , Cmd.none
             )
 
         Down ->
-            ( { model | head = ( Tuple.first model.head + 1, Tuple.second model.head ) }
+            ( { model | head = ( Tuple.first model.head - 1, Tuple.second model.head ) }
             , Cmd.none
             )
 
@@ -88,12 +88,32 @@ update msg model =
 
 view : Model -> Html Msg
 view { playfield, head } =
-    playfield
-        |> updatePlayfield (Tuple.first head) (Tuple.second head) Head
-        |> playfieldToText
-        |> List.map text
-        |> List.map (\s -> Html.p [ style "margin" "0" ] [ s ])
-        |> Html.div []
+    let
+        map =
+            playfield
+                |> updatePlayfield (Tuple.first head) (Tuple.second head) Head
+                |> playfieldToText
+                |> List.map text
+                |> List.map (\s -> Html.p [ style "margin" "0" ] [ s ])
+                |> Html.div []
+
+        key =
+            Html.div []
+                [ Html.p [] [ Html.text ("Head position: " ++ Debug.toString (coordsOffset head)) ]
+                , Html.p [] [ Html.text "Tail position:" ]
+                ]
+    in
+    Html.div [] [ map, key ]
+
+
+offSetX : Int
+offSetX =
+    5
+
+
+offSetY : Int
+offSetY =
+    5
 
 
 makeRow : Int -> List Cell -> Array Cell
@@ -143,6 +163,7 @@ playfieldToText playfield =
     playfield
         |> Array.map rowToText
         |> Array.toList
+        |> List.reverse
 
 
 updatePlayfield : Int -> Int -> Cell -> Playfield -> Playfield
@@ -176,3 +197,8 @@ toDirection string =
 
         _ ->
             Other
+
+
+coordsOffset : ( Int, Int ) -> ( Int, Int )
+coordsOffset coords =
+    ( Tuple.first coords - offSetX, Tuple.second coords - offSetY )
