@@ -51,17 +51,17 @@ suite =
                 \_ ->
                     Expect.equal
                         ( 0, 1 )
-                        (applyCommandToKnot Up ( 0, 0 ))
+                        (applyCommandsToKnot Up ( 0, 0 ))
             , test "apply multiple commands to the rope" <|
                 \_ ->
                     Expect.equal
                         ( -1, 2 )
-                        (List.foldl applyCommandToKnot ( 0, 0 ) [ Up, Right, Up, Left, Left ])
+                        (List.foldl applyCommandsToKnot ( 0, 0 ) [ Up, Right, Up, Left, Left ])
             , test "apply multiple commands to the rope 2" <|
                 \_ ->
                     Expect.equal
                         ( 0, 0 )
-                        (List.foldl applyCommandToKnot ( 0, 0 ) [ Up, Down, Left, Right ])
+                        (List.foldl applyCommandsToKnot ( 0, 0 ) [ Up, Down, Left, Right ])
             , test "apply command 'Right' to rope " <|
                 \_ ->
                     let

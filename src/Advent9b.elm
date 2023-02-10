@@ -38,8 +38,8 @@ makeRope size rope =
         makeRope (size - 1) (( 0, 0 ) :: rope)
 
 
-applyCommandToKnot : Command -> ( Int, Int ) -> ( Int, Int )
-applyCommandToKnot command ( x, y ) =
+applyCommandsToKnot : Command -> ( Int, Int ) -> ( Int, Int )
+applyCommandsToKnot command ( x, y ) =
     case command of
         Up ->
             ( x, y + 1 )
@@ -63,7 +63,7 @@ applyCommandToRope command rope =
         head :: tail ->
             let
                 updatedHead =
-                    applyCommandToKnot command head
+                    applyCommandsToKnot command head
             in
             case tail of
                 [] ->
@@ -122,7 +122,7 @@ applyCommandToRopeRecordTail command ( rope, visited ) =
         head :: tail ->
             let
                 updatedHead =
-                    applyCommandToKnot command head
+                    applyCommandsToKnot command head
             in
             case tail of
                 [] ->
