@@ -35,6 +35,10 @@ type alias Model =
     }
 
 
+type alias Rope =
+    List ( Int, Int )
+
+
 main : Program () Model Msg
 main =
     Browser.element
@@ -114,6 +118,15 @@ offSetX =
 offSetY : Int
 offSetY =
     5
+
+
+makeRope : Int -> Rope -> Rope
+makeRope size rope =
+    if size < 1 then
+        rope
+
+    else
+        makeRope (size - 1) (( 0, 0 ) :: rope)
 
 
 makeRow : Int -> List Cell -> Array Cell
