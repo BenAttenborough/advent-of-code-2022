@@ -19,6 +19,10 @@ type alias Rope =
     List ( Int, Int )
 
 
+ropeTail =
+    ( 0, 0 )
+
+
 getX : ( Int, Int ) -> Int
 getX coords =
     Tuple.first coords
@@ -38,178 +42,59 @@ makeRope size rope =
         makeRope (size - 1) (( 0, 0 ) :: rope)
 
 
-applyCommandToKnot : Command -> ( Int, Int ) -> ( Int, Int )
-applyCommandToKnot command ( x, y ) =
-    case command of
-        Up ->
-            ( x, y + 1 )
-
-        Right ->
-            ( x + 1, y )
-
-        Down ->
-            ( x, y - 1 )
-
-        Left ->
-            ( x - 1, y )
+moveKnot : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
+moveKnot ( orX, orY ) ( relX, relY ) =
+    ( orX + relX, orY + relY )
 
 
-applyCommandToRope : Command -> Rope -> Rope
-applyCommandToRope command rope =
-    case rope of
-        [] ->
-            rope
 
-        head :: tail ->
-            let
-                updatedHead =
-                    applyCommandToKnot command head
-            in
-            case tail of
-                [] ->
-                    [ updatedHead ]
-
-                tailHead :: _ ->
-                    let
-                        headX =
-                            Tuple.first updatedHead
-
-                        headY =
-                            Tuple.second updatedHead
-
-                        tailHeadX =
-                            Tuple.first tailHead
-
-                        tailHeadY =
-                            Tuple.second tailHead
-                    in
-                    case command of
-                        Up ->
-                            if (headY - tailHeadY) > 1 then
-                                updatedHead :: applyCommandToRope command tail
-
-                            else
-                                updatedHead :: tail
-
-                        Right ->
-                            if (headX - tailHeadX) > 1 then
-                                updatedHead :: applyCommandToRope command tail
-
-                            else
-                                updatedHead :: tail
-
-                        Down ->
-                            if (tailHeadY - headY) > 1 then
-                                updatedHead :: applyCommandToRope command tail
-
-                            else
-                                updatedHead :: tail
-
-                        Left ->
-                            if (tailHeadX - headX) > 1 then
-                                updatedHead :: applyCommandToRope command tail
-
-                            else
-                                updatedHead :: tail
+-- Only moves knot in relative position from a range of -1 to 1 in bopth axis
+-- This is relative to the next knot. If movement would cause the knot to move
+-- beyond the -1 to 1 range this is added to the transform - the transform is then
+-- applied to the next knot and so on
 
 
-applyCommandToRopeRecordTail : Command -> ( Rope, Set ( Int, Int ) ) -> ( Rope, Set ( Int, Int ) )
-applyCommandToRopeRecordTail command ( rope, visited ) =
-    case rope of
-        [] ->
-            ( rope, visited )
-
-        head :: tail ->
-            let
-                updatedHead =
-                    applyCommandToKnot command head
-            in
-            case tail of
-                [] ->
-                    ( [ updatedHead ], Set.insert updatedHead visited )
-
-                tailHead :: _ ->
-                    let
-                        headX =
-                            Tuple.first updatedHead
-
-                        headY =
-                            Tuple.second updatedHead
-
-                        tailHeadX =
-                            Tuple.first tailHead
-
-                        tailHeadY =
-                            Tuple.second tailHead
-                    in
-                    case command of
-                        Up ->
-                            if (headY - tailHeadY) > 1 then
-                                ( updatedHead :: applyCommandToRope command tail, visited )
-
-                            else
-                                ( updatedHead :: tail, visited )
-
-                        Right ->
-                            if (headX - tailHeadX) > 1 then
-                                ( updatedHead :: applyCommandToRope command tail, visited )
-
-                            else
-                                ( updatedHead :: tail, visited )
-
-                        Down ->
-                            if (tailHeadY - headY) > 1 then
-                                ( updatedHead :: applyCommandToRope command tail, visited )
-
-                            else
-                                ( updatedHead :: tail, visited )
-
-                        Left ->
-                            if (tailHeadX - headX) > 1 then
-                                ( updatedHead :: applyCommandToRope command tail, visited )
-
-                            else
-                                ( updatedHead :: tail, visited )
+moveKnotRelative : ( Int, Int ) -> ( Int, Int ) -> ( ( Int, Int ), ( Int, Int ) )
+moveKnotRelative ( orX, orY ) ( relX, relY ) =
+    ( ( relX, relY ), ( orX, orY ) )
 
 
-applyCommandsToRope : Rope -> List Command -> Rope
-applyCommandsToRope rope commands =
-    List.foldl
-        (\command knots ->
-            applyCommandToRope command knots
-        )
-        rope
-        commands
+
+-- knotTransform : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
+-- knotTransform ( orX, orY ) ( relX, relY ) =
+--     if (orX + relX) > 1 || (orX + relX) < 0 then
+--         if (orX + relX) > 1 then
+--             ( 1, relY )
+--         else
+--             ( -1, relY )
+--     else if (orY + relY) > 1 || (orY + relY) < 0 then
+--         if (orY + relY) > 1 then
+--             ( relX, 1 )
+--         else
+--             ( relX, -1 )
+--     else
+--         ( relX, relY )
 
 
-applyCommandsToRopeRecordTail : Rope -> List Command -> ( Rope, Set ( Int, Int ) )
-applyCommandsToRopeRecordTail rope commands =
-    List.foldl
-        (\command knots ->
-            applyCommandToRopeRecordTail command knots
-        )
-        ( rope, Set.fromList [ ( 0, 0 ) ] )
-        commands
+moveRope : Rope -> Command -> ( Int, Int ) -> Rope
+moveRope rope command ( transX, transY ) =
+    rope
+        |> List.foldl
+            (\knot x ->
+                case command of
+                    Up ->
+                        ( knot, ( 0, 1 ) )
 
-
-output : List Command -> ( Rope, Set ( Int, Int ) )
-output commands =
-    commands
-        |> applyCommandsToRopeRecordTail (makeRope 10 [])
-
-
-outputFromString : String -> ( Rope, Set ( Int, Int ) )
-outputFromString commands =
-    commands
-        |> parseCommandsFromInput
-        |> applyCommandsToRopeRecordTail (makeRope 10 [])
+                    _ ->
+                        ( knot, ( 0, 0 ) )
+            )
 
 
 main : Html msg
 main =
     realInput
         |> parseCommandsFromInput
-        |> applyCommandsToRope (makeRope 10 [])
+        -- |> applyCommandsToRope (makeRope 10 [])
         |> Debug.toString
         |> Html.text
 
