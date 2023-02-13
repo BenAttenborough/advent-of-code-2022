@@ -138,6 +138,11 @@ makeRow width currentRow =
         makeRow (width - 1) (Empty :: currentRow)
 
 
+initRope : Rope
+initRope =
+    makeRope 10 []
+
+
 makePlayfield : Int -> Int -> Playfield -> Playfield
 makePlayfield width height currentPlayfield =
     if height < 1 then
