@@ -74,20 +74,17 @@ moveKnotRelative ( orX, orY ) ( relX, relY ) =
 --             ( relX, -1 )
 --     else
 --         ( relX, relY )
-
-
-moveRope : Rope -> Command -> ( Int, Int ) -> Rope
-moveRope rope command ( transX, transY ) =
-    rope
-        |> List.foldl
-            (\knot x ->
-                case command of
-                    Up ->
-                        ( knot, ( 0, 1 ) )
-
-                    _ ->
-                        ( knot, ( 0, 0 ) )
-            )
+-- moveRope : Rope -> Command -> ( Int, Int ) -> Rope
+-- moveRope rope command ( transX, transY ) =
+--     rope
+--         |> List.foldl
+--             (\knot x ->
+--                 case command of
+--                     Up ->
+--                         ( knot, ( 0, 1 ) )
+--                     _ ->
+--                         ( knot, ( 0, 0 ) )
+--             )
 
 
 main : Html msg
