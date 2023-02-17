@@ -30,7 +30,7 @@ getX coords =
 
 getY : ( Int, Int ) -> Int
 getY coords =
-    Tuple.first coords
+    Tuple.second coords
 
 
 makeRope : Int -> Rope -> Rope
@@ -42,59 +42,61 @@ makeRope size rope =
         makeRope (size - 1) (( 0, 0 ) :: rope)
 
 
-moveKnot : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
-moveKnot ( orX, orY ) ( relX, relY ) =
-    ( orX + relX, orY + relY )
+commandToTransform : Command -> ( Int, Int )
+commandToTransform command =
+    case command of
+        Up ->
+            ( 0, 1 )
+
+        Down ->
+            ( 0, -1 )
+
+        Right ->
+            ( 1, 0 )
+
+        Left ->
+            ( -1, 0 )
 
 
-
--- Only moves knot in relative position from a range of -1 to 1 in bopth axis
--- This is relative to the next knot. If movement would cause the knot to move
--- beyond the -1 to 1 range this is added to the transform - the transform is then
--- applied to the next knot and so on
-
-
-moveKnotRelative : ( Int, Int ) -> ( Int, Int ) -> ( ( Int, Int ), ( Int, Int ) )
-moveKnotRelative ( orX, orY ) ( relX, relY ) =
-    ( ( relX, relY ), ( orX, orY ) )
+moveKnot : Command -> ( Int, Int ) -> ( Int, Int )
+moveKnot command ( x, y ) =
+    let
+        transform =
+            commandToTransform command
+    in
+    ( x + getX transform, y + getY transform )
 
 
-moveRopeRelative : ( Int, Int ) -> Rope -> Rope
-moveRopeRelative ( x, y ) rope =
-    case rope of
-        [] ->
-            rope
+moveKnotRelativeToLast : Command -> ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
+moveKnotRelativeToLast command ( lastX, lastY ) ( curX, curY ) =
+    case command of
+        Up ->
+            if lastY - curY > 1 then
+                ( lastX, curY + 1 )
 
-        head :: tail ->
-            rope
+            else
+                ( curX, curY )
 
+        Down ->
+            if lastY + curY < -1 || lastY + curY > 1 then
+                ( lastX, curY - 1 )
 
+            else
+                ( curX, curY )
 
--- knotTransform : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
--- knotTransform ( orX, orY ) ( relX, relY ) =
---     if (orX + relX) > 1 || (orX + relX) < 0 then
---         if (orX + relX) > 1 then
---             ( 1, relY )
---         else
---             ( -1, relY )
---     else if (orY + relY) > 1 || (orY + relY) < 0 then
---         if (orY + relY) > 1 then
---             ( relX, 1 )
---         else
---             ( relX, -1 )
---     else
---         ( relX, relY )
--- moveRope : Rope -> Command -> ( Int, Int ) -> Rope
--- moveRope rope command ( transX, transY ) =
---     rope
---         |> List.foldl
---             (\knot x ->
---                 case command of
---                     Up ->
---                         ( knot, ( 0, 1 ) )
---                     _ ->
---                         ( knot, ( 0, 0 ) )
---             )
+        Right ->
+            if lastX - curX > 1 then
+                ( curX + 1, curY )
+
+            else
+                ( curX, curY )
+
+        Left ->
+            if lastX + curX < -1 || lastX + curX > 1 then
+                ( curX - 1, lastY )
+
+            else
+                ( curX, curY )
 
 
 main : Html msg
