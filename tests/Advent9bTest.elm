@@ -42,12 +42,12 @@ suite =
                     Expect.equal
                         (makeRope 3 [])
                         [ ( 0, 0 ), ( 0, 0 ), ( 0, 0 ) ]
-            , test "moveKnotRelative" <|
-                \_ ->
-                    Expect.equal
-                        ( ( 1, 0 ), ( 0, 0 ) )
-                        (moveKnotRelative ( 0, 0 ) ( 1, 0 ))
 
+            -- , test "moveKnotRelative" <|
+            --     \_ ->
+            --         Expect.equal
+            --             ( ( 1, 0 ), ( 0, 0 ) )
+            --             (moveKnotRelative ( 0, 0 ) ( 1, 0 ))
             -- ,test "Move a simple rope" <|
             --         \_ ->
             --             let

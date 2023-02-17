@@ -59,6 +59,16 @@ moveKnotRelative ( orX, orY ) ( relX, relY ) =
     ( ( relX, relY ), ( orX, orY ) )
 
 
+moveRopeRelative : ( Int, Int ) -> Rope -> Rope
+moveRopeRelative ( x, y ) rope =
+    case rope of
+        [] ->
+            rope
+
+        head :: tail ->
+            rope
+
+
 
 -- knotTransform : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
 -- knotTransform ( orX, orY ) ( relX, relY ) =
