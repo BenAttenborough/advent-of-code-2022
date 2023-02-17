@@ -152,5 +152,15 @@ suite =
                     Expect.equal
                         (moveKnotRelativeToLast Left ( 2, 0 ) ( 4, 0 ))
                         ( 3, 0 )
+            , test "applyCommandToRope [(0,1), (0,0)] yeilds [(0,2), (0,1)]" <|
+                \_ ->
+                    Expect.equal
+                        (applyCommandToRope Up [ ( 0, 1 ), ( 0, 0 ) ])
+                        [ ( 0, 2 ), ( 0, 1 ) ]
+            , test "applyCommandsToRope (makeRope 10 []) partTwoLargeInput" <|
+                \_ ->
+                    Expect.equal
+                        (applyCommandsToRope (makeRope 10 []) (parseCommandsFromInput partTwoLargeInput))
+                        []
             ]
         ]

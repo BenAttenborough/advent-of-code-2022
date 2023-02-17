@@ -3,6 +3,8 @@ module Advent9b exposing (..)
 import Advent9Data exposing (realInput, testInput)
 import Html exposing (Html, p, text)
 import Json.Decode exposing (list, oneOf)
+import List exposing (foldl)
+import List.Extra
 import Maybe.Extra exposing (isJust)
 import Parser exposing (..)
 import Set exposing (Set)
@@ -99,11 +101,45 @@ moveKnotRelativeToLast command ( lastX, lastY ) ( curX, curY ) =
                 ( curX, curY )
 
 
+applyCommandsToRope : Rope -> List Command -> Rope
+applyCommandsToRope rope commands =
+    commands
+        |> foldl
+            (\command acc ->
+                applyCommandToRope command acc
+            )
+            rope
+
+
+applyCommandToRope : Command -> Rope -> Rope
+applyCommandToRope command rope =
+    rope
+        |> foldl
+            (\currentKnot acc ->
+                case acc of
+                    [] ->
+                        List.append acc [ moveKnot command currentKnot ]
+
+                    x :: xs ->
+                        let
+                            -- Some dodgy logic here!
+                            lastKnot =
+                                List.Extra.last xs
+                                    |> Maybe.withDefault x
+
+                            newKnot =
+                                moveKnotRelativeToLast command lastKnot currentKnot
+                        in
+                        List.append acc [ newKnot ]
+            )
+            []
+
+
 main : Html msg
 main =
-    realInput
+    testInput
         |> parseCommandsFromInput
-        -- |> applyCommandsToRope (makeRope 10 [])
+        |> applyCommandsToRope (makeRope 10 [])
         |> Debug.toString
         |> Html.text
 
