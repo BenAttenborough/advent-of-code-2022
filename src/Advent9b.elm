@@ -1,11 +1,10 @@
 module Advent9b exposing (..)
 
 import Advent9Data exposing (realInput, testInput)
-import Html exposing (Html, p, text)
-import Json.Decode exposing (list, oneOf)
+import Html exposing (Html)
+import Json.Decode exposing (list)
 import List exposing (foldl)
 import List.Extra
-import Maybe.Extra exposing (isJust)
 import Parser exposing (..)
 import Set exposing (Set)
 
@@ -23,23 +22,13 @@ type alias Rope =
 
 type alias RopeState =
     { positions : Rope
-    , visited : List ( Int, Int )
+    , tailVisited : Set ( Int, Int )
     }
 
 
 initRopeState : RopeState
 initRopeState =
-    RopeState (makeRope 10 []) []
-
-
-getX : ( Int, Int ) -> Int
-getX coords =
-    Tuple.first coords
-
-
-getY : ( Int, Int ) -> Int
-getY coords =
-    Tuple.second coords
+    RopeState (makeRope 10 []) (Set.fromList [ ( 0, 0 ) ])
 
 
 makeRope : Int -> Rope -> Rope
@@ -49,6 +38,47 @@ makeRope size rope =
 
     else
         makeRope (size - 1) (( 0, 0 ) :: rope)
+
+
+relativePositionToTransform : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
+relativePositionToTransform ( firstX, firstY ) ( secondX, secondY ) =
+    -- Slightly painful logic to determine how a knot should move relative to the previous knot's position
+    let
+        relX =
+            secondX - firstX
+
+        relY =
+            secondY - firstY
+    in
+    if relX > 1 then
+        if relY > 0 then
+            ( 1, 1 )
+
+        else if relY == 0 then
+            ( 1, 0 )
+
+        else
+            ( 1, -1 )
+
+    else if relX < -1 then
+        if relY > 0 then
+            ( -1, 1 )
+
+        else if relY == 0 then
+            ( -1, 0 )
+
+        else
+            ( -1, -1 )
+
+    else if relY > 1 then
+        -- relx == -1, 0 or 1
+        ( relX, 1 )
+
+    else if relY < -1 then
+        ( relX, -1 )
+
+    else
+        ( 0, 0 )
 
 
 commandToTransform : Command -> ( Int, Int )
@@ -70,42 +100,20 @@ commandToTransform command =
 moveKnot : Command -> ( Int, Int ) -> ( Int, Int )
 moveKnot command ( x, y ) =
     let
-        transform =
+        ( newX, newY ) =
             commandToTransform command
     in
-    ( x + getX transform, y + getY transform )
+    ( x + newX, y + newY )
 
 
-moveKnotRelativeToLast : Command -> ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
-moveKnotRelativeToLast command ( lastX, lastY ) ( curX, curY ) =
-    case command of
-        Up ->
-            if lastY - curY > 1 then
-                ( lastX, curY + 1 )
-
-            else
-                ( curX, curY )
-
-        Down ->
-            if lastY + curY < -1 || lastY + curY > 1 then
-                ( lastX, curY - 1 )
-
-            else
-                ( curX, curY )
-
-        Right ->
-            if lastX - curX > 1 then
-                ( curX + 1, curY )
-
-            else
-                ( curX, curY )
-
-        Left ->
-            if lastX + curX < -1 || lastX + curX > 1 then
-                ( curX - 1, lastY )
-
-            else
-                ( curX, curY )
+moveKnotRelativeToLast : ( Int, Int ) -> ( Int, Int ) -> ( Int, Int )
+moveKnotRelativeToLast ( lastX, lastY ) ( curX, curY ) =
+    -- Key insight: direction isn't going to help with knots further down the chain
+    let
+        ( newX, newY ) =
+            relativePositionToTransform ( curX, curY ) ( lastX, lastY )
+    in
+    ( curX + newX, curY + newY )
 
 
 applyCommandsToRope : RopeState -> List Command -> RopeState
@@ -122,7 +130,7 @@ applyCommandsToRope rope commands =
                     (intermediateRope
                         |> List.Extra.last
                         |> Maybe.withDefault ( 0, 0 )
-                        |> (\x -> List.append acc.visited [ x ])
+                        |> (\x -> Set.insert x acc.tailVisited)
                     )
             )
             rope
@@ -145,7 +153,7 @@ applyCommandToRope command rope =
                                     |> Maybe.withDefault x
 
                             newKnot =
-                                moveKnotRelativeToLast command lastKnot currentKnot
+                                moveKnotRelativeToLast lastKnot currentKnot
                         in
                         List.append acc [ newKnot ]
             )
@@ -157,7 +165,7 @@ main =
     testInput
         |> parseCommandsFromInput
         |> applyCommandsToRope initRopeState
-        |> (\ropeState -> ropeState.visited |> List.length)
+        |> (\ropeState -> ropeState.tailVisited |> (\x -> List.length (Set.toList x)))
         |> Debug.toString
         |> Html.text
 
