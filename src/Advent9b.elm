@@ -21,8 +21,15 @@ type alias Rope =
     List ( Int, Int )
 
 
-ropeTail =
-    ( 0, 0 )
+type alias RopeState =
+    { positions : Rope
+    , visited : List ( Int, Int )
+    }
+
+
+initRopeState : RopeState
+initRopeState =
+    RopeState (makeRope 10 []) []
 
 
 getX : ( Int, Int ) -> Int
@@ -101,12 +108,22 @@ moveKnotRelativeToLast command ( lastX, lastY ) ( curX, curY ) =
                 ( curX, curY )
 
 
-applyCommandsToRope : Rope -> List Command -> Rope
+applyCommandsToRope : RopeState -> List Command -> RopeState
 applyCommandsToRope rope commands =
     commands
         |> foldl
             (\command acc ->
-                applyCommandToRope command acc
+                let
+                    intermediateRope =
+                        applyCommandToRope command acc.positions
+                in
+                RopeState
+                    intermediateRope
+                    (intermediateRope
+                        |> List.Extra.last
+                        |> Maybe.withDefault ( 0, 0 )
+                        |> (\x -> List.append acc.visited [ x ])
+                    )
             )
             rope
 
@@ -139,7 +156,8 @@ main : Html msg
 main =
     testInput
         |> parseCommandsFromInput
-        |> applyCommandsToRope (makeRope 10 [])
+        |> applyCommandsToRope initRopeState
+        |> (\ropeState -> ropeState.visited |> List.length)
         |> Debug.toString
         |> Html.text
 

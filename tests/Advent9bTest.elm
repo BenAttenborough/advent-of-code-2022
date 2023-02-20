@@ -157,10 +157,30 @@ suite =
                     Expect.equal
                         (applyCommandToRope Up [ ( 0, 1 ), ( 0, 0 ) ])
                         [ ( 0, 2 ), ( 0, 1 ) ]
+
+            -- , test "applyCommandsToRope (makeRope 10 []) testInput" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (applyCommandsToRope initRopeState (parseCommandsFromInput testInput))
+            --             (RopeState [] Set.empty)
             , test "applyCommandsToRope (makeRope 10 []) partTwoLargeInput" <|
                 \_ ->
                     Expect.equal
-                        (applyCommandsToRope (makeRope 10 []) (parseCommandsFromInput partTwoLargeInput))
-                        []
+                        (applyCommandsToRope initRopeState (parseCommandsFromInput partTwoLargeInput))
+                        (RopeState [] [])
+            , test "main init testInput" <|
+                \_ ->
+                    Expect.equal
+                        (applyCommandsToRope initRopeState (parseCommandsFromInput testInput)
+                            |> (\ropeState -> ropeState.visited |> List.length)
+                        )
+                        1
+            , test "main init partTwoLargeInput" <|
+                \_ ->
+                    Expect.equal
+                        (applyCommandsToRope initRopeState (parseCommandsFromInput partTwoLargeInput)
+                            |> (\ropeState -> ropeState.visited |> List.length)
+                        )
+                        36
             ]
         ]
