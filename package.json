@@ -20,10 +20,10 @@
   },
   "homepage": "https://github.com/BenAttenborough/advent-of-code-2022#readme",
   "devDependencies": {
+    "elm-test": "^0.19.1-revision11",
     "elm-watch": "^1.1.1"
   },
   "dependencies": {
-    "elm-format": "^0.8.5",
-    "elm-test": "^0.19.1-revision11"
+    "elm-format": "^0.8.5"
   }
 }

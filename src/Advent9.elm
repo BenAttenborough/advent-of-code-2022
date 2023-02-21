@@ -42,14 +42,6 @@ coordinatesY coords =
 
 applyCommandsToRopeState : Command -> Rope -> Rope
 applyCommandsToRopeState command initialState =
-    -- let
-    --     x =
-    --         Debug.log "head rel position:" initialState.headRel
-    --     _ =
-    --         Debug.log "Tail position:" initialState.tail
-    --     y =
-    --         Debug.log "=" "==============="
-    -- in
     case command of
         Up ->
             let

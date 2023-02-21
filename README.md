@@ -69,3 +69,4 @@ npx elm-watch hot
 ## Tests
 
 To run tests run `elm-test` or `elm-test --watch`
+Or `npx elm-test` or `npx elm-test --watch`
