@@ -1,4 +1,4 @@
-module Advent9Data exposing (partTwoBenInput, partTwoLargeInput, realInput, testInput)
+module Data.Advent9Data exposing (partTwoBenInput, partTwoLargeInput, realInput, testInput)
 
 
 testInput : String

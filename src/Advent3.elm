@@ -1,7 +1,13 @@
 module Advent3 exposing (..)
 
+import Html
 import Html.Attributes exposing (list)
 import Set
+
+
+main : Html.Html msg
+main =
+    Html.text "Hello!"
 
 
 dayThreeTestInput : String
@@ -52,6 +58,7 @@ dayThreePartOne input =
 -- splitStringInTwo : String -> Set.Set String
 
 
+splitStringInTwo : String -> ( Set.Set Char, Set.Set Char )
 splitStringInTwo string =
     let
         midPoint =
@@ -69,6 +76,7 @@ splitStringInTwo string =
     ( Set.fromList (String.toList containerA), Set.fromList (String.toList containerB) )
 
 
+splitListBy : Int -> List (List a) -> List a -> List (List a)
 splitListBy n newList list =
     case list of
         [] ->
@@ -77,7 +85,7 @@ splitListBy n newList list =
         [ _ ] ->
             newList
 
-        x :: y :: rest ->
+        _ :: _ :: _ ->
             let
                 a =
                     List.take n list
@@ -88,6 +96,7 @@ splitListBy n newList list =
             splitListBy n (List.append [ a ] newList) b
 
 
+setIntersection3 : List (Set.Set comparable) -> List comparable
 setIntersection3 list =
     case list of
         [ a, b, c ] ->
@@ -99,6 +108,7 @@ setIntersection3 list =
             []
 
 
+dayThreePartTwo : String -> Int
 dayThreePartTwo input =
     input
         |> String.lines

@@ -1,4 +1,4 @@
-module Advent1Data exposing (..)
+module Data.Advent1Data exposing (..)
 
 
 test : String

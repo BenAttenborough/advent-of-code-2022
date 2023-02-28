@@ -1,6 +1,5 @@
 module Parsers.Parsers exposing (..)
 
-import Html exposing (a)
 import Parser exposing (..)
 
 

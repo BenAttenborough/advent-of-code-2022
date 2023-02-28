@@ -1,11 +1,11 @@
 module AlternativeSolutionTests.Advent1Test exposing (..)
 
 import AlternativeSolutions.Advent1 exposing (..)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Expect
 import Test exposing (..)
 
 
+testInput : String
 testInput =
     """1000
 2000
@@ -23,6 +23,7 @@ testInput =
 10000"""
 
 
+testInput2 : String
 testInput2 =
     """1000
 2000

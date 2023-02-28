@@ -1,7 +1,7 @@
 module Advent6Test exposing (..)
 
 import Advent6 exposing (..)
-import Expect exposing (Expectation)
+import Expect
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 

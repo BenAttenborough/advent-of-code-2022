@@ -1,6 +1,7 @@
-module Advent5Data exposing (..)
+module Data.Advent5Data exposing (..)
 
 
+day5Part1Crates : List (List Char)
 day5Part1Crates =
     [ List.reverse [ 'S', 'T', 'H', 'F', 'W', 'R' ]
     , List.reverse [ 'S', 'G', 'D', 'Q', 'W' ]
@@ -14,6 +15,7 @@ day5Part1Crates =
     ]
 
 
+day5Part1Instructions : String
 day5Part1Instructions =
     """move 4 from 2 to 1
 move 1 from 6 to 9

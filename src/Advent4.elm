@@ -1,9 +1,16 @@
 module Advent4 exposing (..)
 
+import Html
 import Parser exposing (..)
 import Set
 
 
+main : Html.Html msg
+main =
+    Html.text "Hello!"
+
+
+day4TestInput : String
 day4TestInput =
     """2-4,6-8
 2-3,4-5
@@ -31,6 +38,7 @@ stringParser =
         |= int
 
 
+workRangeConstructor : Int -> Int -> Int -> Int -> WorkRange
 workRangeConstructor a b c d =
     let
         range1 =
@@ -42,6 +50,7 @@ workRangeConstructor a b c d =
     WorkRange range1 range2
 
 
+doesOneListContainOther : List comparable -> List comparable -> Bool
 doesOneListContainOther a b =
     let
         setA =
@@ -68,6 +77,7 @@ doesOneListContainOther a b =
         True
 
 
+day4Part1 : String -> Int
 day4Part1 input =
     input
         |> String.lines
@@ -80,6 +90,7 @@ day4Part1 input =
         |> List.length
 
 
+doesOneListOverlapOther : List comparable -> List comparable -> Bool
 doesOneListOverlapOther a b =
     let
         setA =
@@ -106,6 +117,7 @@ doesOneListOverlapOther a b =
         False
 
 
+day4Part2 : String -> Int
 day4Part2 input =
     input
         |> String.lines

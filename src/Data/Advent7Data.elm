@@ -1,4 +1,4 @@
-module Advent7Data exposing (realInput, testInput)
+module Data.Advent7Data exposing (realInput, testInput)
 
 
 testInput : String
@@ -28,6 +28,7 @@ $ ls
 7214296 k"""
 
 
+realInput : String
 realInput =
     """$ cd /
 $ ls

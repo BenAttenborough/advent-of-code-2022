@@ -1,11 +1,9 @@
 module Advent9Test exposing (..)
 
 import Advent9 exposing (..)
-import Advent9Data exposing (testInput)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
-import Parser exposing (Parser)
-import Set exposing (Set)
+import Expect
+import Parser
+import Set
 import Test exposing (..)
 
 

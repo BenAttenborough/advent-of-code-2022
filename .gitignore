@@ -1,3 +1,8 @@
 elm-stuff
 node_modules
 js_compiled
+bin
+lib
+lib64
+share
+pyvenv.cfg

@@ -1,7 +1,13 @@
 module Advent5 exposing (..)
 
-import Array exposing (Array)
+import Array
+import Html
 import Parser exposing (..)
+
+
+main : Html.Html msg
+main =
+    Html.text "Hello!"
 
 
 updateNestedList : Int -> (List a -> List a) -> List (List a) -> List (List a)
@@ -70,6 +76,7 @@ getListItemByIndex index list =
         |> Array.get index
 
 
+moveCrates : List (List a) -> List { b | from : Int, move : Int, to : Int } -> List (List a)
 moveCrates crates instructions =
     case instructions of
         [] ->
@@ -95,6 +102,7 @@ moveCrates crates instructions =
             moveCrates newList rest
 
 
+dayFive : String -> List (List a) -> List a
 dayFive instructions initialCrates =
     instructions
         |> String.lines
@@ -105,6 +113,7 @@ dayFive instructions initialCrates =
         |> List.filterMap List.head
 
 
+moveCrates2 : List (List a) -> List { b | from : Int, move : Int, to : Int } -> List (List a)
 moveCrates2 crates instructions =
     case instructions of
         [] ->
@@ -130,6 +139,7 @@ moveCrates2 crates instructions =
             moveCrates2 newList rest
 
 
+dayFive2 : String -> List (List a) -> List a
 dayFive2 instructions initialCrates =
     instructions
         |> String.lines

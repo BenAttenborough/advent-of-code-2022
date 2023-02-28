@@ -1,10 +1,8 @@
 module Advent8Test exposing (..)
 
 import Advent8 exposing (..)
-import Advent8Data exposing (day8Part1Data)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
-import Parser exposing (Parser)
+import Data.Advent8Data exposing (day8Part1Data)
+import Expect
 import Test exposing (..)
 
 
@@ -47,6 +45,7 @@ listTreeAoCExample =
     ]
 
 
+listTreeFiveFourNine : List { height : number, treesSeen : { east : number, north : number, south : number, west : number } }
 listTreeFiveFourNine =
     [ { height = 5, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
     , { height = 4, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
