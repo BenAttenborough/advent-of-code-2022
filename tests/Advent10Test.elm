@@ -69,12 +69,28 @@ suite =
             , test "Sum of testData signal strengths is 13140" <|
                 \_ ->
                     Expect.equal
-                        (answer testData)
+                        (answerPart1 testData)
                         13140
             , test "Sum of part1Data signal strengths is 14520" <|
                 \_ ->
                     Expect.equal
-                        (answer part1Data)
+                        (answerPart1 part1Data)
                         14520
+
+            -- , test "answerPart2" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (answerPart2 testData)
+            --             ""
+            -- , test "debug" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (debug testData)
+            --             []
+            -- , test "answerPart2 final" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (answerPart2 part1Data)
+            --             "."
             ]
         ]

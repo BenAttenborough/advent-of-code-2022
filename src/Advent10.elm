@@ -2,6 +2,7 @@ module Advent10 exposing (..)
 
 import Array exposing (Array)
 import Parser exposing (..)
+import Utilities.Utilities exposing (partitioner)
 
 
 type Command
@@ -100,8 +101,8 @@ mapSelectedIndexes indexes function register =
             []
 
 
-answer : String -> Int
-answer input =
+answerPart1 : String -> Int
+answerPart1 input =
     input
         |> parseCommandsFromInput
         |> processCommands
@@ -112,3 +113,45 @@ answer input =
                 mapSelectedIndexes indexesToCheck signalStrengthFromIndex state.register
            )
         |> List.foldl (+) 0
+
+
+answerPart2 : String -> String
+answerPart2 input =
+    input
+        |> parseCommandsFromInput
+        |> processCommands
+            { register = Array.fromList []
+            , lastCommandResult = initX
+            }
+        |> .register
+        |> Array.toList
+        |> List.indexedMap decodeRegister
+        |> partitioner 40 []
+        |> List.map (\line -> List.append line [ "\n" ])
+        |> List.concat
+        |> String.concat
+
+
+decodeRegister : Int -> Int -> String
+decodeRegister index signal =
+    let
+        spriteRange =
+            List.range (signal - 1) (signal + 1)
+    in
+    if List.member (modBy 40 index) spriteRange then
+        "#"
+
+    else
+        "."
+
+
+debug : String -> List ( Int, Int )
+debug input =
+    input
+        |> parseCommandsFromInput
+        |> processCommands
+            { register = Array.fromList []
+            , lastCommandResult = initX
+            }
+        |> .register
+        |> Array.toIndexedList
