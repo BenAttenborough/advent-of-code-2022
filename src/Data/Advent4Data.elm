@@ -1,6 +1,7 @@
 module Data.Advent4Data exposing (..)
 
 
+day4Data : String
 day4Data =
     """22-65,22-66
 91-94,63-91

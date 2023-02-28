@@ -5,6 +5,7 @@ import Html
 import Set
 
 
+main : Html.Html msg
 main =
     Html.text "Hello!"
 

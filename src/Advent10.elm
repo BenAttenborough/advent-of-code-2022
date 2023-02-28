@@ -6,6 +6,7 @@ import Parser exposing (..)
 import Utilities.Utilities exposing (partitioner)
 
 
+main : Html.Html msg
 main =
     Html.text "Hello!"
 

@@ -2,15 +2,13 @@ module Advent7 exposing (..)
 
 -- import Utilities.DirectoryTree exposing (..)
 
-import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Data.Advent7Data
-import Html exposing (Html, p, text)
-import Html.Attributes exposing (class, dir, size, style, value)
-import Json.Decode exposing (maybe)
+import Html exposing (Html)
+import Html.Attributes exposing (dir, size, style)
 import Parser exposing (..)
 import Tree exposing (Tree, tree)
 import Tree.Zipper as Zipper
-import Utilities.Utilities exposing (linesDebugToHtml, linesToHtml)
+import Utilities.Utilities exposing (linesDebugToHtml)
 
 
 type alias Directory =
@@ -377,12 +375,14 @@ changeDirectory needle haystack =
            )
 
 
+goForward : Zipper.Zipper a -> Zipper.Zipper a
 goForward x =
     x
         |> Zipper.forward
         |> Maybe.withDefault x
 
 
+goChangeDir : a -> Zipper.Zipper { b | name : a } -> Zipper.Zipper { b | name : a }
 goChangeDir needle haystack =
     Zipper.findNext
         (\x ->

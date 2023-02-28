@@ -1,6 +1,7 @@
 module Data.Advent2Data exposing (..)
 
 
+input : String
 input =
     """A Y
 B Y

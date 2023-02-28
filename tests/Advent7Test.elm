@@ -1,8 +1,7 @@
 module Advent7Test exposing (..)
 
 import Advent7 exposing (..)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Expect
 import Parser exposing (Parser)
 import Test exposing (..)
 

@@ -2,8 +2,7 @@ module Advent11Test exposing (..)
 
 import Advent11 exposing (..)
 import Data.Advent11Data exposing (realInput, testInput)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Expect
 import Test exposing (..)
 
 

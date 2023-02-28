@@ -28,6 +28,7 @@ $ ls
 7214296 k"""
 
 
+realInput : String
 realInput =
     """$ cd /
 $ ls

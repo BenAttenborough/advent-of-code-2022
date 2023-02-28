@@ -1,9 +1,7 @@
-module Data.Advent12Test exposing (..)
+module Advent12Test exposing (..)
 
 import Advent12 exposing (..)
-import Advent12Data exposing (realInput, testInput)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Expect
 import Test exposing (..)
 
 

@@ -1,10 +1,9 @@
 module AlternativeSolutions.Advent4 exposing (..)
 
-import Html.Attributes exposing (list)
 import Parser exposing (..)
-import Set
 
 
+day4TestInput : String
 day4TestInput =
     """2-4,6-8
 2-3,4-5
@@ -26,6 +25,7 @@ stringParser =
         |= int
 
 
+workRangeConstructor : a -> b -> c -> d -> ( ( a, b ), ( c, d ) )
 workRangeConstructor a b c d =
     ( ( a, b ), ( c, d ) )
 
@@ -39,6 +39,7 @@ doesContain ( ( a, b ), ( c, d ) ) =
         0
 
 
+day4Part1 : String -> Int
 day4Part1 input =
     input
         |> String.lines

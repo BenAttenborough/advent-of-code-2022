@@ -1,13 +1,9 @@
 module Advent9bTest exposing (..)
 
-import Advent9Data exposing (partTwoBenInput, partTwoLargeInput, realInput, testInput)
 import Advent9b exposing (..)
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
-import Html.Attributes exposing (list)
-import List.Extra
-import Parser exposing (Parser)
-import Set exposing (Set)
+import Data.Advent9Data exposing (partTwoLargeInput, realInput, testInput)
+import Expect
+import Set
 import Test exposing (..)
 
 

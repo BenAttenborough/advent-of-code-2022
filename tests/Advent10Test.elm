@@ -1,10 +1,9 @@
 module Advent10Test exposing (..)
 
 import Advent10 exposing (..)
-import Advent10Data exposing (part1Data, testData)
 import Array
-import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
+import Data.Advent10Data exposing (part1Data, testData)
+import Expect
 import Parser exposing (..)
 import Test exposing (..)
 

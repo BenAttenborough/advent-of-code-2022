@@ -22,6 +22,7 @@ looper =
     loop [] loopHelper
 
 
+loopHelper : List (List Int) -> Parser (Step (List (List Int)) (List (List Int)))
 loopHelper revStmts =
     oneOf
         [ succeed (\stmt -> Loop (stmt :: revStmts))
@@ -34,6 +35,7 @@ loopHelper revStmts =
         ]
 
 
+getBiggestRations : String -> Result (List DeadEnd) Int
 getBiggestRations data =
     String.lines data
         |> List.map
@@ -63,6 +65,7 @@ getBiggestRations data =
             )
 
 
+getTopThreeRations : String -> Result (List DeadEnd) Int
 getTopThreeRations data =
     String.lines data
         |> List.map
@@ -119,6 +122,7 @@ isNewLine char =
     char == '\n'
 
 
+parseInput : String -> Result (List DeadEnd) (List String)
 parseInput input =
     -- Ok [ 111 ]
     Parser.run listParser input
@@ -131,6 +135,7 @@ parseInput input =
 -- advent1Part1 : String -> List (Result (List DeadEnd) (List String))
 
 
+advent1Part1 : String -> Int
 advent1Part1 input =
     input
         |> String.split "\n\n"

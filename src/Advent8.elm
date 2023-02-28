@@ -1,7 +1,7 @@
 module Advent8 exposing (..)
 
 import Array exposing (Array)
-import Data.Advent8Data exposing (day8Part1Data, day8TestData)
+import Data.Advent8Data exposing (day8TestData)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
@@ -17,10 +17,12 @@ charToInt char =
         Nothing
 
 
+compareVerticalRows : a -> a
 compareVerticalRows input =
     input
 
 
+day8Part1 : String -> Maybe Int
 day8Part1 input =
     input
         |> String.lines
@@ -52,11 +54,12 @@ stringToGrid input =
         |> List.map (List.map (\tree -> ( tree, False )))
 
 
+outputGrid : List (List ( a, Bool )) -> String
 outputGrid list =
     list
         |> List.map
             (List.map
-                (\( height, tagged ) ->
+                (\( _, tagged ) ->
                     if tagged then
                         1
 
@@ -102,6 +105,7 @@ type alias Tree =
     }
 
 
+day8Part2 : String -> Int
 day8Part2 input =
     input
         |> String.lines
@@ -171,6 +175,7 @@ seenTrees trees =
         (List.tail trees)
 
 
+treesIterator : List Tree -> List Tree
 treesIterator =
     \trees ->
         let
@@ -198,6 +203,7 @@ treesIterator =
             trees
 
 
+treesIteratorNorthSouth : List Tree -> List Tree
 treesIteratorNorthSouth =
     \trees ->
         let
@@ -232,7 +238,7 @@ treeRowIterator fnc initialTrees trees =
                 |> List.reverse
                 |> List.filterMap identity
 
-        head :: tail ->
+        _ :: tail ->
             treeRowIterator fnc (fnc trees :: initialTrees) tail
 
 
@@ -246,7 +252,8 @@ listTreeAoCExampleX =
     ]
 
 
-view model =
+view : a -> Html msg
+view _ =
     div []
         [ pre [ style "white-space" "pre-line" ]
             [ text "TEST\n\n"
@@ -262,10 +269,12 @@ view model =
         ]
 
 
+main : Html msg
 main =
     view "dummy model"
 
 
+testRow : List { height : Int, treesSeen : { east : Int, north : Int, south : Int, west : Int } }
 testRow =
     [ { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }
     , { height = 3, treesSeen = { east = 0, north = 0, south = 0, west = 0 } }

@@ -5,6 +5,7 @@ import Parser exposing (..)
 import Result exposing (toMaybe)
 
 
+main : Html.Html msg
 main =
     Html.text "Hello!"
 
@@ -28,26 +29,32 @@ type Result
     | Draw
 
 
+rockValue : Int
 rockValue =
     1
 
 
+paperValue : Int
 paperValue =
     2
 
 
+scissorsValue : Int
 scissorsValue =
     3
 
 
+loseValue : Int
 loseValue =
     0
 
 
+drawValue : Int
 drawValue =
     3
 
 
+winValue : Int
 winValue =
     6
 
@@ -147,6 +154,7 @@ defenseParser =
         ]
 
 
+partOne : String -> Int
 partOne input =
     input
         |> String.lines
@@ -223,6 +231,7 @@ resolveResult { attack, response } =
                     scissorsValue + drawValue
 
 
+partTwo : String -> Int
 partTwo input =
     input
         |> String.lines

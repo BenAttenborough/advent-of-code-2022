@@ -1,9 +1,9 @@
 module AlternativeSolutions.DirectoryParser exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, input, text)
+import Html exposing (Html, div, input, text)
 import Html.Attributes exposing (class, placeholder, value)
-import Html.Events exposing (keyCode, on, onClick, onInput)
+import Html.Events exposing (keyCode, on, onInput)
 import Json.Decode as Decode
 import Parser exposing (..)
 import Tree.Zipper as Zipper

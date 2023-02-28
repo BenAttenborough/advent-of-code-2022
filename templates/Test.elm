@@ -1,7 +1,7 @@
 module Data.{{ name }}Test exposing (..)
 
 import {{ name }} exposing (..)
-import {{ name }}Data exposing (realInput, testInput)
+import Data.{{ name }}Data exposing (realInput, testInput)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
