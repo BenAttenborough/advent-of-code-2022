@@ -1,6 +1,6 @@
 module AlternativeSolutions.Advent1 exposing (..)
 
-import Advent1Data exposing (..)
+import Data.Advent1Data exposing (..)
 import List exposing (foldl)
 import Parser exposing (..)
 

@@ -1,4 +1,4 @@
-module Advent3Data exposing (..)
+module Data.Advent3Data exposing (..)
 
 
 day3Input : String

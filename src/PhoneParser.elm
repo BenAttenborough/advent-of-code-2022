@@ -1,6 +1,11 @@
 module PhoneParser exposing (..)
 
+import Html
 import Parser exposing (..)
+
+
+main =
+    Html.text "Hello!"
 
 
 whitespace : Parser ()

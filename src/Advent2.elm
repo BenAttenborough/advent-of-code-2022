@@ -1,7 +1,12 @@
 module Advent2 exposing (..)
 
+import Html
 import Parser exposing (..)
 import Result exposing (toMaybe)
+
+
+main =
+    Html.text "Hello!"
 
 
 testInput : String

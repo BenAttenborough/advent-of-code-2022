@@ -1,4 +1,4 @@
-module Advent5Data exposing (..)
+module Data.Advent5Data exposing (..)
 
 
 day5Part1Crates =

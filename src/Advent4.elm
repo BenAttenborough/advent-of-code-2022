@@ -1,7 +1,12 @@
 module Advent4 exposing (..)
 
+import Html
 import Parser exposing (..)
 import Set
+
+
+main =
+    Html.text "Hello!"
 
 
 day4TestInput =

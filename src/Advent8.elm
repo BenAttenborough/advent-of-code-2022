@@ -1,7 +1,7 @@
 module Advent8 exposing (..)
 
-import Advent8Data exposing (day8Part1Data, day8TestData)
 import Array exposing (Array)
+import Data.Advent8Data exposing (day8Part1Data, day8TestData)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List

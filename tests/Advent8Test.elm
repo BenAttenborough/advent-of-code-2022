@@ -1,7 +1,7 @@
 module Advent8Test exposing (..)
 
 import Advent8 exposing (..)
-import Advent8Data exposing (day8Part1Data)
+import Data.Advent8Data exposing (day8Part1Data)
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Parser exposing (Parser)

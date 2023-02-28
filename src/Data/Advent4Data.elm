@@ -1,4 +1,4 @@
-module Advent4Data exposing (..)
+module Data.Advent4Data exposing (..)
 
 
 day4Data =

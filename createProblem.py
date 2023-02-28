@@ -17,7 +17,7 @@ with open("tests/" + moduleName + "Test.elm", mode="w", encoding="utf-8") as mes
 
 dataTemplate = environment.get_template("Data.elm")
 
-with open("src/" + moduleName + "Data.elm", mode="w", encoding="utf-8") as message:
+with open("src/Data/" + moduleName + "Data.elm", mode="w", encoding="utf-8") as message:
     message.write(dataTemplate.render(name=moduleName))
 
 htmlTemplate = environment.get_template("advent.html")

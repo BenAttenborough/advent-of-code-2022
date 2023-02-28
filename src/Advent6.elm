@@ -1,7 +1,12 @@
 module Advent6 exposing (..)
 
-import Advent6Data exposing (..)
+import Data.Advent6Data exposing (..)
+import Html
 import Set
+
+
+main =
+    Html.text "Hello!"
 
 
 allUniqueCharacters : String -> Bool

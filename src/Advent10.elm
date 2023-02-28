@@ -1,8 +1,13 @@
 module Advent10 exposing (..)
 
 import Array exposing (Array)
+import Html
 import Parser exposing (..)
 import Utilities.Utilities exposing (partitioner)
+
+
+main =
+    Html.text "Hello!"
 
 
 type Command

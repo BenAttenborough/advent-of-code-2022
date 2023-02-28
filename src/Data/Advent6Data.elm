@@ -1,4 +1,4 @@
-module Advent6Data exposing (..)
+module Data.Advent6Data exposing (..)
 
 
 day6Part1Data : String

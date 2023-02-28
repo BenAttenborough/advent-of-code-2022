@@ -1,4 +1,4 @@
-module Advent2Data exposing (..)
+module Data.Advent2Data exposing (..)
 
 
 input =

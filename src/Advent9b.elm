@@ -1,6 +1,6 @@
 module Advent9b exposing (..)
 
-import Advent9Data exposing (realInput, testInput)
+import Data.Advent9Data exposing (realInput, testInput)
 import Html exposing (Html)
 import Json.Decode exposing (list)
 import List exposing (foldl)

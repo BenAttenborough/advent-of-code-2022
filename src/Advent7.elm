@@ -2,8 +2,8 @@ module Advent7 exposing (..)
 
 -- import Utilities.DirectoryTree exposing (..)
 
-import Advent7Data
 import AlternativeSolutions.DirectoryParser exposing (Msg)
+import Data.Advent7Data
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (class, dir, size, style, value)
 import Json.Decode exposing (maybe)
@@ -38,7 +38,7 @@ main : Html msg
 main =
     let
         commands =
-            getCommands Advent7Data.realInput
+            getCommands Data.Advent7Data.realInput
 
         directoryTree =
             emptyDirectory

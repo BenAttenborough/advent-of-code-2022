@@ -1,4 +1,4 @@
-module {{ name }}Test exposing (..)
+module Data.{{ name }}Test exposing (..)
 
 import {{ name }} exposing (..)
 import {{ name }}Data exposing (realInput, testInput)

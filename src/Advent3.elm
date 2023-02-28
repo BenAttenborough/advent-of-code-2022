@@ -1,7 +1,12 @@
 module Advent3 exposing (..)
 
+import Html
 import Html.Attributes exposing (list)
 import Set
+
+
+main =
+    Html.text "Hello!"
 
 
 dayThreeTestInput : String

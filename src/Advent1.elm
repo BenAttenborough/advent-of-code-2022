@@ -1,5 +1,11 @@
 module Advent1 exposing (..)
 
+import Html
+
+
+main =
+    Html.text "Hello!"
+
 
 advent1Part1 input =
     input

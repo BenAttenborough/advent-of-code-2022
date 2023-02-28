@@ -1,4 +1,4 @@
-module Advent12Test exposing (..)
+module Data.Advent12Test exposing (..)
 
 import Advent12 exposing (..)
 import Advent12Data exposing (realInput, testInput)

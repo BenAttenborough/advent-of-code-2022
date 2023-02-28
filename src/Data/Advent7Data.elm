@@ -1,4 +1,4 @@
-module Advent7Data exposing (realInput, testInput)
+module Data.Advent7Data exposing (realInput, testInput)
 
 
 testInput : String

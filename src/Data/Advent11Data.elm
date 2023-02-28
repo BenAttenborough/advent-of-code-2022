@@ -1,4 +1,4 @@
-module Advent11Data exposing (..)
+module Data.Advent11Data exposing (..)
 
 
 testInput =

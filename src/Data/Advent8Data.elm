@@ -1,4 +1,4 @@
-module Advent8Data exposing (day8Part1Data, day8TestData)
+module Data.Advent8Data exposing (day8Part1Data, day8TestData)
 
 
 day8TestData : String
