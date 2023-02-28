@@ -88,3 +88,12 @@ To create the equivilent of a package.json use:
 
 To install requirements
 `python3 -m pip install -r requirements.txt`
+
+## Auto generating problem files
+
+`python3 createProblem.py <ProblemName>`
+Note: No extension is required but you should cap up the problem name
+
+## Switch rendered file
+
+`python3 switchProblem.py <ProblemName>`

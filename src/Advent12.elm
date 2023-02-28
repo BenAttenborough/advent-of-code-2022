@@ -1,4 +1,4 @@
-module Advent11 exposing (..)
+module Advent12 exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
