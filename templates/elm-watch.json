@@ -1,0 +1,8 @@
+{
+    "targets": {
+        "My target name": {
+            "inputs": [{{files}}],
+            "output": "js_compiled/advent.js"
+        }
+    }
+}

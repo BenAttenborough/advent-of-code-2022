@@ -1,8 +1,8 @@
 {
     "targets": {
         "My target name": {
-            "inputs": ["src/Advent9b.elm"],
-            "output": "js_compiled/advent9b.js"
+            "inputs": ["src/Advent4Data.elm","src/Advent11.elm","src/Advent10.elm","src/Advent5Data.elm","src/Advent9.elm","src/Advent7Data.elm","src/Advent8.elm","src/Advent6Data.elm","src/Advent3.elm","src/Advent2.elm","src/Advent11Data.elm","src/Advent3Data.elm","src/Advent1.elm","src/Advent5.elm","src/Advent10Data.elm","src/Advent9b.elm","src/Advent2Data.elm","src/Advent4.elm","src/Advent6.elm","src/Sandpit.elm","src/Advent7.elm","src/HomePage.elm","src/PhoneParser.elm","src/Advent9Data.elm","src/Advent8Data.elm","src/Advent1Data.elm"],
+            "output": "js_compiled/advent.js"
         }
     }
 }
