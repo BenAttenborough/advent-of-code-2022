@@ -70,3 +70,17 @@ npx elm-watch hot
 
 To run tests run `elm-test` or `elm-test --watch`
 Or `npx elm-test` or `npx elm-test --watch`
+
+## Python
+
+https://docs.python.org/3/library/venv.html
+
+`python3 -m venv /path/to/new/virtual/environment`
+`source bin/activate`
+
+pip works a bit different from npm
+
+`source bin/activate` if python3 doesn't work
+`python3 -m pip install <package>`
+To create the equivilent of a package.json use:
+`python3 -m pip freeze > requirements.txt`
