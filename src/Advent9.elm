@@ -1,9 +1,8 @@
 module Advent9 exposing (..)
 
-import Data.Advent9Data exposing (realInput, testInput)
-import Html exposing (Html, p, text)
-import Json.Decode exposing (list, oneOf)
-import Maybe.Extra exposing (isJust)
+import Data.Advent9Data exposing (realInput)
+import Html exposing (Html)
+import Json.Decode exposing (list)
 import Parser exposing (..)
 import Set exposing (Set)
 

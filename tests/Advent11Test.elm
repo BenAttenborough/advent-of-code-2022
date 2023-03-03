@@ -1,7 +1,7 @@
 module Advent11Test exposing (..)
 
 import Advent11 exposing (..)
-import Data.Advent11Data exposing (realInput, testInput)
+import Data.Advent11Data
 import Expect
 import Test exposing (..)
 

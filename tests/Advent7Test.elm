@@ -2,7 +2,6 @@ module Advent7Test exposing (..)
 
 import Advent7 exposing (..)
 import Expect
-import Parser exposing (Parser)
 import Test exposing (..)
 
 

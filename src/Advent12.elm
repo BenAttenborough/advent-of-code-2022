@@ -4,8 +4,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 
 
-view : a -> Html msg
-view _ =
+view : Html msg
+view =
     div []
         [ pre [ style "white-space" "pre-line" ]
             [ text "TEST\n\n"
@@ -15,4 +15,4 @@ view _ =
 
 main : Html msg
 main =
-    view "dummy model"
+    view
