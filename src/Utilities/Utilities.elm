@@ -1,5 +1,6 @@
-module Utilities.Utilities exposing (linesDebugToHtml, linesToHtml, partitioner)
+module Utilities.Utilities exposing (getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner)
 
+import Array exposing (Array)
 import Html exposing (Html, p, text)
 import Html.Attributes exposing (class)
 
@@ -46,3 +47,10 @@ partitioner size container list =
                 List.take size list :: container
         in
         partitioner size newContainer (List.drop size list)
+
+
+getElementFrom2DArray : Int -> Int -> Array (Array a) -> Maybe a
+getElementFrom2DArray x y twoDMap =
+    twoDMap
+        |> Array.get y
+        |> Maybe.andThen (Array.get x)

@@ -1,9 +1,19 @@
 module UtilitiesTest exposing (..)
 
+import Array exposing (Array)
 import Expect
 import Parser exposing (..)
 import Test exposing (..)
-import Utilities.Utilities exposing (partitioner)
+import Utilities.Utilities exposing (getElementFrom2DArray, partitioner)
+
+
+testTwoDArray : Array (Array Int)
+testTwoDArray =
+    Array.fromList
+        [ Array.fromList [ 0, 1, 2 ]
+        , Array.fromList [ 3, 4, 5 ]
+        , Array.fromList [ 6, 7, 8 ]
+        ]
 
 
 suite : Test
@@ -35,5 +45,27 @@ suite =
                     Expect.equal
                         (partitioner -1 [] [ 1, 2, 3, 4, 5 ])
                         [ [ 1, 2, 3, 4, 5 ] ]
+            ]
+        , describe "getElementFrom2DArray" <|
+            [ test "getElementFrom2DArray 1 1 testTwoDArray = Just 4" <|
+                \_ ->
+                    Expect.equal
+                        (getElementFrom2DArray 1 1 testTwoDArray)
+                        (Just 4)
+            , test "getElementFrom2DArray 0 0 testTwoDArray = Just 0" <|
+                \_ ->
+                    Expect.equal
+                        (getElementFrom2DArray 0 0 testTwoDArray)
+                        (Just 0)
+            , test "getElementFrom2DArray 3 0 testTwoDArray = Nothing" <|
+                \_ ->
+                    Expect.equal
+                        (getElementFrom2DArray 3 0 testTwoDArray)
+                        Nothing
+            , test "getElementFrom2DArray -1 -1 testTwoDArray = Nothing" <|
+                \_ ->
+                    Expect.equal
+                        (getElementFrom2DArray -1 -1 testTwoDArray)
+                        Nothing
             ]
         ]
