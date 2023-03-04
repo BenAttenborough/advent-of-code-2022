@@ -1,13 +1,12 @@
 module Advent12 exposing (..)
 
+-- import Data.Advent12Data exposing (testInput)
+
 import Array exposing (Array)
 import Char exposing (toCode)
-import Data.Advent12Data exposing (testInput)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Json.Decode exposing (array)
-import Parser exposing (end)
-import Tree exposing (Tree, tree)
+import Tree exposing (tree)
 import Tree.Zipper exposing (Zipper, append)
 
 
@@ -20,6 +19,8 @@ type Tile
 type alias Cell =
     { elevation : Int
     , cellType : Tile
+    , x : Int
+    , y : Int
     }
 
 
@@ -124,19 +125,32 @@ endElevation =
     25
 
 
-charToCode : Char -> Cell
+charToCode : Char -> Int
 charToCode =
     toCode
         >> (\code ->
                 if code == startCharCode then
-                    Cell startElevation Start
+                    startElevation
 
                 else if code == endCharCode then
-                    Cell endElevation End
+                    endElevation
 
                 else
-                    Cell (code - aCode) Journey
+                    code - aCode
            )
+
+
+charToCellType : Char -> Tile
+charToCellType char =
+    case char of
+        'S' ->
+            Start
+
+        'E' ->
+            End
+
+        _ ->
+            Journey
 
 
 prepareInput : String -> Array (Array Cell)
@@ -144,10 +158,19 @@ prepareInput =
     String.lines
         >> List.map
             (String.toList
-                >> List.map charToCode
+                >> List.map
+                    (\char ->
+                        { elevation = charToCode char
+                        , cellType = charToCellType char
+                        , x = 0
+                        , y = 0
+                        }
+                    )
                 >> Array.fromList
+                >> Array.indexedMap (\index arr -> { arr | x = index })
             )
         >> Array.fromList
+        >> Array.indexedMap (\index arr -> Array.map (\arr_ -> { arr_ | y = index }) arr)
 
 
 view : Html msg

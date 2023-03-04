@@ -4,10 +4,11 @@ import Advent12 exposing (..)
 import Array exposing (Array)
 import Data.Advent12Data exposing (testInput)
 import Expect
-import Html.Attributes exposing (type_)
 import Test exposing (..)
-import Tree exposing (Tree, tree)
-import Tree.Zipper as Zipper
+
+
+
+-- import Tree.Zipper as Zipper
 
 
 testTwoDArray : Array (Array Int)
@@ -34,14 +35,14 @@ suite =
                         (prepareInput "aSa\nbEb")
                         (Array.fromList
                             [ Array.fromList
-                                [ { cellType = Journey, elevation = 0 }
-                                , { cellType = Start, elevation = startElevation }
-                                , { cellType = Journey, elevation = 0 }
+                                [ { cellType = Journey, elevation = 0, x = 0, y = 0 }
+                                , { cellType = Start, elevation = 0, x = 1, y = 0 }
+                                , { cellType = Journey, elevation = 0, x = 2, y = 0 }
                                 ]
                             , Array.fromList
-                                [ { cellType = Journey, elevation = 1 }
-                                , { cellType = End, elevation = endElevation }
-                                , { cellType = Journey, elevation = 1 }
+                                [ { cellType = Journey, elevation = 1, x = 0, y = 1 }
+                                , { cellType = End, elevation = 25, x = 1, y = 1 }
+                                , { cellType = Journey, elevation = 1, x = 2, y = 1 }
                                 ]
                             ]
                         )
@@ -62,27 +63,27 @@ suite =
                 \_ ->
                     Expect.equal
                         (charToCode 'a')
-                        (Cell 0 Journey)
+                        0
             , test "charToCode b" <|
                 \_ ->
                     Expect.equal
                         (charToCode 'b')
-                        (Cell 1 Journey)
+                        1
             , test "charToCode z" <|
                 \_ ->
                     Expect.equal
                         (charToCode 'z')
-                        (Cell 25 Journey)
+                        25
             , test "charToCode S" <|
                 \_ ->
                     Expect.equal
                         (charToCode 'S')
-                        (Cell startElevation Start)
+                        startElevation
             , test "charToCode E" <|
                 \_ ->
                     Expect.equal
                         (charToCode 'E')
-                        (Cell endElevation End)
+                        endElevation
             , test "simpleArrayTarverse" <|
                 \_ ->
                     Expect.equal
@@ -136,27 +137,27 @@ suite =
             , test "nodeTraversable 1 1 True" <|
                 \_ ->
                     Expect.equal
-                        (nodeTraversable { elevation = 1, cellType = Journey } { elevation = 1, cellType = Journey })
+                        (nodeTraversable { elevation = 1, cellType = Journey, x = 0, y = 0 } { elevation = 1, cellType = Journey, x = 0, y = 0 })
                         True
             , test "nodeTraversable 1 2 True" <|
                 \_ ->
                     Expect.equal
-                        (nodeTraversable { elevation = 1, cellType = Journey } { elevation = 2, cellType = Journey })
+                        (nodeTraversable { elevation = 1, cellType = Journey, x = 0, y = 0 } { elevation = 2, cellType = Journey, x = 0, y = 0 })
                         True
             , test "nodeTraversable 1 3 False" <|
                 \_ ->
                     Expect.equal
-                        (nodeTraversable { elevation = 1, cellType = Journey } { elevation = 3, cellType = Journey })
+                        (nodeTraversable { elevation = 1, cellType = Journey, x = 0, y = 0 } { elevation = 3, cellType = Journey, x = 0, y = 0 })
                         False
             , test "nodeTraversable 5 3 False" <|
                 \_ ->
                     Expect.equal
-                        (nodeTraversable { elevation = 5, cellType = Journey } { elevation = 3, cellType = Journey })
+                        (nodeTraversable { elevation = 5, cellType = Journey, x = 0, y = 0 } { elevation = 3, cellType = Journey, x = 0, y = 0 })
                         False
             , test "nodeTraversable 5 4 True" <|
                 \_ ->
                     Expect.equal
-                        (nodeTraversable { elevation = 5, cellType = Journey } { elevation = 4, cellType = Journey })
+                        (nodeTraversable { elevation = 5, cellType = Journey, x = 0, y = 0 } { elevation = 4, cellType = Journey, x = 0, y = 0 })
                         True
             , test "getNodes" <|
                 \_ ->
