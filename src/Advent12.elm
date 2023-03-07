@@ -153,6 +153,44 @@ charToCellType char =
             Journey
 
 
+type alias GraphNode =
+    { key : String
+    , neighbours : List String
+    }
+
+
+type alias Graph =
+    List GraphNode
+
+
+convertCellToKey : Cell -> String
+convertCellToKey cell =
+    String.fromInt cell.x ++ "-" ++ String.fromInt cell.y
+
+
+twoDArrayToGraph : Array (Array Cell) -> Graph
+twoDArrayToGraph arr =
+    arr
+        |> Array.map Array.toList
+        |> Array.toList
+        |> List.concat
+        |> List.map
+            (\cell ->
+                let
+                    neighbours =
+                        getNodes cell.x cell.y arr
+                            |> List.map convertCellToKey
+                in
+                { key = convertCellToKey cell
+                , neighbours = neighbours
+                }
+            )
+
+
+
+-- |> Array.map (\a -> Array.map (\cell -> {key = "a", neighbours = []}))
+
+
 prepareInput : String -> Array (Array Cell)
 prepareInput =
     String.lines

@@ -169,5 +169,16 @@ suite =
                     Expect.equal
                         (getNodes 0 0 testTwoDArray)
                         [ 3, 1 ]
+            , test "twoDArrayToGraph testTwoDArray" <|
+                \_ ->
+                    Expect.equal
+                        (twoDArrayToGraph (prepareInput "aSa\nbEb"))
+                        [ { key = "0-0", neighbours = [ "0-1", "1-0" ] }
+                        , { key = "1-0", neighbours = [ "1-1", "0-0", "2-0" ] }
+                        , { key = "2-0", neighbours = [ "2-1", "1-0" ] }
+                        , { key = "0-1", neighbours = [ "0-0", "1-1" ] }
+                        , { key = "1-1", neighbours = [ "1-0", "0-1", "2-1" ] }
+                        , { key = "2-1", neighbours = [ "2-0", "1-1" ] }
+                        ]
             ]
         ]
