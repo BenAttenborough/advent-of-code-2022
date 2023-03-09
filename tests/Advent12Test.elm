@@ -3,6 +3,7 @@ module Advent12Test exposing (..)
 import Advent12 exposing (..)
 import Array exposing (Array)
 import Data.Advent12Data exposing (testInput)
+import Dict
 import Expect
 import Test exposing (..)
 
@@ -17,6 +18,15 @@ testTwoDArray =
         [ Array.fromList [ 0, 1, 2 ]
         , Array.fromList [ 3, 4, 5 ]
         , Array.fromList [ 6, 7, 8 ]
+        ]
+
+
+testCellMap : Array (Array Cell)
+testCellMap =
+    Array.fromList
+        [ Array.fromList [ Cell 5 Journey 0 0, Cell 2 Journey 1 0, Cell 5 Journey 2 0 ]
+        , Array.fromList [ Cell 2 Journey 0 1, Cell 1 Start 1 1, Cell 5 Journey 2 1 ]
+        , Array.fromList [ Cell 5 Journey 0 2, Cell 5 Journey 1 2, Cell 5 End 2 2 ]
         ]
 
 
@@ -57,6 +67,19 @@ suite =
                             , Array.fromList [ 0, 2, 2, 18, 25, endElevation, 23, 10 ]
                             , Array.fromList [ 0, 2, 2, 19, 20, 21, 22, 9 ]
                             , Array.fromList [ 0, 1, 3, 4, 5, 6, 7, 8 ]
+                            ]
+                        )
+            , test "prepareInput start end - tests that start and end types have correct height" <|
+                \_ ->
+                    Expect.equal
+                        (prepareInput "SazE")
+                        (Array.fromList
+                            [ Array.fromList
+                                [ { cellType = Start, elevation = 0, x = 0, y = 0 }
+                                , { cellType = Journey, elevation = 0, x = 1, y = 0 }
+                                , { cellType = Journey, elevation = 25, x = 2, y = 0 }
+                                , { cellType = End, elevation = 25, x = 3, y = 0 }
+                                ]
                             ]
                         )
             , test "charToCode a" <|
@@ -104,16 +127,6 @@ suite =
                     Expect.equal
                         (simpleArrayTarverse -5 Array.empty (Array.fromList [ 'a', 'b', 'c' ]))
                         Array.empty
-
-            -- , test "simpleArrayTarverseTwo" <|
-            --     \_ ->
-            --         Expect.equal
-            --             (simpleArrayTarverseTwo
-            --                 0
-            --                 (Zipper.fromTree (Tree.singleton 'z'))
-            --                 (Array.fromList [ 'a', 'b', 'c' ])
-            --             )
-            --             (Zipper.fromTree (Tree.singleton 'z'))
             , test "getNode 1 1 testTwoDArray = Just 4" <|
                 \_ ->
                     Expect.equal
@@ -173,12 +186,78 @@ suite =
                 \_ ->
                     Expect.equal
                         (twoDArrayToGraph (prepareInput "aSa\nbEb"))
-                        [ { key = "0-0", neighbours = [ "0-1", "1-0" ] }
-                        , { key = "1-0", neighbours = [ "1-1", "0-0", "2-0" ] }
-                        , { key = "2-0", neighbours = [ "2-1", "1-0" ] }
-                        , { key = "0-1", neighbours = [ "0-0", "1-1" ] }
-                        , { key = "1-1", neighbours = [ "1-0", "0-1", "2-1" ] }
-                        , { key = "2-1", neighbours = [ "2-0", "1-1" ] }
-                        ]
+                        (Dict.fromList
+                            [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
+                            , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-0" ] } )
+                            , ( "1-0", { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] } )
+                            , ( "1-1", { destination = End, key = "1-1", neighbours = [] } )
+                            , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1", "1-0" ] } )
+                            , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-0" ] } )
+                            ]
+                        )
+            , test "twoDArrayToGraph simple" <|
+                \_ ->
+                    Expect.equal
+                        (twoDArrayToGraph (prepareInput "abc\nbcd\ncde"))
+                        (Dict.fromList
+                            [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
+                            , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-0", "0-2", "1-1" ] } )
+                            , ( "0-2", { destination = Journey, key = "0-2", neighbours = [ "0-1", "1-2" ] } )
+                            , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "1-1", "0-0", "2-0" ] } )
+                            , ( "1-1", { destination = Journey, key = "1-1", neighbours = [ "1-0", "1-2", "0-1", "2-1" ] } )
+                            , ( "1-2", { destination = Journey, key = "1-2", neighbours = [ "1-1", "0-2", "2-2" ] } )
+                            , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1", "1-0" ] } )
+                            , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-0", "2-2", "1-1" ] } )
+                            , ( "2-2", { destination = Journey, key = "2-2", neighbours = [ "2-1", "1-2" ] } )
+                            ]
+                        )
+            , test "findStart testInput" <|
+                \_ ->
+                    Expect.equal
+                        (testInput
+                            |> prepareInput
+                            |> twoDArrayToGraph
+                            |> findStart
+                        )
+                        (Just { destination = Start, key = "0-0", neighbours = [ "0-1", "1-0" ] })
+            , test "findStart aSa\nbEb" <|
+                \_ ->
+                    Expect.equal
+                        ("aSa\nbEb"
+                            |> prepareInput
+                            |> twoDArrayToGraph
+                            |> findStart
+                        )
+                        (Just { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] })
+            , test "removeNonUniqueValues" <|
+                \_ ->
+                    Expect.equal
+                        (removeNonUniqueValues [ "a", "b", "c" ] [ "b", "d", "e" ])
+                        [ "a", "c" ]
+            , test "removeNonUniqueValues Long" <|
+                \_ ->
+                    Expect.equal
+                        (removeNonUniqueValues [ "a", "b", "c", "d", "e", "f", "g" ] [ "b", "d", "f" ])
+                        [ "a", "c", "e", "g" ]
+
+            -- , test "part1Solution" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (part1Solution testInput)
+            --             31
+            , test "getNodesIfTravesable" <|
+                \_ ->
+                    let
+                        cell =
+                            Cell 1 Start 1 1
+                    in
+                    Expect.equal
+                        (getNodesIfTravesable cell testCellMap)
+                        [ { cellType = Journey, elevation = 2, x = 1, y = 0 }, { cellType = Journey, elevation = 2, x = 0, y = 1 } ]
+            , test "simple puzzle answer" <|
+                \_ ->
+                    Expect.equal
+                        (part1Solution "SbcdefghijklmnopqrstuvwxyzE")
+                        25
             ]
         ]
