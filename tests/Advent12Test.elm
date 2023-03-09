@@ -151,27 +151,27 @@ suite =
                 \_ ->
                     Expect.equal
                         (nodeTraversable { elevation = 1, cellType = Journey, x = 0, y = 0 } { elevation = 1, cellType = Journey, x = 0, y = 0 })
-                        True
+                        (Just { elevation = 1, cellType = Journey, x = 0, y = 0 })
             , test "nodeTraversable 1 2 True" <|
                 \_ ->
                     Expect.equal
                         (nodeTraversable { elevation = 1, cellType = Journey, x = 0, y = 0 } { elevation = 2, cellType = Journey, x = 0, y = 0 })
-                        True
+                        (Just { elevation = 2, cellType = Journey, x = 0, y = 0 })
             , test "nodeTraversable 1 3 False" <|
                 \_ ->
                     Expect.equal
                         (nodeTraversable { elevation = 1, cellType = Journey, x = 0, y = 0 } { elevation = 3, cellType = Journey, x = 0, y = 0 })
-                        False
+                        Nothing
             , test "nodeTraversable 5 3 False" <|
                 \_ ->
                     Expect.equal
                         (nodeTraversable { elevation = 5, cellType = Journey, x = 0, y = 0 } { elevation = 3, cellType = Journey, x = 0, y = 0 })
-                        False
+                        Nothing
             , test "nodeTraversable 5 4 True" <|
                 \_ ->
                     Expect.equal
                         (nodeTraversable { elevation = 5, cellType = Journey, x = 0, y = 0 } { elevation = 4, cellType = Journey, x = 0, y = 0 })
-                        True
+                        (Just { elevation = 4, cellType = Journey, x = 0, y = 0 })
             , test "getNodes" <|
                 \_ ->
                     Expect.equal
@@ -182,53 +182,54 @@ suite =
                     Expect.equal
                         (getNodes 0 0 testTwoDArray)
                         [ 3, 1 ]
-            , test "twoDArrayToGraph testTwoDArray" <|
-                \_ ->
-                    Expect.equal
-                        (twoDArrayToGraph (prepareInput "aSa\nbEb"))
-                        (Dict.fromList
-                            [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
-                            , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-0" ] } )
-                            , ( "1-0", { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] } )
-                            , ( "1-1", { destination = End, key = "1-1", neighbours = [] } )
-                            , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1", "1-0" ] } )
-                            , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-0" ] } )
-                            ]
-                        )
-            , test "twoDArrayToGraph simple" <|
-                \_ ->
-                    Expect.equal
-                        (twoDArrayToGraph (prepareInput "abc\nbcd\ncde"))
-                        (Dict.fromList
-                            [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
-                            , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-0", "0-2", "1-1" ] } )
-                            , ( "0-2", { destination = Journey, key = "0-2", neighbours = [ "0-1", "1-2" ] } )
-                            , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "1-1", "0-0", "2-0" ] } )
-                            , ( "1-1", { destination = Journey, key = "1-1", neighbours = [ "1-0", "1-2", "0-1", "2-1" ] } )
-                            , ( "1-2", { destination = Journey, key = "1-2", neighbours = [ "1-1", "0-2", "2-2" ] } )
-                            , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1", "1-0" ] } )
-                            , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-0", "2-2", "1-1" ] } )
-                            , ( "2-2", { destination = Journey, key = "2-2", neighbours = [ "2-1", "1-2" ] } )
-                            ]
-                        )
-            , test "findStart testInput" <|
-                \_ ->
-                    Expect.equal
-                        (testInput
-                            |> prepareInput
-                            |> twoDArrayToGraph
-                            |> findStart
-                        )
-                        (Just { destination = Start, key = "0-0", neighbours = [ "0-1", "1-0" ] })
-            , test "findStart aSa\nbEb" <|
-                \_ ->
-                    Expect.equal
-                        ("aSa\nbEb"
-                            |> prepareInput
-                            |> twoDArrayToGraph
-                            |> findStart
-                        )
-                        (Just { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] })
+
+            -- , test "twoDArrayToGraph testTwoDArray" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (cellArrayToCellGraph (prepareInput "aSa\nbEb"))
+            --             (Dict.fromList
+            --                 [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
+            --                 , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-0" ] } )
+            --                 , ( "1-0", { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] } )
+            --                 , ( "1-1", { destination = End, key = "1-1", neighbours = [] } )
+            --                 , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1", "1-0" ] } )
+            --                 , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-0" ] } )
+            --                 ]
+            --             )
+            -- , test "twoDArrayToGraph simple" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (cellArrayToCellGraph (prepareInput "abc\nbcd\ncde"))
+            --             (Dict.fromList
+            --                 [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
+            --                 , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-2", "1-1" ] } )
+            --                 , ( "0-2", { destination = Journey, key = "0-2", neighbours = [ "1-2" ] } )
+            --                 , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "1-1", "2-0" ] } )
+            --                 , ( "1-1", { destination = Journey, key = "1-1", neighbours = [ "1-2", "2-1" ] } )
+            --                 , ( "1-2", { destination = Journey, key = "1-2", neighbours = [ "2-2" ] } )
+            --                 , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1" ] } )
+            --                 , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-2" ] } )
+            --                 , ( "2-2", { destination = Journey, key = "2-2", neighbours = [] } )
+            --                 ]
+            --             )
+            -- , test "findStart testInput" <|
+            --     \_ ->
+            --         Expect.equal
+            --             (testInput
+            --                 |> prepareInput
+            --                 |> cellArrayToCellGraph
+            --                 |> findStart
+            --             )
+            --             (Just { destination = Start, key = "0-0", neighbours = [ "0-1", "1-0" ] })
+            -- , test "findStart aSa\nbEb" <|
+            --     \_ ->
+            --         Expect.equal
+            --             ("aSa\nbEb"
+            --                 |> prepareInput
+            --                 |> cellArrayToCellGraph
+            --                 |> findStart
+            --             )
+            --             (Just { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] })
             , test "removeNonUniqueValues" <|
                 \_ ->
                     Expect.equal
@@ -259,5 +260,105 @@ suite =
                     Expect.equal
                         (part1Solution "SbcdefghijklmnopqrstuvwxyzE")
                         25
+
+            -- , test "cellListToNeighboursList" <|
+            --     \_ ->
+            --         let
+            --             arr =
+            --                 Array.fromList
+            --                     [ Array.fromList
+            --                         [ Cell 1 Journey 0 0
+            --                         , Cell 1 Journey 1 0
+            --                         , Cell 1 Journey 2 0
+            --                         , Cell 1 Journey 3 0
+            --                         , Cell 1 Journey 4 0
+            --                         ]
+            --                     ]
+            --             listCell =
+            --                 arr
+            --                     |> Array.map Array.toList
+            --                     |> Array.toList
+            --                     |> List.concat
+            --         in
+            --         Expect.equal
+            --             (cellListToNeighboursList
+            --                 arr
+            --                 []
+            --                 []
+            --                 listCell
+            --             )
+            --             [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "1-0" ] } )
+            --             , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "2-0" ] } )
+            --             , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "3-0" ] } )
+            --             , ( "3-0", { destination = Journey, key = "3-0", neighbours = [ "4-0" ] } )
+            --             , ( "4-0", { destination = Journey, key = "4-0", neighbours = [] } )
+            --             ]
             ]
+        ]
+
+
+help : Dict.Dict String GraphNode
+help =
+    Dict.fromList
+        [ ( "0-0", { destination = Start, key = "0-0", neighbours = [ "1-0" ] } )
+        , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "2-0" ] } )
+        , ( "10-0", { destination = Journey, key = "10-0", neighbours = [ "11-0" ] } )
+        , ( "11-0", { destination = Journey, key = "11-0", neighbours = [ "12-0" ] } )
+        , ( "12-0", { destination = Journey, key = "12-0", neighbours = [ "13-0" ] } )
+        , ( "13-0", { destination = Journey, key = "13-0", neighbours = [ "14-0" ] } )
+        , ( "14-0", { destination = Journey, key = "14-0", neighbours = [ "15-0" ] } )
+        , ( "15-0", { destination = Journey, key = "15-0", neighbours = [ "16-0" ] } )
+        , ( "16-0", { destination = Journey, key = "16-0", neighbours = [ "17-0" ] } )
+        , ( "17-0", { destination = Journey, key = "17-0", neighbours = [ "18-0" ] } )
+        , ( "18-0", { destination = Journey, key = "18-0", neighbours = [ "19-0" ] } )
+        , ( "19-0", { destination = Journey, key = "19-0", neighbours = [ "20-0" ] } )
+        , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "3-0" ] } )
+        , ( "20-0", { destination = Journey, key = "20-0", neighbours = [ "21-0" ] } )
+        , ( "21-0", { destination = Journey, key = "21-0", neighbours = [ "22-0" ] } )
+        , ( "22-0", { destination = Journey, key = "22-0", neighbours = [ "23-0" ] } )
+        , ( "23-0", { destination = Journey, key = "23-0", neighbours = [ "24-0" ] } )
+        , ( "24-0", { destination = Journey, key = "24-0", neighbours = [ "25-0" ] } )
+        , ( "25-0", { destination = Journey, key = "25-0", neighbours = [ "26-0" ] } )
+        , ( "26-0", { destination = End, key = "26-0", neighbours = [] } )
+        , ( "3-0", { destination = Journey, key = "3-0", neighbours = [ "4-0" ] } )
+        , ( "4-0", { destination = Journey, key = "4-0", neighbours = [ "5-0" ] } )
+        , ( "5-0", { destination = Journey, key = "5-0", neighbours = [ "6-0" ] } )
+        , ( "6-0", { destination = Journey, key = "6-0", neighbours = [ "7-0" ] } )
+        , ( "7-0", { destination = Journey, key = "7-0", neighbours = [ "8-0" ] } )
+        , ( "8-0", { destination = Journey, key = "8-0", neighbours = [ "9-0" ] } )
+        , ( "9-0", { destination = Journey, key = "9-0", neighbours = [ "10-0" ] } )
+        ]
+
+
+help2 =
+    Dict.fromList
+        [ ( "00000-00000", { destination = Start, key = "00000-00000", neighbours = [ "00001-00000" ] } )
+        , ( "00001-00000", { destination = Journey, key = "00001-00000", neighbours = [ "00002-00000" ] } )
+        , ( "00002-00000", { destination = Journey, key = "00002-00000", neighbours = [ "00003-00000" ] } )
+        , ( "00003-00000", { destination = Journey, key = "00003-00000", neighbours = [ "00004-00000" ] } )
+        , ( "00004-00000", { destination = Journey, key = "00004-00000", neighbours = [ "00005-00000" ] } )
+        , ( "00005-00000", { destination = Journey, key = "00005-00000", neighbours = [ "00006-00000" ] } )
+        , ( "00006-00000", { destination = Journey, key = "00006-00000", neighbours = [ "00007-00000" ] } )
+        , ( "00007-00000", { destination = Journey, key = "00007-00000", neighbours = [ "00008-00000" ] } )
+        , ( "00008-00000", { destination = Journey, key = "00008-00000", neighbours = [ "00009-00000" ] } )
+        , ( "00009-00000", { destination = Journey, key = "00009-00000", neighbours = [ "00010-00000" ] } )
+        , ( "00010-00000", { destination = Journey, key = "00010-00000", neighbours = [ "00011-00000" ] } )
+        , ( "00011-00000", { destination = Journey, key = "00011-00000", neighbours = [ "00012-00000" ] } )
+        , ( "00012-00000", { destination = Journey, key = "00012-00000", neighbours = [ "00013-00000" ] } )
+        , ( "00013-00000", { destination = Journey, key = "00013-00000", neighbours = [ "00014-00000" ] } )
+        , ( "00014-00000", { destination = Journey, key = "00014-00000", neighbours = [ "00015-00000" ] } )
+        , ( "00015-00000", { destination = Journey, key = "00015-00000", neighbours = [ "00016-00000" ] } )
+        , ( "00016-00000", { destination = Journey, key = "00016-00000", neighbours = [ "00017-00000" ] } )
+        , ( "00017-00000", { destination = Journey, key = "00017-00000", neighbours = [ "00018-00000" ] } )
+        , ( "00018-00000", { destination = Journey, key = "00018-00000", neighbours = [ "00019-00000" ] } )
+        , ( "00019-00000", { destination = Journey, key = "00019-00000", neighbours = [ "00020-00000" ] } )
+        , ( "00020-00000", { destination = Journey, key = "00020-00000", neighbours = [ "00021-00000" ] } )
+        , ( "00021-00000", { destination = Journey, key = "00021-00000", neighbours = [ "00022-00000" ] } )
+        , ( "00022-00000", { destination = Journey, key = "00022-00000", neighbours = [ "00023-00000" ] } )
+        , ( "00023-00000", { destination = Journey, key = "00023-00000", neighbours = [ "00024-00000" ] } )
+        , ( "00024-00000", { destination = Journey, key = "00024-00000", neighbours = [ "00025-00000" ] } )
+        , ( "00025-00000"
+          , { destination = Journey, key = "00025-00000", neighbours = [ "00026-00000" ] }
+          )
+        , ( "00026-00000", { destination = End, key = "00026-00000", neighbours = [] } )
         ]

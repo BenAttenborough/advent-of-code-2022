@@ -67,11 +67,6 @@ getNode x y twoDMap =
         |> Maybe.andThen (Array.get x)
 
 
-nodeTraversable : Cell -> Cell -> Bool
-nodeTraversable currentCell nextCell =
-    nextCell.elevation <= (currentCell.elevation + 1) && nextCell.elevation >= (currentCell.elevation - 1)
-
-
 simpleArrayTarverseTwo : Int -> Zipper a -> Array a -> Zipper a
 simpleArrayTarverseTwo index tree atlas =
     case Array.get index atlas of
@@ -158,7 +153,27 @@ type alias Graph =
 
 convertCellToKey : Cell -> String
 convertCellToKey cell =
-    String.fromInt cell.x ++ "-" ++ String.fromInt cell.y
+    let
+        x =
+            String.padLeft 2 '0' (String.fromInt cell.x)
+
+        y =
+            String.padLeft 2 '0' (String.fromInt cell.y)
+    in
+    x ++ "-" ++ y
+
+
+nodeTraversable : Cell -> Cell -> Maybe Cell
+nodeTraversable currentCell nextCell =
+    let
+        predicate =
+            nextCell.elevation <= (currentCell.elevation + 1) && nextCell.elevation >= (currentCell.elevation - 1)
+    in
+    if predicate then
+        Just nextCell
+
+    else
+        Nothing
 
 
 getNodesIfTravesable : Cell -> Array (Array Cell) -> List Cell
@@ -166,73 +181,73 @@ getNodesIfTravesable cell twoDMap =
     let
         up =
             getNode cell.x (cell.y - 1) twoDMap
-                |> Maybe.andThen
-                    (\newCell ->
-                        if nodeTraversable cell newCell then
-                            Just newCell
-
-                        else
-                            Nothing
-                    )
+                |> Maybe.andThen (nodeTraversable cell)
 
         down =
             getNode cell.x (cell.y + 1) twoDMap
-                |> Maybe.andThen
-                    (\newCell ->
-                        if nodeTraversable cell newCell then
-                            Just newCell
-
-                        else
-                            Nothing
-                    )
+                |> Maybe.andThen (nodeTraversable cell)
 
         left =
             getNode (cell.x - 1) cell.y twoDMap
-                |> Maybe.andThen
-                    (\newCell ->
-                        if nodeTraversable cell newCell then
-                            Just newCell
-
-                        else
-                            Nothing
-                    )
+                |> Maybe.andThen (nodeTraversable cell)
 
         right =
             getNode (cell.x + 1) cell.y twoDMap
-                |> Maybe.andThen
-                    (\newCell ->
-                        if nodeTraversable cell newCell then
-                            Just newCell
-
-                        else
-                            Nothing
-                    )
+                |> Maybe.andThen (nodeTraversable cell)
     in
     [ up, down, left, right ]
         |> List.filterMap identity
 
 
-twoDArrayToGraph : Array (Array Cell) -> Graph
-twoDArrayToGraph arr =
+cellListToNeighboursList : Array (Array Cell) -> List ( String, GraphNode ) -> List String -> List Cell -> List ( String, GraphNode )
+cellListToNeighboursList arr container alreadyTraversed cellList =
+    case cellList of
+        [] ->
+            container
+
+        cell :: cells ->
+            let
+                cellKey =
+                    convertCellToKey cell
+
+                traversed =
+                    alreadyTraversed
+                        ++ [ cellKey ]
+
+                -- |> Debug.log "Traversed"
+                neighbours =
+                    -- Need to avoid adding cells already traveresed
+                    getNodesIfTravesable cell arr
+                        |> List.map convertCellToKey
+                        |> List.filter (\key -> not (List.member key traversed))
+
+                newGraphNode =
+                    ( convertCellToKey cell
+                    , { key = convertCellToKey cell
+                      , neighbours = neighbours
+                      , destination = cell.cellType
+                      }
+                    )
+
+                newGraphNodeList =
+                    container ++ [ newGraphNode ]
+            in
+            cellListToNeighboursList arr newGraphNodeList traversed cells
+
+
+cellArrayToCellGraph : Array (Array Cell) -> Graph
+cellArrayToCellGraph arr =
     arr
         |> Array.map Array.toList
         |> Array.toList
         |> List.concat
-        |> List.map
-            (\cell ->
-                let
-                    neighbours =
-                        getNodesIfTravesable cell arr
-                            |> List.map convertCellToKey
-                in
-                ( convertCellToKey cell
-                , { key = convertCellToKey cell
-                  , neighbours = neighbours
-                  , destination = cell.cellType
-                  }
-                )
-            )
+        -- Need a cleaver function where we only add neighbours that have not already been traversed
+        |> cellListToNeighboursList arr [] []
         |> Dict.fromList
+
+
+
+-- |> Debug.log "Dict"
 
 
 findStart : Graph -> Maybe GraphNode
@@ -294,6 +309,13 @@ countNodesToEnd currentCount graph nodes =
                 currentCount + 1
 
             else
+                let
+                    _ =
+                        Debug.log "count" currentCount
+
+                    a =
+                        Debug.log "nodesToAdd" nodesToAdd
+                in
                 countNodesToEnd (currentCount + 1) graph nodesToAdd
 
 
@@ -348,11 +370,11 @@ part1Solution input =
         graph =
             input
                 |> prepareInput
-                |> twoDArrayToGraph
+                |> cellArrayToCellGraph
     in
     graph
         |> findStart
-        |> Debug.log "start"
+        -- |> Debug.log "start"
         |> Maybe.map (\start -> start.neighbours ++ [ start.key ])
         |> Maybe.withDefault []
         |> countNodesToEnd 0 graph
