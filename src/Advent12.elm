@@ -199,6 +199,45 @@ getNodesIfTravesable cell twoDMap =
         |> List.filterMap identity
 
 
+getAvailableNeighbours : Cell -> Array (Array Cell) -> List String
+getAvailableNeighbours cell atlas =
+    let
+        up =
+            getNode cell.x (cell.y - 1) atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        down =
+            getNode cell.x (cell.y + 1) atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        left =
+            getNode (cell.x - 1) cell.y atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        right =
+            getNode (cell.x + 1) cell.y atlas
+                |> Maybe.andThen (nodeTraversable cell)
+    in
+    [ up, down, left, right ]
+        |> List.filterMap identity
+        |> List.map convertCellToKey
+
+
+convertCellToNode : Cell -> Array (Array Cell) -> GraphNode
+convertCellToNode cell atlas =
+    let
+        key =
+            convertCellToKey cell
+
+        neighbours =
+            getAvailableNeighbours cell atlas
+
+        destination =
+            cell.cellType
+    in
+    GraphNode key neighbours destination
+
+
 cellListToNeighboursList : Array (Array Cell) -> List ( String, GraphNode ) -> List String -> List Cell -> List ( String, GraphNode )
 cellListToNeighboursList arr container alreadyTraversed cellList =
     case cellList of
@@ -237,6 +276,7 @@ cellListToNeighboursList arr container alreadyTraversed cellList =
 
 cellArrayToCellGraph : Array (Array Cell) -> Graph
 cellArrayToCellGraph arr =
+    -- Need to adjust this
     arr
         |> Array.map Array.toList
         |> Array.toList
@@ -309,13 +349,12 @@ countNodesToEnd currentCount graph nodes =
                 currentCount + 1
 
             else
-                let
-                    _ =
-                        Debug.log "count" currentCount
-
-                    a =
-                        Debug.log "nodesToAdd" nodesToAdd
-                in
+                -- let
+                --     _ =
+                --         Debug.log "count" currentCount
+                --     a =
+                --         Debug.log "nodesToAdd" nodesToAdd
+                -- in
                 countNodesToEnd (currentCount + 1) graph nodesToAdd
 
 
@@ -374,7 +413,6 @@ part1Solution input =
     in
     graph
         |> findStart
-        -- |> Debug.log "start"
         |> Maybe.map (\start -> start.neighbours ++ [ start.key ])
         |> Maybe.withDefault []
         |> countNodesToEnd 0 graph
