@@ -219,27 +219,24 @@ suite =
                                             ]
                                         )
                             ]
-                    , skip <|
-                        describe "Find start" <|
-                            [ test "findStart testInput" <|
-                                \_ ->
-                                    Expect.equal
-                                        (testInput
-                                            |> prepareInput
-                                            |> cellArrayToCellGraph
-                                            |> findStart
-                                        )
-                                        (Just { destination = Start, key = "0-0", neighbours = [ "0-1", "1-0" ] })
-                            , test "findStart aSa\nbEb" <|
-                                \_ ->
-                                    Expect.equal
-                                        ("aSa\nbEb"
-                                            |> prepareInput
-                                            |> cellArrayToCellGraph
-                                            |> findStart
-                                        )
-                                        (Just { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] })
-                            ]
+                    , describe "Find start" <|
+                        [ test "findStart testInput" <|
+                            \_ ->
+                                Expect.equal
+                                    (testInput
+                                        |> prepareInput
+                                        |> findStart
+                                    )
+                                    (Just { cellType = Start, elevation = 0, x = 0, y = 0 })
+                        , test "findStart aSa\nbEb" <|
+                            \_ ->
+                                Expect.equal
+                                    ("aSa\nbEb"
+                                        |> prepareInput
+                                        |> findStart
+                                    )
+                                    (Just { cellType = Start, elevation = 0, x = 1, y = 0 })
+                        ]
                     , describe "removeNonUniqueValues" <|
                         [ test "removeNonUniqueValues simple" <|
                             \_ ->
@@ -263,7 +260,7 @@ suite =
                             in
                             \_ ->
                                 Expect.equal
-                                    (getAvailableNeighbours cell atlas)
+                                    (getAvailableNeighbours cell atlas "")
                                     []
                         , test "getAvailableNeighbours 1 neighbour" <|
                             let
@@ -277,7 +274,7 @@ suite =
                             in
                             \_ ->
                                 Expect.equal
-                                    (getAvailableNeighbours cell atlas)
+                                    (getAvailableNeighbours cell atlas "")
                                     [ "01-00" ]
                         , test "getAvailableNeighbours 2 neighbours" <|
                             let
@@ -291,19 +288,33 @@ suite =
                             in
                             \_ ->
                                 Expect.equal
-                                    (getAvailableNeighbours cell atlas)
+                                    (getAvailableNeighbours cell atlas "")
                                     [ "00-00", "02-00" ]
+                        , test "getAvailableNeighbours 2 neighbours but ignore parent" <|
+                            let
+                                cell =
+                                    Cell 0 Start 1 0
+
+                                atlas =
+                                    Array.fromList
+                                        [ Array.fromList [ Cell 0 Journey 0 0, cell, Cell 0 Journey 2 0 ]
+                                        ]
+                            in
+                            \_ ->
+                                Expect.equal
+                                    (getAvailableNeighbours cell atlas "00-00")
+                                    [ "02-00" ]
                         ]
                     , skip <|
                         describe
                             "Test solutions"
                         <|
-                            [ test "simple puzzle answer" <|
-                                \_ ->
-                                    Expect.equal
-                                        (part1Solution "SbcdefghijklmnopqrstuvwxyzE")
-                                        25
-                            , test "cellListToNeighboursList" <|
+                            [ -- [ test "simple puzzle answer" <|
+                              --     \_ ->
+                              --         Expect.equal
+                              --             (part1Solution "SbcdefghijklmnopqrstuvwxyzE")
+                              --             25
+                              test "cellListToNeighboursList" <|
                                 \_ ->
                                     let
                                         arr =
@@ -336,12 +347,45 @@ suite =
                                         , ( "3-0", { destination = Journey, key = "3-0", neighbours = [ "4-0" ] } )
                                         , ( "4-0", { destination = Journey, key = "4-0", neighbours = [] } )
                                         ]
-                            , test "part1Solution" <|
-                                \_ ->
-                                    Expect.equal
-                                        (part1Solution testInput)
-                                        31
+
+                            -- , test "part1Solution" <|
+                            --     \_ ->
+                            --         Expect.equal
+                            --             (part1Solution testInput)
+                            --             31
                             ]
+                    , describe "getAvailableNeighboursCell" <|
+                        [ test "getAvailableNeighboursCell 2 neighbours" <|
+                            let
+                                cell =
+                                    Cell 0 Start 1 0
+
+                                atlas =
+                                    Array.fromList
+                                        [ Array.fromList [ Cell 0 Journey 0 0, cell, Cell 0 Journey 2 0 ]
+                                        ]
+                            in
+                            \_ ->
+                                Expect.equal
+                                    (getAvailableNeighboursCell cell atlas)
+                                    [ { cellType = Journey, elevation = 0, x = 0, y = 0 }
+                                    , { cellType = Journey, elevation = 0, x = 2, y = 0 }
+                                    ]
+                        , test "getAvailableNeighboursCell 2 neighbours but ignore parent" <|
+                            let
+                                cell =
+                                    Cell 0 Start 1 0
+
+                                atlas =
+                                    Array.fromList
+                                        [ Array.fromList [ Cell 0 Journey 0 0, cell, Cell 0 Journey 2 0 ]
+                                        ]
+                            in
+                            \_ ->
+                                Expect.equal
+                                    (getAvailableNeighboursCell cell atlas)
+                                    [ { cellType = Journey, elevation = 0, x = 2, y = 0 } ]
+                        ]
                     ]
                 ]
             , describe "Active tests (So you can disable all those above to avoid interference)" <|

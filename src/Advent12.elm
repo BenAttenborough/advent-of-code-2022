@@ -9,6 +9,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Tree exposing (tree)
 import Tree.Zipper exposing (Zipper, append)
+import Utilities.Utilities exposing (uniqueItemFrom2DArray)
 
 
 type Tile
@@ -199,8 +200,8 @@ getNodesIfTravesable cell twoDMap =
         |> List.filterMap identity
 
 
-getAvailableNeighbours : Cell -> Array (Array Cell) -> List String
-getAvailableNeighbours cell atlas =
+getAvailableNeighbours : Cell -> Array (Array Cell) -> String -> List String
+getAvailableNeighbours cell atlas parentKey =
     let
         up =
             getNode cell.x (cell.y - 1) atlas
@@ -221,21 +222,63 @@ getAvailableNeighbours cell atlas =
     [ up, down, left, right ]
         |> List.filterMap identity
         |> List.map convertCellToKey
+        |> List.filter (\item -> not (item == parentKey))
 
 
-convertCellToNode : Cell -> Array (Array Cell) -> GraphNode
-convertCellToNode cell atlas =
+getAvailableNeighboursCell : Cell -> Array (Array Cell) -> List Cell
+getAvailableNeighboursCell cell atlas =
+    let
+        up =
+            getNode cell.x (cell.y - 1) atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        down =
+            getNode cell.x (cell.y + 1) atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        left =
+            getNode (cell.x - 1) cell.y atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        right =
+            getNode (cell.x + 1) cell.y atlas
+                |> Maybe.andThen (nodeTraversable cell)
+    in
+    [ up, down, left, right ]
+        |> List.filterMap identity
+
+
+convertCellToNode : Cell -> Array (Array Cell) -> String -> GraphNode
+convertCellToNode cell atlas parent =
     let
         key =
             convertCellToKey cell
 
         neighbours =
-            getAvailableNeighbours cell atlas
+            getAvailableNeighbours cell atlas parent
 
         destination =
             cell.cellType
     in
     GraphNode key neighbours destination
+
+
+
+-- buildGraph : Cell -> Array (Array Cell) -> String -> SGraph -> SGraph
+-- buildGraph cell atlas parent graph =
+--     let
+--         neighbours =
+--             getAvailableNeighbours cell atlas parent
+--     in
+--     case neighbours of
+--         [] ->
+--             Dict.insert (convertCellToKey cell) { neighbours = neighbours, destination = cell.cellType } graph
+--         x :: xs ->
+--             let
+--                 neighbours_ =
+--                     []
+--             in
+--             Dict.insert (convertCellToKey cell) { neighbours = neighbours_, destination = cell.cellType } graph
 
 
 cellListToNeighboursList : Array (Array Cell) -> List ( String, GraphNode ) -> List String -> List Cell -> List ( String, GraphNode )
@@ -286,28 +329,13 @@ cellArrayToCellGraph arr =
         |> Dict.fromList
 
 
-
--- |> Debug.log "Dict"
-
-
-findStart : Graph -> Maybe GraphNode
-findStart graph =
-    graph
-        |> Dict.toList
-        |> List.filter (\item -> Tuple.second item |> (\x -> x.destination == Start))
-        |> (\list ->
-                case list of
-                    [] ->
-                        Nothing
-
-                    x :: xs ->
-                        case xs of
-                            [] ->
-                                Just (Tuple.second x)
-
-                            _ :: _ ->
-                                Nothing
-           )
+findStart : Array (Array Cell) -> Maybe Cell
+findStart atlas =
+    let
+        predicate =
+            \cell -> cell.cellType == Start
+    in
+    uniqueItemFrom2DArray predicate atlas
 
 
 removeNonUniqueValues : List a -> List a -> List a
@@ -403,19 +431,46 @@ view =
         ]
 
 
-part1Solution : String -> Int
+countSteps : Cell -> Array (Array Cell) -> List Cell -> Int -> Int
+countSteps cell atlas queue count =
+    if cell.cellType == End then
+        count
+
+    else
+        let
+            neighbours : List Cell
+            neighbours =
+                getAvailableNeighboursCell cell atlas
+
+            updatedQueue : List Cell
+            updatedQueue =
+                queue ++ neighbours
+        in
+        -1
+
+
+part1Solution : String -> Maybe Cell
 part1Solution input =
-    let
-        graph =
-            input
-                |> prepareInput
-                |> cellArrayToCellGraph
-    in
-    graph
+    input
+        |> prepareInput
         |> findStart
-        |> Maybe.map (\start -> start.neighbours ++ [ start.key ])
-        |> Maybe.withDefault []
-        |> countNodesToEnd 0 graph
+
+
+
+-- |> Maybe.map
+-- part1Solution : String -> Int
+-- part1Solution input =
+--     let
+--         graph =
+--             input
+--                 |> prepareInput
+--                 |> cellArrayToCellGraph
+--     in
+--     graph
+--         |> findStart
+--         |> Maybe.map (\start -> start.neighbours ++ [ start.key ])
+--         |> Maybe.withDefault []
+--         |> countNodesToEnd 0 graph
 
 
 main : Html msg

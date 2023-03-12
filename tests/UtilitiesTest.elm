@@ -4,7 +4,7 @@ import Array exposing (Array)
 import Expect
 import Parser exposing (..)
 import Test exposing (..)
-import Utilities.Utilities exposing (getElementFrom2DArray, partitioner)
+import Utilities.Utilities exposing (build2DArray, getElementFrom2DArray, partitioner, uniqueItemFrom2DArray)
 
 
 testTwoDArray : Array (Array Int)
@@ -67,5 +67,56 @@ suite =
                     Expect.equal
                         (getElementFrom2DArray -1 -1 testTwoDArray)
                         Nothing
+            , describe "build2DArray" <|
+                [ test "test" <|
+                    \_ ->
+                        Expect.equal
+                            (build2DArray
+                                [ [ 'a', 'b', 'c' ]
+                                , [ 'd', 'e', 'f' ]
+                                , [ 'g', 'h', 'i' ]
+                                ]
+                            )
+                            (Array.fromList
+                                [ Array.fromList [ 'a', 'b', 'c' ]
+                                , Array.fromList [ 'd', 'e', 'f' ]
+                                , Array.fromList [ 'g', 'h', 'i' ]
+                                ]
+                            )
+                ]
+            , describe "uniqueItemFrom2DArray" <|
+                [ test "test" <|
+                    let
+                        testArray =
+                            build2DArray
+                                [ [ 'a', 'b', 'c' ]
+                                , [ 'd', 'e', 'f' ]
+                                , [ 'g', 'h', 'i' ]
+                                ]
+
+                        predicate =
+                            \a -> a == 'e'
+                    in
+                    \_ ->
+                        Expect.equal
+                            (uniqueItemFrom2DArray predicate testArray)
+                            (Just 'e')
+                , test "test not unique" <|
+                    let
+                        testArray =
+                            build2DArray
+                                [ [ 'a', 'b', 'c' ]
+                                , [ 'd', 'e', 'f' ]
+                                , [ 'g', 'h', 'e' ]
+                                ]
+
+                        predicate =
+                            \a -> a == 'e'
+                    in
+                    \_ ->
+                        Expect.equal
+                            (uniqueItemFrom2DArray predicate testArray)
+                            Nothing
+                ]
             ]
         ]

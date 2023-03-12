@@ -1,8 +1,8 @@
-module Utilities.Utilities exposing (getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner)
+module Utilities.Utilities exposing (build2DArray, getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner, uniqueItemFrom2DArray)
 
 import Array exposing (Array)
-import Html exposing (Html, p, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, p, text)
+import Html.Attributes exposing (class, list)
 
 
 linesDebugToHtml : List a -> Html msg
@@ -54,3 +54,29 @@ getElementFrom2DArray x y twoDMap =
     twoDMap
         |> Array.get y
         |> Maybe.andThen (Array.get x)
+
+
+build2DArray : List (List a) -> Array (Array a)
+build2DArray list =
+    list
+        |> List.map Array.fromList
+        |> Array.fromList
+
+
+uniqueItemFrom2DArray : (a -> Bool) -> Array (Array a) -> Maybe a
+uniqueItemFrom2DArray test atlas =
+    atlas
+        |> Array.map
+            (\arr ->
+                Array.filter test arr
+                    |> Array.get 0
+            )
+        |> Array.toList
+        |> List.filterMap identity
+        |> (\list ->
+                if List.length list == 1 then
+                    List.head list
+
+                else
+                    Nothing
+           )
