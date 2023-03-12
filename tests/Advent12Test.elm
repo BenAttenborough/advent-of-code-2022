@@ -2,7 +2,7 @@ module Advent12Test exposing (..)
 
 import Advent12 exposing (..)
 import Array exposing (Array)
-import Data.Advent12Data exposing (testInput)
+import Data.Advent12Data exposing (realInput, testInput)
 import Dict
 import Expect
 import Test exposing (..)
@@ -106,28 +106,6 @@ suite =
                             Expect.equal
                                 (charToCode 'E')
                                 endElevation
-                    , describe "simpleArrayTarverse"
-                        [ test "simpleArrayTarverse 0" <|
-                            \_ ->
-                                Expect.equal
-                                    (simpleArrayTarverse 0 Array.empty (Array.fromList [ 'a', 'b', 'c' ]))
-                                    (Array.fromList [ 'a', 'b', 'c' ])
-                        , test "simpleArrayTarverse 1" <|
-                            \_ ->
-                                Expect.equal
-                                    (simpleArrayTarverse 1 Array.empty (Array.fromList [ 'a', 'b', 'c' ]))
-                                    (Array.fromList [ 'b', 'c' ])
-                        , test "simpleArrayTarverse out of bounds" <|
-                            \_ ->
-                                Expect.equal
-                                    (simpleArrayTarverse 5 Array.empty (Array.fromList [ 'a', 'b', 'c' ]))
-                                    Array.empty
-                        , test "simpleArrayTarverse out of bounds -5" <|
-                            \_ ->
-                                Expect.equal
-                                    (simpleArrayTarverse -5 Array.empty (Array.fromList [ 'a', 'b', 'c' ]))
-                                    Array.empty
-                        ]
                     , describe "getNode / nodes"
                         [ test "getNode 1 1 testTwoDArray = Just 4" <|
                             \_ ->
@@ -305,92 +283,81 @@ suite =
                                     (getAvailableNeighbours cell atlas "00-00")
                                     [ "02-00" ]
                         ]
-                    , skip <|
-                        describe
-                            "Test solutions"
-                        <|
-                            [ -- [ test "simple puzzle answer" <|
-                              --     \_ ->
-                              --         Expect.equal
-                              --             (part1Solution "SbcdefghijklmnopqrstuvwxyzE")
-                              --             25
-                              test "cellListToNeighboursList" <|
-                                \_ ->
-                                    let
-                                        arr =
-                                            Array.fromList
-                                                [ Array.fromList
-                                                    [ Cell 1 Journey 0 0
-                                                    , Cell 1 Journey 1 0
-                                                    , Cell 1 Journey 2 0
-                                                    , Cell 1 Journey 3 0
-                                                    , Cell 1 Journey 4 0
-                                                    ]
-                                                ]
-
-                                        listCell =
-                                            arr
-                                                |> Array.map Array.toList
-                                                |> Array.toList
-                                                |> List.concat
-                                    in
-                                    Expect.equal
-                                        (cellListToNeighboursList
-                                            arr
-                                            []
-                                            []
-                                            listCell
-                                        )
-                                        [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "1-0" ] } )
-                                        , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "2-0" ] } )
-                                        , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "3-0" ] } )
-                                        , ( "3-0", { destination = Journey, key = "3-0", neighbours = [ "4-0" ] } )
-                                        , ( "4-0", { destination = Journey, key = "4-0", neighbours = [] } )
-                                        ]
-
-                            -- , test "part1Solution" <|
-                            --     \_ ->
-                            --         Expect.equal
-                            --             (part1Solution testInput)
-                            --             31
-                            ]
-                    , describe "getAvailableNeighboursCell" <|
-                        [ test "getAvailableNeighboursCell 2 neighbours" <|
-                            let
-                                cell =
-                                    Cell 0 Start 1 0
-
-                                atlas =
-                                    Array.fromList
-                                        [ Array.fromList [ Cell 0 Journey 0 0, cell, Cell 0 Journey 2 0 ]
-                                        ]
-                            in
+                    , describe
+                        "Test solutions"
+                      <|
+                        [ -- test "simple puzzle answer" <|
+                          -- \_ ->
+                          --     Expect.equal
+                          --         (part1Solution "SabcdefghijklmnopqrstuvwxyzE")
+                          --         (Just 27)
+                          -- , test "cellListToNeighboursList" <|
+                          --     \_ ->
+                          --         let
+                          --             arr =
+                          --                 Array.fromList
+                          --                     [ Array.fromList
+                          --                         [ Cell 1 Journey 0 0
+                          --                         , Cell 1 Journey 1 0
+                          --                         , Cell 1 Journey 2 0
+                          --                         , Cell 1 Journey 3 0
+                          --                         , Cell 1 Journey 4 0
+                          --                         ]
+                          --                     ]
+                          --             listCell =
+                          --                 arr
+                          --                     |> Array.map Array.toList
+                          --                     |> Array.toList
+                          --                     |> List.concat
+                          --         in
+                          --         Expect.equal
+                          --             (cellListToNeighboursList
+                          --                 arr
+                          --                 []
+                          --                 []
+                          --                 listCell
+                          --             )
+                          --             [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "1-0" ] } )
+                          --             , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "2-0" ] } )
+                          --             , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "3-0" ] } )
+                          --             , ( "3-0", { destination = Journey, key = "3-0", neighbours = [ "4-0" ] } )
+                          --             , ( "4-0", { destination = Journey, key = "4-0", neighbours = [] } )
+                          -- ]
+                          --   test "part1Solution" <|
+                          --     \_ ->
+                          --         Expect.equal
+                          --             (part1Solution realInput)
+                          --             (Just 31)
+                          test "part1Solution testInput" <|
                             \_ ->
                                 Expect.equal
-                                    (getAvailableNeighboursCell cell atlas)
-                                    [ { cellType = Journey, elevation = 0, x = 0, y = 0 }
-                                    , { cellType = Journey, elevation = 0, x = 2, y = 0 }
-                                    ]
-                        , test "getAvailableNeighboursCell 2 neighbours but ignore parent" <|
-                            let
-                                cell =
-                                    Cell 0 Start 1 0
-
-                                atlas =
-                                    Array.fromList
-                                        [ Array.fromList [ Cell 0 Journey 0 0, cell, Cell 0 Journey 2 0 ]
-                                        ]
-                            in
-                            \_ ->
-                                Expect.equal
-                                    (getAvailableNeighboursCell cell atlas)
-                                    [ { cellType = Journey, elevation = 0, x = 2, y = 0 } ]
+                                    (part1Solution realInput)
+                                    -- (Just 31)
+                                    (Just { cellType = End, elevation = 25, x = 5, y = 2 })
                         ]
                     ]
+                , describe "getAvailableNeighboursCell" <|
+                    [ test "getAvailableNeighboursCell 2 neighbours" <|
+                        let
+                            cell =
+                                Cell 0 Start 1 0
+
+                            atlas =
+                                Array.fromList
+                                    [ Array.fromList [ Cell 0 Journey 0 0, cell, Cell 0 Journey 2 0 ]
+                                    ]
+                        in
+                        \_ ->
+                            Expect.equal
+                                (getAvailableNeighboursCell cell atlas)
+                                [ { cellType = Journey, elevation = 0, x = 0, y = 0 }
+                                , { cellType = Journey, elevation = 0, x = 2, y = 0 }
+                                ]
+                    ]
                 ]
-            , describe "Active tests (So you can disable all those above to avoid interference)" <|
-                [ test "foo" <|
-                    \_ -> Expect.equal 1 1
-                ]
+            ]
+        , describe "Active tests (So you can disable all those above to avoid interference)" <|
+            [ test "foo" <|
+                \_ -> Expect.equal 1 1
             ]
         ]
