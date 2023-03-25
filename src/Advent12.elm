@@ -59,16 +59,6 @@ getNode x y twoDMap =
         |> Maybe.andThen (Array.get x)
 
 
-simpleArrayTarverseTwo : Int -> Zipper a -> Array a -> Zipper a
-simpleArrayTarverseTwo index tree atlas =
-    case Array.get index atlas of
-        Just value ->
-            simpleArrayTarverseTwo (index + 1) (append (Tree.singleton value) tree) atlas
-
-        Nothing ->
-            tree
-
-
 aCode : number
 aCode =
     97
@@ -151,18 +141,6 @@ convertCellToKey cell =
 
         y =
             String.padLeft 2 '0' (String.fromInt cell.y)
-    in
-    x ++ "-" ++ y
-
-
-convertXYToId : ( Int, Int ) -> String
-convertXYToId ( orgX, orgY ) =
-    let
-        x =
-            String.padLeft 2 '0' (String.fromInt orgX)
-
-        y =
-            String.padLeft 2 '0' (String.fromInt orgY)
     in
     x ++ "-" ++ y
 
@@ -251,21 +229,6 @@ getAvailableNeighboursCell cell atlas =
         |> List.filterMap identity
 
 
-convertCellToNode : Cell -> Array (Array Cell) -> String -> GraphNode
-convertCellToNode cell atlas parent =
-    let
-        key =
-            convertCellToKey cell
-
-        neighbours =
-            getAvailableNeighbours cell atlas parent
-
-        destination =
-            cell.cellType
-    in
-    GraphNode key neighbours destination
-
-
 cellListToNeighboursList : Array (Array Cell) -> List ( String, GraphNode ) -> List String -> List Cell -> List ( String, GraphNode )
 cellListToNeighboursList arr container alreadyTraversed cellList =
     case cellList of
@@ -304,6 +267,7 @@ cellListToNeighboursList arr container alreadyTraversed cellList =
 
 cellArrayToCellGraph : Array (Array Cell) -> Graph
 cellArrayToCellGraph arr =
+    -- Tested but not used?
     -- Need to adjust this
     arr
         |> Array.map Array.toList
@@ -536,10 +500,6 @@ walkToCell cell atlas queue visited =
                 walkToCell x atlas xs updatedVisited
 
 
-
--- -2
-
-
 part1Solution : String -> Maybe Cell
 part1Solution input =
     let
@@ -567,31 +527,6 @@ part1Solution input =
 
         Nothing ->
             Nothing
-
-
-
--- (\begin ->
---     wildIdea
---         [ begin ]
---         atlas
---         [ begin ]
---         0
--- )
--- |> (\start -> countSteps start
--- |> Maybe.map
--- part1Solution : String -> Int
--- part1Solution input =
---     let
---         graph =
---             input
---                 |> prepareInput
---                 |> cellArrayToCellGraph
---     in
---     graph
---         |> findStart
---         |> Maybe.map (\start -> start.neighbours ++ [ start.key ])
---         |> Maybe.withDefault []
---         |> countNodesToEnd 0 graph
 
 
 main : Html msg
