@@ -2,7 +2,7 @@ module Advent12Test exposing (..)
 
 import Advent12 exposing (..)
 import Array exposing (Array)
-import Data.Advent12Data exposing (realInput, testInput)
+import Data.Advent12Data exposing (difficultInput, pruningInput, realInput, simplifiedInput, testInput)
 import Dict
 import Expect
 import Test exposing (..)
@@ -108,41 +108,6 @@ charToCodeTests =
     ]
 
 
-getNodeTests : List Test
-getNodeTests =
-    [ test "getNode 1 1 testTwoDArray = Just 4" <|
-        \_ ->
-            Expect.equal
-                (getNode 1 1 testTwoDArray)
-                (Just 4)
-    , test "getNode 0 0 testTwoDArray = Just 0" <|
-        \_ ->
-            Expect.equal
-                (getNode 0 0 testTwoDArray)
-                (Just 0)
-    , test "getNode 3 0 testTwoDArray = Nothing" <|
-        \_ ->
-            Expect.equal
-                (getNode 3 0 testTwoDArray)
-                Nothing
-    , test "getNode -1 -1 testTwoDArray = Nothing" <|
-        \_ ->
-            Expect.equal
-                (getNode -1 -1 testTwoDArray)
-                Nothing
-    , test "getNodes" <|
-        \_ ->
-            Expect.equal
-                (getNodes 1 1 testTwoDArray)
-                [ 1, 7, 3, 5 ]
-    , test "getNodes 0 0 testTwoDArray" <|
-        \_ ->
-            Expect.equal
-                (getNodes 0 0 testTwoDArray)
-                [ 3, 1 ]
-    ]
-
-
 nodeTraversableTests : List Test
 nodeTraversableTests =
     [ test "nodeTraversable 1 1 True" <|
@@ -173,40 +138,6 @@ nodeTraversableTests =
     ]
 
 
-twoDArrayToGraphTests : List Test
-twoDArrayToGraphTests =
-    [ test "twoDArrayToGraph testTwoDArray" <|
-        \_ ->
-            Expect.equal
-                (cellArrayToCellGraph (prepareInput "aSa\nbEb"))
-                (Dict.fromList
-                    [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
-                    , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-0" ] } )
-                    , ( "1-0", { destination = Start, key = "1-0", neighbours = [ "0-0", "2-0" ] } )
-                    , ( "1-1", { destination = End, key = "1-1", neighbours = [] } )
-                    , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1", "1-0" ] } )
-                    , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-0" ] } )
-                    ]
-                )
-    , test "twoDArrayToGraph simple" <|
-        \_ ->
-            Expect.equal
-                (cellArrayToCellGraph (prepareInput "abc\nbcd\ncde"))
-                (Dict.fromList
-                    [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "0-1", "1-0" ] } )
-                    , ( "0-1", { destination = Journey, key = "0-1", neighbours = [ "0-2", "1-1" ] } )
-                    , ( "0-2", { destination = Journey, key = "0-2", neighbours = [ "1-2" ] } )
-                    , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "1-1", "2-0" ] } )
-                    , ( "1-1", { destination = Journey, key = "1-1", neighbours = [ "1-2", "2-1" ] } )
-                    , ( "1-2", { destination = Journey, key = "1-2", neighbours = [ "2-2" ] } )
-                    , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "2-1" ] } )
-                    , ( "2-1", { destination = Journey, key = "2-1", neighbours = [ "2-2" ] } )
-                    , ( "2-2", { destination = Journey, key = "2-2", neighbours = [] } )
-                    ]
-                )
-    ]
-
-
 findStartTests : List Test
 findStartTests =
     [ test "findStart testInput" <|
@@ -225,21 +156,6 @@ findStartTests =
                     |> findStart
                 )
                 (Just { cellType = Start, elevation = 0, x = 1, y = 0 })
-    ]
-
-
-removeNonUniqueValuesTests : List Test
-removeNonUniqueValuesTests =
-    [ test "removeNonUniqueValues simple" <|
-        \_ ->
-            Expect.equal
-                (removeNonUniqueValues [ "a", "b", "c" ] [ "b", "d", "e" ])
-                [ "a", "c" ]
-    , test "removeNonUniqueValues Long" <|
-        \_ ->
-            Expect.equal
-                (removeNonUniqueValues [ "a", "b", "c", "d", "e", "f", "g" ] [ "b", "d", "f" ])
-                [ "a", "c", "e", "g" ]
     ]
 
 
@@ -304,54 +220,65 @@ getAvailableNeighboursTests =
 
 solutionsTests : List Test
 solutionsTests =
-    [ -- test "simple puzzle answer" <|
-      -- \_ ->
-      --     Expect.equal
-      --         (part1Solution "SabcdefghijklmnopqrstuvwxyzE")
-      --         (Just 27)
-      -- , test "cellListToNeighboursList" <|
-      --     \_ ->
-      --         let
-      --             arr =
-      --                 Array.fromList
-      --                     [ Array.fromList
-      --                         [ Cell 1 Journey 0 0
-      --                         , Cell 1 Journey 1 0
-      --                         , Cell 1 Journey 2 0
-      --                         , Cell 1 Journey 3 0
-      --                         , Cell 1 Journey 4 0
-      --                         ]
-      --                     ]
-      --             listCell =
-      --                 arr
-      --                     |> Array.map Array.toList
-      --                     |> Array.toList
-      --                     |> List.concat
-      --         in
-      --         Expect.equal
-      --             (cellListToNeighboursList
-      --                 arr
-      --                 []
-      --                 []
-      --                 listCell
-      --             )
-      --             [ ( "0-0", { destination = Journey, key = "0-0", neighbours = [ "1-0" ] } )
-      --             , ( "1-0", { destination = Journey, key = "1-0", neighbours = [ "2-0" ] } )
-      --             , ( "2-0", { destination = Journey, key = "2-0", neighbours = [ "3-0" ] } )
-      --             , ( "3-0", { destination = Journey, key = "3-0", neighbours = [ "4-0" ] } )
-      --             , ( "4-0", { destination = Journey, key = "4-0", neighbours = [] } )
-      -- ]
-      --   test "part1Solution" <|
-      --     \_ ->
-      --         Expect.equal
-      --             (part1Solution realInput)
-      --             (Just 31)
-      test "part1Solution testInput" <|
+    [ test "null" <|
         \_ ->
             Expect.equal
-                (part1Solution realInput)
-                -- (Just 31)
-                (Just { cellType = End, elevation = 25, x = 5, y = 2 })
+                1
+                1
+
+    -- , test "simple puzzle answer" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution "SabcdefghijklmnopqrstuvwxyzE")
+    --             (Just 27)
+    -- , test "testInput" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution testInput)
+    --             (Just 31)
+    , test "simplifiedInput" <|
+        \_ ->
+            Expect.equal
+                (part1Solution simplifiedInput)
+                (Just 68)
+
+    -- simplifiedInput
+    -- , test "part1Solution realInput" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution realInput)
+    --             (Just 10)
+    -- , test "simple puzzle answer" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution "SabcdefghijklmnopqrstuvwxyzE")
+    --             (Just { cellType = End, elevation = 25, x = 27, y = 0 })
+    --   ,only <|
+    --     test "very simple puzzle answer" <|
+    --         \_ ->
+    --             Expect.equal
+    --                 (part1Solution "SabcdefghijklmnopqrstuvwxyzE")
+    --                 Nothing
+    -- , test "pruning test" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution pruningInput)
+    --             Nothing
+    -- , test "testInput" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution testInput)
+    --             (Just { cellType = End, elevation = 25, x = 5, y = 2 })
+    -- , test "difficultInput" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution difficultInput)
+    --             Nothing
+    -- , test "part1Solution realInput" <|
+    --     \_ ->
+    --         Expect.equal
+    --             (part1Solution realInput)
+    --             (Just { cellType = End, elevation = 25, x = 5, y = 2 })
     ]
 
 
@@ -380,11 +307,8 @@ baseTests : List Test
 baseTests =
     [ describe "Prepare Input" <| prepareInputTests
     , describe "charToCode" <| charToCodeTests
-    , describe "getNode / nodes" <| getNodeTests
     , describe "nodeTraversable" <| nodeTraversableTests
-    , skip <| describe "twoDArrayToGraph" <| twoDArrayToGraphTests
     , describe "Find start" <| findStartTests
-    , describe "removeNonUniqueValues" <| removeNonUniqueValuesTests
     , describe "getAvailableNeighbours" <| getAvailableNeighboursTests
     , describe "getAvailableNeighboursCell" <| getAvailableNeighboursCellTests
     ]
@@ -403,6 +327,6 @@ suite =
         [ describe "Part 1" <|
             [ describe "Base tests" <| baseTests
             , describe "Dev tests" <| devTests
-            , skip <| describe "Test solutions" <| solutionsTests
+            , only <| describe "Test solutions" <| solutionsTests
             ]
         ]

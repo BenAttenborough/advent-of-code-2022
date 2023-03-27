@@ -33,25 +33,6 @@ type alias Position =
     }
 
 
-getNodes : Int -> Int -> Array (Array a) -> List a
-getNodes orgX orgY twoDMap =
-    let
-        up =
-            getNode orgX (orgY - 1) twoDMap
-
-        down =
-            getNode orgX (orgY + 1) twoDMap
-
-        left =
-            getNode (orgX - 1) orgY twoDMap
-
-        right =
-            getNode (orgX + 1) orgY twoDMap
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
-
-
 getNode : Int -> Int -> Array (Array a) -> Maybe a
 getNode x y twoDMap =
     twoDMap
@@ -122,17 +103,6 @@ charToCellType char =
             Journey
 
 
-type alias GraphNode =
-    { key : String
-    , neighbours : List String
-    , destination : Tile
-    }
-
-
-type alias Graph =
-    Dict String GraphNode
-
-
 convertCellToKey : Cell -> String
 convertCellToKey cell =
     let
@@ -156,29 +126,6 @@ nodeTraversable currentCell nextCell =
 
     else
         Nothing
-
-
-getNodesIfTravesable : Cell -> Array (Array Cell) -> List Cell
-getNodesIfTravesable cell twoDMap =
-    let
-        up =
-            getNode cell.x (cell.y - 1) twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-
-        down =
-            getNode cell.x (cell.y + 1) twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-
-        left =
-            getNode (cell.x - 1) cell.y twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-
-        right =
-            getNode (cell.x + 1) cell.y twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
 
 
 getAvailableNeighbours : Cell -> Array (Array Cell) -> String -> List String
@@ -229,55 +176,6 @@ getAvailableNeighboursCell cell atlas =
         |> List.filterMap identity
 
 
-cellListToNeighboursList : Array (Array Cell) -> List ( String, GraphNode ) -> List String -> List Cell -> List ( String, GraphNode )
-cellListToNeighboursList arr container alreadyTraversed cellList =
-    case cellList of
-        [] ->
-            container
-
-        cell :: cells ->
-            let
-                cellKey =
-                    convertCellToKey cell
-
-                traversed =
-                    alreadyTraversed
-                        ++ [ cellKey ]
-
-                -- |> Debug.log "Traversed"
-                neighbours =
-                    -- Need to avoid adding cells already traveresed
-                    getNodesIfTravesable cell arr
-                        |> List.map convertCellToKey
-                        |> List.filter (\key -> not (List.member key traversed))
-
-                newGraphNode =
-                    ( convertCellToKey cell
-                    , { key = convertCellToKey cell
-                      , neighbours = neighbours
-                      , destination = cell.cellType
-                      }
-                    )
-
-                newGraphNodeList =
-                    container ++ [ newGraphNode ]
-            in
-            cellListToNeighboursList arr newGraphNodeList traversed cells
-
-
-cellArrayToCellGraph : Array (Array Cell) -> Graph
-cellArrayToCellGraph arr =
-    -- Tested but not used?
-    -- Need to adjust this
-    arr
-        |> Array.map Array.toList
-        |> Array.toList
-        |> List.concat
-        -- Need a cleaver function where we only add neighbours that have not already been traversed
-        |> cellListToNeighboursList arr [] []
-        |> Dict.fromList
-
-
 findStart : Array (Array Cell) -> Maybe Cell
 findStart atlas =
     let
@@ -285,70 +183,6 @@ findStart atlas =
             \cell -> cell.cellType == Start
     in
     uniqueItemFrom2DArray predicate atlas
-
-
-removeNonUniqueValues : List a -> List a -> List a
-removeNonUniqueValues list uniqueValues =
-    let
-        fnc : a -> List a -> List a
-        fnc value accumulator =
-            if List.member value uniqueValues then
-                accumulator
-
-            else
-                accumulator ++ [ value ]
-    in
-    List.foldl fnc [] list
-
-
-countNodesToEnd : Int -> Graph -> List String -> Int
-countNodesToEnd currentCount graph nodes =
-    case nodes of
-        [] ->
-            -1
-
-        x :: xs ->
-            let
-                node =
-                    getNodeFromGraph x graph
-
-                uniqueNodesToAdd =
-                    removeNonUniqueValues node.neighbours xs
-
-                -- |> Debug.log "uniqueNodesToAdd"
-                nodesToAdd =
-                    xs
-                        ++ uniqueNodesToAdd
-
-                -- |> Debug.log "nodesToAdd"
-            in
-            if graphNodeIsEnd node then
-                currentCount + 1
-
-            else
-                -- let
-                --     _ =
-                --         Debug.log "count" currentCount
-                --     a =
-                --         Debug.log "nodesToAdd" nodesToAdd
-                -- in
-                countNodesToEnd (currentCount + 1) graph nodesToAdd
-
-
-
--- Need set like behaviour, but must be ordered
-
-
-graphNodeIsEnd : GraphNode -> Bool
-graphNodeIsEnd node =
-    node.destination == End
-
-
-getNodeFromGraph : String -> Graph -> GraphNode
-getNodeFromGraph key graph =
-    -- Dodgy default - but should be impossible to get to
-    Dict.get key graph
-        |> Maybe.withDefault { key = "", neighbours = [], destination = Journey }
 
 
 prepareInput : String -> Array (Array Cell)
@@ -380,127 +214,41 @@ view =
         ]
 
 
-getAvailableNeighboursCellHack : Cell -> Array (Array Cell) -> List Cell
-getAvailableNeighboursCellHack cell atlas =
-    let
-        up =
-            getNode cell.x (cell.y - 1) atlas
-
-        down =
-            getNode cell.x (cell.y + 1) atlas
-
-        left =
-            getNode (cell.x - 1) cell.y atlas
-
-        right =
-            getNode (cell.x + 1) cell.y atlas
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
-
-
-wildIdea : List Cell -> Array (Array Cell) -> List Cell -> Int -> Int
-wildIdea queue atlas visited count =
+countStepsToEnd : List Cell -> Array (Array Cell) -> List Cell -> Int -> Int
+countStepsToEnd queue atlas visited count =
     if List.any (\cell -> cell.cellType == End) queue then
         count
 
     else
         let
             allNeighbours =
-                List.map (\cell -> getAvailableNeighboursCellHack cell atlas) queue
+                List.map (\cell -> getAvailableNeighboursCell cell atlas) queue
                     |> List.concat
-                    |> List.unique
                     |> List.filter (\item -> not (List.member item visited))
+                    |> List.unique
                     |> Debug.log "All Neighbours"
 
+            -- Debug.log "All Neighbours"
+            --     (List.unique (List.filter (\item -> not (List.member item visited)) (List.concat (List.map (\cell -> getAvailableNeighboursCell cell atlas) queue))))
+            -- Debug.log "All Neighbours"
+            --     (List.unique (List.filter (\item -> not (List.member item visited)) (List.concat (List.map (\cell -> getAvailableNeighboursCell cell atlas) queue))))
             updatedVisited =
                 visited
                     ++ allNeighbours
                     |> List.unique
+
+            -- visited ++ allNeighbours
+            updatedCount =
+                count + 1
         in
         if List.length allNeighbours == 0 then
             -1
 
         else
-            wildIdea allNeighbours atlas updatedVisited (count + 1)
+            countStepsToEnd allNeighbours atlas updatedVisited updatedCount
 
 
-countSteps : Cell -> Array (Array Cell) -> List Cell -> List Cell -> Int -> Int
-countSteps cell atlas queue visited count =
-    if cell.cellType == End then
-        count
-
-    else
-        let
-            updatedVisited : List Cell
-            updatedVisited =
-                visited
-                    ++ [ cell ]
-
-            -- |> Debug.log "updatedVisited"
-            neighbours : List Cell
-            neighbours =
-                getAvailableNeighboursCell cell atlas
-                    |> List.filter (\item -> not (List.member item visited))
-
-            -- |> Debug.log "neighbours"
-            updatedQueue : List Cell
-            updatedQueue =
-                queue
-                    ++ neighbours
-
-            -- |> Debug.log "updatedQueue"
-            updatedCount : Int
-            updatedCount =
-                if List.isEmpty neighbours then
-                    count
-
-                else
-                    count + 1
-        in
-        case updatedQueue of
-            [] ->
-                -1
-
-            x :: xs ->
-                countSteps x atlas xs updatedVisited updatedCount
-
-
-walkToCell : Cell -> Array (Array Cell) -> List Cell -> List Cell -> Maybe Cell
-walkToCell cell atlas queue visited =
-    if cell.cellType == End then
-        Just cell
-
-    else
-        let
-            updatedVisited : List Cell
-            updatedVisited =
-                visited
-                    ++ [ cell ]
-
-            -- |> Debug.log "updatedVisited"
-            neighbours : List Cell
-            neighbours =
-                getAvailableNeighboursCell cell atlas
-                    |> List.filter (\item -> not (List.member item visited))
-                    |> Debug.log "neighbours"
-
-            updatedQueue : List Cell
-            updatedQueue =
-                queue
-                    ++ neighbours
-
-            -- |> Debug.log "updatedQueue"
-        in
-        case updatedQueue of
-            [] ->
-                Nothing
-
-            x :: xs ->
-                walkToCell x atlas xs updatedVisited
-
-
-part1Solution : String -> Maybe Cell
+part1Solution : String -> Maybe Int
 part1Solution input =
     let
         atlas =
@@ -510,23 +258,7 @@ part1Solution input =
         start =
             findStart atlas
     in
-    -- start
-    -- |> Maybe.map (\begin -> countSteps begin atlas [] [] 0)
-    -- |> Maybe.map
-    --     (\begin ->
-    --         countSteps
-    --             begin
-    --             atlas
-    --             []
-    --             []
-    --             0
-    --     )
-    case start of
-        Just begin ->
-            walkToCell begin atlas [] []
-
-        Nothing ->
-            Nothing
+    Maybe.map (\begin -> countStepsToEnd [ begin ] atlas [ begin ] 0) start
 
 
 main : Html msg
