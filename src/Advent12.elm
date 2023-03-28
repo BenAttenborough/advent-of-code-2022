@@ -1,15 +1,15 @@
 module Advent12 exposing (..)
 
--- import Data.Advent12Data exposing (testInput)
-
 import Array exposing (Array)
 import Char exposing (toCode)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
+import Set exposing (Set)
 import Tree exposing (tree)
 import Tree.Zipper exposing (Zipper, append)
+import Tuple3
 import Utilities.Utilities exposing (uniqueItemFrom2DArray)
 
 
@@ -20,11 +20,7 @@ type Tile
 
 
 type alias Cell =
-    { elevation : Int
-    , cellType : Tile
-    , x : Int
-    , y : Int
-    }
+    ( Int, Int, Int )
 
 
 type alias Position =
@@ -115,11 +111,26 @@ convertCellToKey cell =
     x ++ "-" ++ y
 
 
+cellX : Cell -> Int
+cellX =
+    Tuple.first
+
+
+cellY : Cell -> Int
+cellY =
+    Tuple.second
+
+
+cellZ : Cell -> Int
+cellZ =
+    Tuple3.third
+
+
 nodeTraversable : Cell -> Cell -> Maybe Cell
 nodeTraversable currentCell nextCell =
     let
         predicate =
-            nextCell.elevation <= (currentCell.elevation + 1) && nextCell.elevation >= (currentCell.elevation - 1)
+            cellZ nextCell <= (cellZ currentCell + 1) && cellZ nextCell >= (cellZ currentCell - 1)
     in
     if predicate then
         Just nextCell
@@ -176,13 +187,27 @@ getAvailableNeighboursCell cell atlas =
         |> List.filterMap identity
 
 
-findStart : Array (Array Cell) -> Maybe Cell
-findStart atlas =
-    let
-        predicate =
-            \cell -> cell.cellType == Start
-    in
-    uniqueItemFrom2DArray predicate atlas
+findStart : String -> Maybe ( Int, Int, Char.Char )
+findStart stringInput =
+    stringInput
+        |> inputToCharArray
+        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'S')
+
+
+inputToCharArray : String -> Array (Array ( Int, Int, Char ))
+inputToCharArray =
+    String.lines
+        >> List.map
+            (String.toList
+                >> List.map
+                    (\char ->
+                        ( 0, 0, char )
+                    )
+                >> Array.fromList
+                >> Array.indexedMap (\index ( _, y, z ) -> ( index, y, z ))
+            )
+        >> Array.fromList
+        >> Array.indexedMap (\index arr -> Array.map (\( x, _, z ) -> ( x, index, z )) arr)
 
 
 prepareInput : String -> Array (Array Cell)
@@ -192,17 +217,13 @@ prepareInput =
             (String.toList
                 >> List.map
                     (\char ->
-                        { elevation = charToCode char
-                        , cellType = charToCellType char
-                        , x = 0
-                        , y = 0
-                        }
+                        ( 0, 0, charToCode char )
                     )
                 >> Array.fromList
-                >> Array.indexedMap (\index arr -> { arr | x = index })
+                >> Array.indexedMap (\index ( _, y, z ) -> ( index, y, z ))
             )
         >> Array.fromList
-        >> Array.indexedMap (\index arr -> Array.map (\arr_ -> { arr_ | y = index }) arr)
+        >> Array.indexedMap (\index arr -> Array.map (\( x, _, z ) -> ( x, index, z )) arr)
 
 
 view : Html msg
