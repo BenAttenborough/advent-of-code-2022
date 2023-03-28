@@ -7,8 +7,10 @@ import Char exposing (toCode)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import List.Extra as List
 import Tree exposing (tree)
 import Tree.Zipper exposing (Zipper, append)
+import Utilities.Utilities exposing (uniqueItemFrom2DArray)
 
 
 type Tile
@@ -31,50 +33,11 @@ type alias Position =
     }
 
 
-simpleArrayTarverse : Int -> Array a -> Array a -> Array a
-simpleArrayTarverse index new old =
-    case Array.get index old of
-        Just value ->
-            simpleArrayTarverse (index + 1) (Array.push value new) old
-
-        Nothing ->
-            new
-
-
-getNodes : Int -> Int -> Array (Array a) -> List a
-getNodes orgX orgY twoDMap =
-    let
-        up =
-            getNode orgX (orgY - 1) twoDMap
-
-        down =
-            getNode orgX (orgY + 1) twoDMap
-
-        left =
-            getNode (orgX - 1) orgY twoDMap
-
-        right =
-            getNode (orgX + 1) orgY twoDMap
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
-
-
 getNode : Int -> Int -> Array (Array a) -> Maybe a
 getNode x y twoDMap =
     twoDMap
         |> Array.get y
         |> Maybe.andThen (Array.get x)
-
-
-simpleArrayTarverseTwo : Int -> Zipper a -> Array a -> Zipper a
-simpleArrayTarverseTwo index tree atlas =
-    case Array.get index atlas of
-        Just value ->
-            simpleArrayTarverseTwo (index + 1) (append (Tree.singleton value) tree) atlas
-
-        Nothing ->
-            tree
 
 
 aCode : number
@@ -140,17 +103,6 @@ charToCellType char =
             Journey
 
 
-type alias GraphNode =
-    { key : String
-    , neighbours : List String
-    , destination : Tile
-    }
-
-
-type alias Graph =
-    Dict String GraphNode
-
-
 convertCellToKey : Cell -> String
 convertCellToKey cell =
     let
@@ -176,31 +128,8 @@ nodeTraversable currentCell nextCell =
         Nothing
 
 
-getNodesIfTravesable : Cell -> Array (Array Cell) -> List Cell
-getNodesIfTravesable cell twoDMap =
-    let
-        up =
-            getNode cell.x (cell.y - 1) twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-
-        down =
-            getNode cell.x (cell.y + 1) twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-
-        left =
-            getNode (cell.x - 1) cell.y twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-
-        right =
-            getNode (cell.x + 1) cell.y twoDMap
-                |> Maybe.andThen (nodeTraversable cell)
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
-
-
-getAvailableNeighbours : Cell -> Array (Array Cell) -> List String
-getAvailableNeighbours cell atlas =
+getAvailableNeighbours : Cell -> Array (Array Cell) -> String -> List String
+getAvailableNeighbours cell atlas parentKey =
     let
         up =
             getNode cell.x (cell.y - 1) atlas
@@ -221,157 +150,39 @@ getAvailableNeighbours cell atlas =
     [ up, down, left, right ]
         |> List.filterMap identity
         |> List.map convertCellToKey
+        |> List.filter (\item -> not (item == parentKey))
 
 
-convertCellToNode : Cell -> Array (Array Cell) -> GraphNode
-convertCellToNode cell atlas =
+getAvailableNeighboursCell : Cell -> Array (Array Cell) -> List Cell
+getAvailableNeighboursCell cell atlas =
     let
-        key =
-            convertCellToKey cell
+        up =
+            getNode cell.x (cell.y - 1) atlas
+                |> Maybe.andThen (nodeTraversable cell)
 
-        neighbours =
-            getAvailableNeighbours cell atlas
+        down =
+            getNode cell.x (cell.y + 1) atlas
+                |> Maybe.andThen (nodeTraversable cell)
 
-        destination =
-            cell.cellType
+        left =
+            getNode (cell.x - 1) cell.y atlas
+                |> Maybe.andThen (nodeTraversable cell)
+
+        right =
+            getNode (cell.x + 1) cell.y atlas
+                |> Maybe.andThen (nodeTraversable cell)
     in
-    GraphNode key neighbours destination
+    [ up, down, left, right ]
+        |> List.filterMap identity
 
 
-cellListToNeighboursList : Array (Array Cell) -> List ( String, GraphNode ) -> List String -> List Cell -> List ( String, GraphNode )
-cellListToNeighboursList arr container alreadyTraversed cellList =
-    case cellList of
-        [] ->
-            container
-
-        cell :: cells ->
-            let
-                cellKey =
-                    convertCellToKey cell
-
-                traversed =
-                    alreadyTraversed
-                        ++ [ cellKey ]
-
-                -- |> Debug.log "Traversed"
-                neighbours =
-                    -- Need to avoid adding cells already traveresed
-                    getNodesIfTravesable cell arr
-                        |> List.map convertCellToKey
-                        |> List.filter (\key -> not (List.member key traversed))
-
-                newGraphNode =
-                    ( convertCellToKey cell
-                    , { key = convertCellToKey cell
-                      , neighbours = neighbours
-                      , destination = cell.cellType
-                      }
-                    )
-
-                newGraphNodeList =
-                    container ++ [ newGraphNode ]
-            in
-            cellListToNeighboursList arr newGraphNodeList traversed cells
-
-
-cellArrayToCellGraph : Array (Array Cell) -> Graph
-cellArrayToCellGraph arr =
-    -- Need to adjust this
-    arr
-        |> Array.map Array.toList
-        |> Array.toList
-        |> List.concat
-        -- Need a cleaver function where we only add neighbours that have not already been traversed
-        |> cellListToNeighboursList arr [] []
-        |> Dict.fromList
-
-
-
--- |> Debug.log "Dict"
-
-
-findStart : Graph -> Maybe GraphNode
-findStart graph =
-    graph
-        |> Dict.toList
-        |> List.filter (\item -> Tuple.second item |> (\x -> x.destination == Start))
-        |> (\list ->
-                case list of
-                    [] ->
-                        Nothing
-
-                    x :: xs ->
-                        case xs of
-                            [] ->
-                                Just (Tuple.second x)
-
-                            _ :: _ ->
-                                Nothing
-           )
-
-
-removeNonUniqueValues : List a -> List a -> List a
-removeNonUniqueValues list uniqueValues =
+findStart : Array (Array Cell) -> Maybe Cell
+findStart atlas =
     let
-        fnc : a -> List a -> List a
-        fnc value accumulator =
-            if List.member value uniqueValues then
-                accumulator
-
-            else
-                accumulator ++ [ value ]
+        predicate =
+            \cell -> cell.cellType == Start
     in
-    List.foldl fnc [] list
-
-
-countNodesToEnd : Int -> Graph -> List String -> Int
-countNodesToEnd currentCount graph nodes =
-    case nodes of
-        [] ->
-            -1
-
-        x :: xs ->
-            let
-                node =
-                    getNodeFromGraph x graph
-
-                uniqueNodesToAdd =
-                    removeNonUniqueValues node.neighbours xs
-
-                -- |> Debug.log "uniqueNodesToAdd"
-                nodesToAdd =
-                    xs
-                        ++ uniqueNodesToAdd
-
-                -- |> Debug.log "nodesToAdd"
-            in
-            if graphNodeIsEnd node then
-                currentCount + 1
-
-            else
-                -- let
-                --     _ =
-                --         Debug.log "count" currentCount
-                --     a =
-                --         Debug.log "nodesToAdd" nodesToAdd
-                -- in
-                countNodesToEnd (currentCount + 1) graph nodesToAdd
-
-
-
--- Need set like behaviour, but must be ordered
-
-
-graphNodeIsEnd : GraphNode -> Bool
-graphNodeIsEnd node =
-    node.destination == End
-
-
-getNodeFromGraph : String -> Graph -> GraphNode
-getNodeFromGraph key graph =
-    -- Dodgy default - but should be impossible to get to
-    Dict.get key graph
-        |> Maybe.withDefault { key = "", neighbours = [], destination = Journey }
+    uniqueItemFrom2DArray predicate atlas
 
 
 prepareInput : String -> Array (Array Cell)
@@ -403,19 +214,51 @@ view =
         ]
 
 
-part1Solution : String -> Int
+countStepsToEnd : List Cell -> Array (Array Cell) -> List Cell -> Int -> Int
+countStepsToEnd queue atlas visited count =
+    if List.any (\cell -> cell.cellType == End) queue then
+        count
+
+    else
+        let
+            allNeighbours =
+                List.map (\cell -> getAvailableNeighboursCell cell atlas) queue
+                    |> List.concat
+                    |> List.filter (\item -> not (List.member item visited))
+                    |> List.unique
+                    |> Debug.log "All Neighbours"
+
+            -- Debug.log "All Neighbours"
+            --     (List.unique (List.filter (\item -> not (List.member item visited)) (List.concat (List.map (\cell -> getAvailableNeighboursCell cell atlas) queue))))
+            -- Debug.log "All Neighbours"
+            --     (List.unique (List.filter (\item -> not (List.member item visited)) (List.concat (List.map (\cell -> getAvailableNeighboursCell cell atlas) queue))))
+            updatedVisited =
+                visited
+                    ++ allNeighbours
+                    |> List.unique
+
+            -- visited ++ allNeighbours
+            updatedCount =
+                count + 1
+        in
+        if List.length allNeighbours == 0 then
+            -1
+
+        else
+            countStepsToEnd allNeighbours atlas updatedVisited updatedCount
+
+
+part1Solution : String -> Maybe Int
 part1Solution input =
     let
-        graph =
+        atlas =
             input
                 |> prepareInput
-                |> cellArrayToCellGraph
+
+        start =
+            findStart atlas
     in
-    graph
-        |> findStart
-        |> Maybe.map (\start -> start.neighbours ++ [ start.key ])
-        |> Maybe.withDefault []
-        |> countNodesToEnd 0 graph
+    Maybe.map (\begin -> countStepsToEnd [ begin ] atlas [ begin ] 0) start
 
 
 main : Html msg
