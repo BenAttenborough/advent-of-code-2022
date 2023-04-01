@@ -1,17 +1,67 @@
 module Advent12Test exposing (..)
 
--- import Array exposing (Array)
 -- import Dict
 -- import Data.Advent12Data exposing (difficultInput, pruningInput, realInput, simplifiedInput, testInput)
 
 import Advent12 exposing (..)
+import Array
 import Expect
 import Test exposing (..)
 
 
+
+-- test "S" <|
+--         \_ ->
+--             Expect.equal
+--                 ()
+--                 ()
+
+
+charToCodeTests : List Test
+charToCodeTests =
+    [ test "S" <|
+        \_ ->
+            Expect.equal
+                (charToCode 'S')
+                0
+    , test "E" <|
+        \_ ->
+            Expect.equal
+                (charToCode 'E')
+                25
+    , test "a" <|
+        \_ ->
+            Expect.equal
+                (charToCode 'a')
+                0
+    , test "z" <|
+        \_ ->
+            Expect.equal
+                (charToCode 'z')
+                25
+    ]
+
+
+inputToCharArrayTests : List Test
+inputToCharArrayTests =
+    [ test "Simple array" <|
+        \_ ->
+            Expect.equal
+                (inputToCharArray "aaa\nbbb\nccc")
+                (Array.fromList
+                    [ Array.fromList [ ( 0, 0, 'a' ), ( 1, 0, 'a' ), ( 2, 0, 'a' ) ]
+                    , Array.fromList [ ( 0, 1, 'b' ), ( 1, 1, 'b' ), ( 2, 1, 'b' ) ]
+                    , Array.fromList [ ( 0, 2, 'c' ), ( 1, 2, 'c' ), ( 2, 2, 'c' ) ]
+                    ]
+                )
+    ]
+
+
 baseTests : List Test
 baseTests =
-    []
+    [ describe "charToCodeTests" <| charToCodeTests
+    , describe "inputToCharArray" <| inputToCharArrayTests
+    ]
 
 
 devTests : List Test
@@ -37,6 +87,6 @@ suite =
         [ describe "Part 1" <|
             [ describe "Base tests" <| baseTests
             , describe "Dev tests" <| devTests
-            , only <| describe "Test solutions" <| solutionsTests
+            , describe "Test solutions" <| solutionsTests
             ]
         ]

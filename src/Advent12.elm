@@ -18,6 +18,10 @@ type alias Cell =
     ( Int, Int, Int )
 
 
+
+-- Constants, can be adjusted for different problems
+
+
 aCode : number
 aCode =
     97
@@ -33,16 +37,6 @@ endChar =
     'E'
 
 
-startCharCode : Int
-startCharCode =
-    toCode startChar
-
-
-endCharCode : Int
-endCharCode =
-    toCode endChar
-
-
 startElevation : Int
 startElevation =
     0
@@ -51,6 +45,20 @@ startElevation =
 endElevation : Int
 endElevation =
     25
+
+
+
+-- Converting special characters
+
+
+startCharCode : Int
+startCharCode =
+    toCode startChar
+
+
+endCharCode : Int
+endCharCode =
+    toCode endChar
 
 
 charToCode : Char -> Int
@@ -66,6 +74,10 @@ charToCode =
                 else
                     code - aCode
            )
+
+
+
+-- Cell helpers
 
 
 cellX : Cell -> Int
