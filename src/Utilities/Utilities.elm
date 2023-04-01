@@ -1,7 +1,7 @@
 module Utilities.Utilities exposing (build2DArray, getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner, uniqueItemFrom2DArray)
 
 import Array exposing (Array)
-import Html exposing (Html, a, p, text)
+import Html exposing (Html, p, text)
 import Html.Attributes exposing (class, list)
 
 

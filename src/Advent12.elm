@@ -1,39 +1,21 @@
 module Advent12 exposing (..)
 
+-- import Dict exposing (Dict)
+-- import Tree exposing (tree)
+-- import Tree.Zipper exposing (Zipper, append)
+-- import Utilities.Utilities exposing (uniqueItemFrom2DArray)
+
 import Array exposing (Array)
 import Char exposing (toCode)
-import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
 import Set exposing (Set)
-import Tree exposing (tree)
-import Tree.Zipper exposing (Zipper, append)
 import Tuple3
-import Utilities.Utilities exposing (uniqueItemFrom2DArray)
-
-
-type Tile
-    = Start
-    | Journey
-    | End
 
 
 type alias Cell =
     ( Int, Int, Int )
-
-
-type alias Position =
-    { x : Int
-    , y : Int
-    }
-
-
-getNode : Int -> Int -> Array (Array a) -> Maybe a
-getNode x y twoDMap =
-    twoDMap
-        |> Array.get y
-        |> Maybe.andThen (Array.get x)
 
 
 aCode : number
@@ -86,31 +68,6 @@ charToCode =
            )
 
 
-charToCellType : Char -> Tile
-charToCellType char =
-    case char of
-        'S' ->
-            Start
-
-        'E' ->
-            End
-
-        _ ->
-            Journey
-
-
-convertCellToKey : Cell -> String
-convertCellToKey cell =
-    let
-        x =
-            String.padLeft 2 '0' (String.fromInt (cellX cell))
-
-        y =
-            String.padLeft 2 '0' (String.fromInt (cellY cell))
-    in
-    x ++ "-" ++ y
-
-
 cellX : Cell -> Int
 cellX =
     Tuple3.first
@@ -126,79 +83,17 @@ cellZ =
     Tuple3.third
 
 
-nodeTraversable : Cell -> Cell -> Maybe Cell
-nodeTraversable currentCell nextCell =
-    let
-        predicate =
-            cellZ nextCell <= (cellZ currentCell + 1) && cellZ nextCell >= (cellZ currentCell - 1)
-    in
-    if predicate then
-        Just nextCell
 
-    else
-        Nothing
-
-
-getAvailableNeighbours : Cell -> Array (Array Cell) -> String -> List String
-getAvailableNeighbours cell atlas parentKey =
-    let
-        up =
-            getNode (cellX cell) (cellY cell - 1) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-
-        down =
-            getNode (cellX cell) (cellY cell + 1) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-
-        left =
-            getNode (cellX cell - 1) (cellY cell) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-
-        right =
-            getNode (cellX cell + 1) (cellY cell) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
-        |> List.map convertCellToKey
-        |> List.filter (\item -> not (item == parentKey))
-
-
-getAvailableNeighboursCell : Cell -> Array (Array Cell) -> List Cell
-getAvailableNeighboursCell cell atlas =
-    let
-        up =
-            getNode (cellX cell) (cellY cell - 1) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-
-        down =
-            getNode (cellX cell) (cellY cell + 1) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-
-        left =
-            getNode (cellX cell - 1) (cellY cell) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-
-        right =
-            getNode (cellX cell + 1) (cellY cell) atlas
-                |> Maybe.andThen (nodeTraversable cell)
-    in
-    [ up, down, left, right ]
-        |> List.filterMap identity
-
-
-findStart : String -> Maybe Cell
-findStart stringInput =
-    stringInput
-        |> inputToCharArray
-        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'S')
-
-
-findEnd : String -> Maybe Cell
-findEnd stringInput =
-    stringInput
-        |> inputToCharArray
-        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'E')
+-- findStart : String -> Maybe Cell
+-- findStart stringInput =
+--     stringInput
+--         |> inputToCharArray
+--         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'S')
+-- findEnd : String -> Maybe Cell
+-- findEnd stringInput =
+--     stringInput
+--         |> inputToCharArray
+--         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'E')
 
 
 inputToCharArray : String -> Array (Array ( Int, Int, Char ))
@@ -240,56 +135,6 @@ view =
             [ text "TEST\n\n"
             ]
         ]
-
-
-countStepsToEnd : List Cell -> Cell -> Array (Array Cell) -> List Cell -> Int -> Int
-countStepsToEnd queue endCell atlas visited count =
-    if List.any (\cell -> cell == endCell) queue then
-        count
-
-    else
-        let
-            allNeighbours =
-                List.map (\cell -> getAvailableNeighboursCell cell atlas) queue
-                    |> List.concat
-                    |> List.filter (\item -> not (List.member item visited))
-                    |> List.unique
-                    |> Debug.log "All Neighbours"
-
-            -- Debug.log "All Neighbours"
-            --     (List.unique (List.filter (\item -> not (List.member item visited)) (List.concat (List.map (\cell -> getAvailableNeighboursCell cell atlas) queue))))
-            -- Debug.log "All Neighbours"
-            --     (List.unique (List.filter (\item -> not (List.member item visited)) (List.concat (List.map (\cell -> getAvailableNeighboursCell cell atlas) queue))))
-            updatedVisited =
-                visited
-                    ++ allNeighbours
-                    |> List.unique
-
-            -- visited ++ allNeighbours
-            updatedCount =
-                count + 1
-        in
-        if List.length allNeighbours == 0 then
-            -1
-
-        else
-            countStepsToEnd allNeighbours endCell atlas updatedVisited updatedCount
-
-
-part1Solution : String -> Maybe Int
-part1Solution input =
-    let
-        atlas =
-            input
-                |> prepareInput
-
-        start =
-            findStart input
-
-        end =
-            findEnd input
-    in
-    Maybe.map (\begin -> countStepsToEnd [ begin ] end atlas [ begin ] 0) start
 
 
 main : Html msg
