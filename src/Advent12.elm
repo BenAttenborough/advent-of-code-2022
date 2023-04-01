@@ -103,22 +103,22 @@ convertCellToKey : Cell -> String
 convertCellToKey cell =
     let
         x =
-            String.padLeft 2 '0' (String.fromInt cell.x)
+            String.padLeft 2 '0' (String.fromInt (cellX cell))
 
         y =
-            String.padLeft 2 '0' (String.fromInt cell.y)
+            String.padLeft 2 '0' (String.fromInt (cellY cell))
     in
     x ++ "-" ++ y
 
 
 cellX : Cell -> Int
 cellX =
-    Tuple.first
+    Tuple3.first
 
 
 cellY : Cell -> Int
 cellY =
-    Tuple.second
+    Tuple3.second
 
 
 cellZ : Cell -> Int
@@ -143,19 +143,19 @@ getAvailableNeighbours : Cell -> Array (Array Cell) -> String -> List String
 getAvailableNeighbours cell atlas parentKey =
     let
         up =
-            getNode cell.x (cell.y - 1) atlas
+            getNode (cellX cell) (cellY cell - 1) atlas
                 |> Maybe.andThen (nodeTraversable cell)
 
         down =
-            getNode cell.x (cell.y + 1) atlas
+            getNode (cellX cell) (cellY cell + 1) atlas
                 |> Maybe.andThen (nodeTraversable cell)
 
         left =
-            getNode (cell.x - 1) cell.y atlas
+            getNode (cellX cell - 1) (cellY cell) atlas
                 |> Maybe.andThen (nodeTraversable cell)
 
         right =
-            getNode (cell.x + 1) cell.y atlas
+            getNode (cellX cell + 1) (cellY cell) atlas
                 |> Maybe.andThen (nodeTraversable cell)
     in
     [ up, down, left, right ]
@@ -168,30 +168,37 @@ getAvailableNeighboursCell : Cell -> Array (Array Cell) -> List Cell
 getAvailableNeighboursCell cell atlas =
     let
         up =
-            getNode cell.x (cell.y - 1) atlas
+            getNode (cellX cell) (cellY cell - 1) atlas
                 |> Maybe.andThen (nodeTraversable cell)
 
         down =
-            getNode cell.x (cell.y + 1) atlas
+            getNode (cellX cell) (cellY cell + 1) atlas
                 |> Maybe.andThen (nodeTraversable cell)
 
         left =
-            getNode (cell.x - 1) cell.y atlas
+            getNode (cellX cell - 1) (cellY cell) atlas
                 |> Maybe.andThen (nodeTraversable cell)
 
         right =
-            getNode (cell.x + 1) cell.y atlas
+            getNode (cellX cell + 1) (cellY cell) atlas
                 |> Maybe.andThen (nodeTraversable cell)
     in
     [ up, down, left, right ]
         |> List.filterMap identity
 
 
-findStart : String -> Maybe ( Int, Int, Char.Char )
+findStart : String -> Maybe Cell
 findStart stringInput =
     stringInput
         |> inputToCharArray
         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'S')
+
+
+findEnd : String -> Maybe Cell
+findEnd stringInput =
+    stringInput
+        |> inputToCharArray
+        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == 'E')
 
 
 inputToCharArray : String -> Array (Array ( Int, Int, Char ))
@@ -235,9 +242,9 @@ view =
         ]
 
 
-countStepsToEnd : List Cell -> Array (Array Cell) -> List Cell -> Int -> Int
-countStepsToEnd queue atlas visited count =
-    if List.any (\cell -> cell.cellType == End) queue then
+countStepsToEnd : List Cell -> Cell -> Array (Array Cell) -> List Cell -> Int -> Int
+countStepsToEnd queue endCell atlas visited count =
+    if List.any (\cell -> cell == endCell) queue then
         count
 
     else
@@ -266,7 +273,7 @@ countStepsToEnd queue atlas visited count =
             -1
 
         else
-            countStepsToEnd allNeighbours atlas updatedVisited updatedCount
+            countStepsToEnd allNeighbours endCell atlas updatedVisited updatedCount
 
 
 part1Solution : String -> Maybe Int
@@ -277,9 +284,12 @@ part1Solution input =
                 |> prepareInput
 
         start =
-            findStart atlas
+            findStart input
+
+        end =
+            findEnd input
     in
-    Maybe.map (\begin -> countStepsToEnd [ begin ] atlas [ begin ] 0) start
+    Maybe.map (\begin -> countStepsToEnd [ begin ] end atlas [ begin ] 0) start
 
 
 main : Html msg
