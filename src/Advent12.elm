@@ -3,6 +3,7 @@ module Advent12 exposing (..)
 -- import Tree exposing (tree)
 -- import Tree.Zipper exposing (Zipper, append)
 
+import Advent9 exposing (coordinatesX, coordinatesY)
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Array exposing (Array)
 import Char exposing (toCode)
@@ -16,8 +17,8 @@ import Tuple3
 import Utilities.Utilities exposing (array2dToDict2d, uniqueItemFrom2DArray)
 
 
-type alias Cell =
-    ( Int, Int, Int )
+type alias Coordinates =
+    ( Int, Int )
 
 
 type Msg
@@ -90,33 +91,28 @@ charToCode =
 -- Cell helpers
 
 
-cellX : Cell -> Int
-cellX =
-    Tuple3.first
+coordinateX : Coordinates -> Int
+coordinateX =
+    Tuple.first
 
 
-cellY : Cell -> Int
-cellY =
-    Tuple3.second
+coordinateY : Coordinates -> Int
+coordinateY =
+    Tuple.second
 
 
-cellZ : Cell -> Int
-cellZ =
-    Tuple3.third
-
-
-findStart : Array (Array ( Int, Int, Char )) -> Maybe Cell
+findStart : Array (Array ( Int, Int, Char )) -> Maybe Coordinates
 findStart charArray =
     charArray
         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == startChar)
-        |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY, startElevation ))
+        |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY ))
 
 
-findEnd : Array (Array ( Int, Int, Char )) -> Maybe Cell
+findEnd : Array (Array ( Int, Int, Char )) -> Maybe Coordinates
 findEnd charArray =
     charArray
         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == endChar)
-        |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY, endElevation ))
+        |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY ))
 
 
 inputToCharArray : String -> Array (Array ( Int, Int, Char ))
@@ -136,54 +132,61 @@ inputToCharArray =
 
 
 
--- prepareInput : String -> Array (Array Cell)
--- prepareInput =
---     String.lines
---         >> List.map
---             (String.toList
---                 >> List.map
---                     (\char ->
---                         ( 0, 0, charToCode char )
---                     )
---                 >> Array.fromList
---                 >> Array.indexedMap (\index ( _, y, z ) -> ( index, y, z ))
---             )
---         >> Array.fromList
---         >> Array.indexedMap (\index arr -> Array.map (\( x, _, z ) -> ( x, index, z )) arr)
 -- VIEW helpers
 
 
-printCharRow : Array ( Int, Int, Char ) -> Html msg
-printCharRow row =
+printCharRow : Array ( Int, Int, Char ) -> Coordinates -> Coordinates -> Html msg
+printCharRow row start end =
     Array.toList row
-        -- |> List.map (\item -> div [] [ Html.text (Tuple3.third item |> String.fromChar) ])
-        |> List.map Tuple3.third
-        |> String.fromList
-        |> (\str -> div [] [ Html.text str ])
+        |> List.map
+            (\item ->
+                let
+                    x =
+                        Tuple3.first item
+
+                    y =
+                        Tuple3.second item
+
+                    cellStyle =
+                        if coordinatesX start == x && coordinatesY start == y then
+                            "red"
+
+                        else if coordinatesX end == x && coordinatesY end == y then
+                            "cyan"
+
+                        else
+                            "greenyellow"
+                in
+                span [ style "color" cellStyle ] [ Html.text ((String.fromChar << Tuple3.third) item) ]
+            )
+        |> (\list ->
+                div []
+                    list
+           )
 
 
-printCharGrid : Array (Array ( Int, Int, Char )) -> List (Html msg)
-printCharGrid grid =
+printCharGrid : Array (Array ( Int, Int, Char )) -> Coordinates -> Coordinates -> List (Html msg)
+printCharGrid grid start end =
     Array.toList grid
-        |> List.map (\row -> printCharRow row)
+        |> List.map (\row -> printCharRow row start end)
 
 
-checkInput : Array (Array ( Int, Int, Char )) -> Result String (Array (Array ( Int, Int, Char )))
+checkInput : Array (Array ( Int, Int, Char )) -> Result String ( Coordinates, Coordinates )
 checkInput input =
     case findStart input of
         Nothing ->
             Err "No start point!"
 
-        Just _ ->
+        Just start ->
             case findEnd input of
                 Nothing ->
                     Err "No end point!"
 
-                Just _ ->
-                    Ok input
+                Just end ->
+                    Ok ( start, end )
 
 
-view : Cell -> Html msg
+view : Coordinates -> Html msg
 view cell =
     let
         charArray =
@@ -202,9 +205,9 @@ puzzleView input =
             inputToCharArray input
     in
     case checkInput charArray of
-        Ok atlas ->
+        Ok ( start, end ) ->
             div []
-                (printCharGrid atlas)
+                (printCharGrid charArray start end)
 
         Err err ->
             div []
