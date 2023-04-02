@@ -125,22 +125,30 @@ inputToCharArray =
                         ( 0, 0, char )
                     )
                 >> Array.fromList
-                >> Array.indexedMap (\index ( _, y, z ) -> ( index, y, z ))
+                >> Array.indexedMap (\index ( x, _, z ) -> ( x, index, z ))
             )
         >> Array.fromList
-        >> Array.indexedMap (\index arr -> Array.map (\( x, _, z ) -> ( x, index, z )) arr)
+        >> Array.indexedMap (\index arr -> Array.map (\( _, y, z ) -> ( index, y, z )) arr)
+
+
+array2dMap : (a -> b) -> Array (Array a) -> Array (Array b)
+array2dMap function array =
+    array |> Array.map (Array.map function)
 
 
 
 -- VIEW helpers
 
 
-printCharRow : Array ( Int, Int, Char ) -> Coordinates -> Coordinates -> Html msg
-printCharRow row start end =
+printCharRow : Array ( Int, Int, Char ) -> Coordinates -> Coordinates -> Dict ( Int, Int ) Int -> Html msg
+printCharRow row start end unvisited =
     Array.toList row
         |> List.map
             (\item ->
                 let
+                    _ =
+                        Debug.log "Dict" unvisited
+
                     x =
                         Tuple3.first item
 
@@ -154,6 +162,9 @@ printCharRow row start end =
                         else if coordinatesX end == x && coordinatesY end == y then
                             "cyan"
 
+                        else if Dict.member ( x, y ) unvisited then
+                            "gray"
+
                         else
                             "greenyellow"
                 in
@@ -165,10 +176,10 @@ printCharRow row start end =
            )
 
 
-printCharGrid : Array (Array ( Int, Int, Char )) -> Coordinates -> Coordinates -> List (Html msg)
-printCharGrid grid start end =
+printCharGrid : Array (Array ( Int, Int, Char )) -> Coordinates -> Coordinates -> Dict ( Int, Int ) Int -> List (Html msg)
+printCharGrid grid start end unvisited =
     Array.toList grid
-        |> List.map (\row -> printCharRow row start end)
+        |> List.map (\row -> printCharRow row start end unvisited)
 
 
 checkInput : Array (Array ( Int, Int, Char )) -> Result String ( Coordinates, Coordinates )
@@ -203,11 +214,17 @@ puzzleView input =
         charArray : Array (Array ( Int, Int, Char ))
         charArray =
             inputToCharArray input
+
+        unvisitedCells : Dict ( Int, Int ) Int
+        unvisitedCells =
+            charArray
+                |> array2dMap (Tuple3.third >> charToCode)
+                |> array2dToDict2d
     in
     case checkInput charArray of
         Ok ( start, end ) ->
             div []
-                (printCharGrid charArray start end)
+                (printCharGrid charArray start end unvisitedCells)
 
         Err err ->
             div []
