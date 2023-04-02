@@ -4,9 +4,18 @@ module Advent12Test exposing (..)
 -- import Data.Advent12Data exposing (difficultInput, pruningInput, realInput, simplifiedInput, testInput)
 
 import Advent12 exposing (..)
-import Array
+import Array exposing (Array)
 import Expect
 import Test exposing (..)
+
+
+simpleMaze : Array (Array ( Int, Int, Char ))
+simpleMaze =
+    Array.fromList
+        [ Array.fromList [ ( 0, 0, 'a' ), ( 1, 0, 'a' ), ( 2, 0, 'a' ) ]
+        , Array.fromList [ ( 0, 1, 'b' ), ( 1, 1, 'S' ), ( 2, 1, 'b' ) ]
+        , Array.fromList [ ( 0, 2, 'E' ), ( 1, 2, 'c' ), ( 2, 2, 'c' ) ]
+        ]
 
 
 
@@ -15,6 +24,26 @@ import Test exposing (..)
 --             Expect.equal
 --                 ()
 --                 ()
+
+
+findStartTests : List Test
+findStartTests =
+    [ test "simpleMaze" <|
+        \_ ->
+            Expect.equal
+                (findStart simpleMaze)
+                (Just ( 1, 1, 0 ))
+    ]
+
+
+findEndTests : List Test
+findEndTests =
+    [ test "simpleMaze" <|
+        \_ ->
+            Expect.equal
+                (findEnd simpleMaze)
+                (Just ( 0, 2, 25 ))
+    ]
 
 
 charToCodeTests : List Test
@@ -61,6 +90,8 @@ baseTests : List Test
 baseTests =
     [ describe "charToCodeTests" <| charToCodeTests
     , describe "inputToCharArray" <| inputToCharArrayTests
+    , describe "findStartTests" <| findStartTests
+    , describe "findEndTests" <| findEndTests
     ]
 
 

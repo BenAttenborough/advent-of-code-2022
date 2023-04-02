@@ -1,8 +1,9 @@
-module Utilities.Utilities exposing (build2DArray, getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner, uniqueItemFrom2DArray)
+module Utilities.Utilities exposing (array2dToDict2d, build2DArray, getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner, uniqueItemFrom2DArray)
 
 import Array exposing (Array)
+import Dict exposing (Dict)
 import Html exposing (Html, p, text)
-import Html.Attributes exposing (class, list)
+import Html.Attributes exposing (class, itemprop, list)
 
 
 linesDebugToHtml : List a -> Html msg
@@ -80,3 +81,33 @@ uniqueItemFrom2DArray test atlas =
                 else
                     Nothing
            )
+
+
+array2dToDict2d : Array (Array a) -> Dict ( Int, Int ) a
+array2dToDict2d x =
+    x
+        |> Array.map
+            Array.toIndexedList
+        |> Array.toIndexedList
+        |> List.map
+            (\tuple ->
+                let
+                    xIndex =
+                        Tuple.first tuple
+
+                    tupleValue =
+                        Tuple.second tuple
+
+                    value =
+                        tupleValue
+                            |> List.map
+                                (\( yIndex, value_ ) ->
+                                    ( ( xIndex, yIndex ), value_ )
+                                )
+                in
+                ( xIndex, value )
+            )
+        |> List.map
+            Tuple.second
+        |> List.concat
+        |> Dict.fromList

@@ -96,4 +96,4 @@ Note: No extension is required but you should cap up the problem name
 
 ## Switch rendered file
 
-`python3 switchProblem.py <ProblemName>`
+`python3 switchProblem.py <ProblemName>` NOTE: this should be Advent12 NOT Advent12.elm!!

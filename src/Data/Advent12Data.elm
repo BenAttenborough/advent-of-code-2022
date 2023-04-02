@@ -1,8 +1,17 @@
-module Data.Advent12Data exposing (difficultInput, pruningInput, realInput, simplifiedInput, testInput)
+module Data.Advent12Data exposing (brokenInput, difficultInput, pruningInput, realInput, simplifiedInput, testInput)
 
 
 testInput : String
 testInput =
+    """Sabqponm
+abcryxxl
+accszExk
+acctuvwj
+abdefghi"""
+
+
+brokenInput : String
+brokenInput =
     """Sabqponm
 abcryxxl
 accszExk
