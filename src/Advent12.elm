@@ -2,17 +2,17 @@ module Advent12 exposing (..)
 
 -- import Tree exposing (tree)
 -- import Tree.Zipper exposing (Zipper, append)
+-- import Set exposing (Set)
 
 import Advent9 exposing (coordinatesX, coordinatesY)
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Array exposing (Array)
-import Char exposing (toCode)
-import Data.Advent12Data exposing (brokenInput, testInput)
+import Char exposing (fromCode, toCode)
+import Data.Advent12Data exposing (brokenInput)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
-import Set exposing (Set)
 import Tuple3
 import Utilities.Utilities exposing (array2dToDict2d, uniqueItemFrom2DArray)
 
@@ -21,12 +21,12 @@ type alias Coordinates =
     ( Int, Int )
 
 
-type alias VisualCell =
-    ( Int, Int, Char )
+type alias Cell =
+    ( Int, Int, Int )
 
 
 type alias Atlas =
-    Array (Array VisualCell)
+    Array (Array Cell)
 
 
 type alias UnvisitedCells =
@@ -114,25 +114,25 @@ coordinateY =
 findStart : Atlas -> Maybe Coordinates
 findStart charArray =
     charArray
-        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == startChar)
+        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == toCode startChar)
         |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY ))
 
 
 findEnd : Atlas -> Maybe Coordinates
 findEnd charArray =
     charArray
-        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == endChar)
+        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == toCode endChar)
         |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY ))
 
 
-inputToCharArray : String -> Atlas
-inputToCharArray =
+inputToAtlas : String -> Atlas
+inputToAtlas =
     String.lines
         >> List.map
             (String.toList
                 >> List.map
                     (\char ->
-                        ( 0, 0, char )
+                        ( 0, 0, toCode char )
                     )
                 >> Array.fromList
                 >> Array.indexedMap (\index ( x, _, z ) -> ( x, index, z ))
@@ -153,31 +153,43 @@ array2dGetNode x y twoDMap =
         |> Maybe.andThen (Array.get x)
 
 
+nodeTraversable : Cell -> Cell -> Maybe Cell
+nodeTraversable currentCell comparableCell =
+    if Tuple3.third comparableCell <= (Tuple3.third comparableCell + 1) && Tuple3.third currentCell >= (Tuple3.third comparableCell - 1) then
+        Just comparableCell
 
--- getAvailableNeighbours : VisualCell -> Atlas -> String -> List String
--- getAvailableNeighbours cell atlas parentKey =
---     let
---         up =
---             array2dGetNode (coordinateX cell) (cell.y - 1) atlas
---                 |> Maybe.andThen (nodeTraversable cell)
---         down =
---             getNode cell.x (cell.y + 1) atlas
---                 |> Maybe.andThen (nodeTraversable cell)
---         left =
---             getNode (cell.x - 1) cell.y atlas
---                 |> Maybe.andThen (nodeTraversable cell)
---         right =
---             getNode (cell.x + 1) cell.y atlas
---                 |> Maybe.andThen (nodeTraversable cell)
---     in
---     [ up, down, left, right ]
---         |> List.filterMap identity
---         |> List.map convertCellToKey
---         |> List.filter (\item -> not (item == parentKey))
+    else
+        Nothing
+
+
+getAvailableNeighbours : Cell -> Atlas -> List Cell
+getAvailableNeighbours currentCell atlas =
+    let
+        up =
+            array2dGetNode (Tuple3.first currentCell) (Tuple3.second currentCell - 1) atlas
+                |> Maybe.andThen (\comparableCell -> nodeTraversable currentCell comparableCell)
+
+        down =
+            array2dGetNode (Tuple3.first currentCell) (Tuple3.second currentCell + 1) atlas
+                |> Maybe.andThen (\comparableCell -> nodeTraversable currentCell comparableCell)
+
+        left =
+            array2dGetNode (Tuple3.first currentCell - 1) (Tuple3.second currentCell) atlas
+                |> Maybe.andThen (\comparableCell -> nodeTraversable currentCell comparableCell)
+
+        right =
+            array2dGetNode (Tuple3.first currentCell + 1) (Tuple3.second currentCell) atlas
+                |> Maybe.andThen (\comparableCell -> nodeTraversable currentCell comparableCell)
+    in
+    [ up, down, left, right ]
+        |> List.filterMap identity
+
+
+
 -- VIEW helpers
 
 
-printCharRow : Array VisualCell -> Coordinates -> Coordinates -> UnvisitedCells -> Html msg
+printCharRow : Array Cell -> Coordinates -> Coordinates -> UnvisitedCells -> Html msg
 printCharRow row start end unvisited =
     Array.toList row
         |> List.map
@@ -205,7 +217,7 @@ printCharRow row start end unvisited =
                         else
                             "gray"
                 in
-                span [ style "color" cellStyle ] [ Html.text ((String.fromChar << Tuple3.third) item) ]
+                span [ style "color" cellStyle ] [ Html.text ((String.fromChar << fromCode << Tuple3.third) item) ]
             )
         |> (\list ->
                 div []
@@ -236,10 +248,6 @@ checkInput input =
 
 view : Coordinates -> Html msg
 view cell =
-    let
-        charArray =
-            inputToCharArray testInput
-    in
     div []
         [ Html.text (Debug.toString cell)
         ]
@@ -248,22 +256,22 @@ view cell =
 puzzleView : String -> Html msg
 puzzleView input =
     let
-        charArray : Atlas
-        charArray =
-            inputToCharArray input
+        atlas : Atlas
+        atlas =
+            inputToAtlas input
 
         unvisitedCells : UnvisitedCells
         unvisitedCells =
-            charArray
-                |> array2dMap (Tuple3.third >> charToCode)
+            atlas
+                |> array2dMap Tuple3.third
                 |> array2dToDict2d
 
         -- |> Dict.remove ( 1, 1 )
     in
-    case checkInput charArray of
+    case checkInput atlas of
         Ok ( start, end ) ->
             div []
-                (printCharGrid charArray start end unvisitedCells)
+                (printCharGrid atlas start end unvisitedCells)
 
         Err err ->
             div []

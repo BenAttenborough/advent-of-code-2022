@@ -9,12 +9,12 @@ import Expect
 import Test exposing (..)
 
 
-simpleMaze : Array (Array ( Int, Int, Char ))
+simpleMaze : Array (Array ( Int, Int, Int ))
 simpleMaze =
     Array.fromList
-        [ Array.fromList [ ( 0, 0, 'a' ), ( 1, 0, 'a' ), ( 2, 0, 'a' ) ]
-        , Array.fromList [ ( 0, 1, 'b' ), ( 1, 1, 'S' ), ( 2, 1, 'b' ) ]
-        , Array.fromList [ ( 0, 2, 'E' ), ( 1, 2, 'c' ), ( 2, 2, 'c' ) ]
+        [ Array.fromList [ ( 0, 0, 0 ), ( 1, 0, 0 ), ( 2, 0, 0 ) ]
+        , Array.fromList [ ( 0, 1, 1 ), ( 1, 1, 22 ), ( 2, 1, 1 ) ]
+        , Array.fromList [ ( 0, 2, 20 ), ( 1, 2, 3 ), ( 2, 2, 3 ) ]
         ]
 
 
@@ -32,7 +32,7 @@ findStartTests =
         \_ ->
             Expect.equal
                 (findStart simpleMaze)
-                (Just ( 1, 1, 0 ))
+                (Just ( 1, 1 ))
     ]
 
 
@@ -42,7 +42,7 @@ findEndTests =
         \_ ->
             Expect.equal
                 (findEnd simpleMaze)
-                (Just ( 0, 2, 25 ))
+                (Just ( 0, 2 ))
     ]
 
 
@@ -76,11 +76,11 @@ inputToCharArrayTests =
     [ test "Simple array" <|
         \_ ->
             Expect.equal
-                (inputToCharArray "aaa\nbbb\nccc")
+                (inputToAtlas "aaa\nbbb\nccc")
                 (Array.fromList
-                    [ Array.fromList [ ( 0, 0, 'a' ), ( 1, 0, 'a' ), ( 2, 0, 'a' ) ]
-                    , Array.fromList [ ( 0, 1, 'b' ), ( 1, 1, 'b' ), ( 2, 1, 'b' ) ]
-                    , Array.fromList [ ( 0, 2, 'c' ), ( 1, 2, 'c' ), ( 2, 2, 'c' ) ]
+                    [ Array.fromList [ ( 0, 0, 0 ), ( 1, 0, 0 ), ( 2, 0, 0 ) ]
+                    , Array.fromList [ ( 0, 1, 1 ), ( 1, 1, 1 ), ( 2, 1, 1 ) ]
+                    , Array.fromList [ ( 0, 2, 2 ), ( 1, 2, 2 ), ( 2, 2, 2 ) ]
                     ]
                 )
     ]

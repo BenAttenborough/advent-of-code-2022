@@ -3,7 +3,7 @@ module Utilities.Utilities exposing (array2dToDict2d, build2DArray, getElementFr
 import Array exposing (Array)
 import Dict exposing (Dict)
 import Html exposing (Html, p, text)
-import Html.Attributes exposing (class, itemprop, list)
+import Html.Attributes exposing (class, list)
 
 
 linesDebugToHtml : List a -> Html msg
