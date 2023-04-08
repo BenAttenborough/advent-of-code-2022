@@ -3,8 +3,8 @@ module Advent12 exposing (..)
 -- import Tree exposing (tree)
 -- import Tree.Zipper exposing (Zipper, append)
 -- import Set exposing (Set)
+-- import Advent9 exposing (coordinatesX, coordinatesY)
 
-import Advent9 exposing (coordinatesX, coordinatesY)
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Array exposing (Array)
 import Char exposing (fromCode, toCode)
@@ -111,18 +111,37 @@ coordinateY =
     Tuple.second
 
 
-findStart : Atlas -> Maybe Coordinates
-findStart charArray =
-    charArray
-        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == toCode startChar)
-        |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY ))
+inputToCharArray : String -> Array (Array ( Int, Int, Char ))
+inputToCharArray input =
+    input
+        |> String.lines
+        |> List.map
+            (String.toList
+                >> List.map
+                    (\char ->
+                        ( 0, 0, char )
+                    )
+                >> Array.fromList
+                >> Array.indexedMap (\index ( x, _, z ) -> ( x, index, z ))
+            )
+        |> Array.fromList
+        |> Array.indexedMap (\index arr -> Array.map (\( _, y, z ) -> ( index, y, z )) arr)
 
 
-findEnd : Atlas -> Maybe Coordinates
-findEnd charArray =
-    charArray
-        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == toCode endChar)
-        |> Maybe.map (\( intX, intY, _ ) -> ( intX, intY ))
+findStart : String -> Maybe Cell
+findStart input =
+    input
+        |> inputToCharArray
+        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == startChar)
+        |> Maybe.map (\item -> ( Tuple3.first item, Tuple3.second item, toCode (Tuple3.third item) ))
+
+
+findEnd : String -> Maybe Cell
+findEnd input =
+    input
+        |> inputToCharArray
+        |> uniqueItemFrom2DArray (\item -> Tuple3.third item == endChar)
+        |> Maybe.map (\item -> ( Tuple3.first item, Tuple3.second item, toCode (Tuple3.third item) ))
 
 
 inputToAtlas : String -> Atlas
@@ -189,7 +208,7 @@ getAvailableNeighbours currentCell atlas =
 -- VIEW helpers
 
 
-printCharRow : Array Cell -> Coordinates -> Coordinates -> UnvisitedCells -> Html msg
+printCharRow : Array Cell -> Cell -> Cell -> UnvisitedCells -> Html msg
 printCharRow row start end unvisited =
     Array.toList row
         |> List.map
@@ -205,10 +224,10 @@ printCharRow row start end unvisited =
                         Tuple3.second item
 
                     cellStyle =
-                        if coordinatesX start == x && coordinatesY start == y then
+                        if Tuple3.first start == x && Tuple3.second start == y then
                             "red"
 
-                        else if coordinatesX end == x && coordinatesY end == y then
+                        else if Tuple3.first end == x && Tuple3.second end == y then
                             "cyan"
 
                         else if Dict.member ( x, y ) unvisited then
@@ -225,14 +244,14 @@ printCharRow row start end unvisited =
            )
 
 
-printCharGrid : Atlas -> Coordinates -> Coordinates -> UnvisitedCells -> List (Html msg)
+printCharGrid : Atlas -> Cell -> Cell -> UnvisitedCells -> List (Html msg)
 printCharGrid grid start end unvisited =
     Array.toList grid
         |> List.map (\row -> printCharRow row start end unvisited)
 
 
-checkInput : Atlas -> Result String ( Coordinates, Coordinates )
-checkInput input =
+findStartAndEnd : String -> Result String ( Cell, Cell )
+findStartAndEnd input =
     case findStart input of
         Nothing ->
             Err "No start point!"
@@ -259,19 +278,33 @@ puzzleView input =
         atlas : Atlas
         atlas =
             inputToAtlas input
-
-        unvisitedCells : UnvisitedCells
-        unvisitedCells =
-            atlas
-                |> array2dMap Tuple3.third
-                |> array2dToDict2d
-
-        -- |> Dict.remove ( 1, 1 )
     in
-    case checkInput atlas of
+    case findStartAndEnd input of
         Ok ( start, end ) ->
+            let
+                visitedCells : List Coordinates
+                visitedCells =
+                    getAvailableNeighbours start atlas
+                        |> List.map (\item -> ( Tuple3.first item, Tuple3.second item ))
+
+                unvisitedCells : UnvisitedCells
+                unvisitedCells =
+                    atlas
+                        |> array2dMap Tuple3.third
+                        |> array2dToDict2d
+                        |> Dict.filter
+                            (\comparable _ ->
+                                not (List.member comparable visitedCells)
+                            )
+            in
             div []
-                (printCharGrid atlas start end unvisitedCells)
+                (printCharGrid atlas start end unvisitedCells
+                    ++ [ div []
+                            [ Html.text "Unvisited cells"
+                            , Html.text (Debug.toString visitedCells)
+                            ]
+                       ]
+                )
 
         Err err ->
             div []
