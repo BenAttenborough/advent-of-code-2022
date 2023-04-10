@@ -1,4 +1,4 @@
-module Utilities.Utilities exposing (array2dToDict2d, build2DArray, getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner, uniqueItemFrom2DArray)
+module Utilities.Utilities exposing (array2dToDict, build2DArray, getElementFrom2DArray, linesDebugToHtml, linesToHtml, partitioner, uniqueItemFrom2DArray)
 
 import Array exposing (Array)
 import Dict exposing (Dict)
@@ -83,8 +83,8 @@ uniqueItemFrom2DArray test atlas =
            )
 
 
-array2dToDict2d : Array (Array a) -> Dict ( Int, Int ) a
-array2dToDict2d x =
+array2dToDict : Array (Array a) -> Dict ( Int, Int ) a
+array2dToDict x =
     x
         |> Array.map
             Array.toIndexedList
@@ -92,7 +92,7 @@ array2dToDict2d x =
         |> List.map
             (\tuple ->
                 let
-                    xIndex =
+                    yIndex =
                         Tuple.first tuple
 
                     tupleValue =
@@ -101,11 +101,11 @@ array2dToDict2d x =
                     value =
                         tupleValue
                             |> List.map
-                                (\( yIndex, value_ ) ->
+                                (\( xIndex, value_ ) ->
                                     ( ( xIndex, yIndex ), value_ )
                                 )
                 in
-                ( xIndex, value )
+                ( yIndex, value )
             )
         |> List.map
             Tuple.second

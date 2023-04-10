@@ -1,10 +1,11 @@
 module UtilitiesTest exposing (..)
 
 import Array exposing (Array)
+import Dict
 import Expect
 import Parser exposing (..)
 import Test exposing (..)
-import Utilities.Utilities exposing (build2DArray, getElementFrom2DArray, partitioner, uniqueItemFrom2DArray)
+import Utilities.Utilities exposing (array2dToDict, build2DArray, getElementFrom2DArray, partitioner, uniqueItemFrom2DArray)
 
 
 testTwoDArray : Array (Array Int)
@@ -117,6 +118,38 @@ suite =
                         Expect.equal
                             (uniqueItemFrom2DArray predicate testArray)
                             Nothing
+                ]
+            , describe "array2dToDict" <|
+                [ test "simple input" <|
+                    \_ ->
+                        Expect.equal
+                            (Array.fromList
+                                [ Array.fromList
+                                    [ 1, 2, 3, 4 ]
+                                ]
+                                |> array2dToDict
+                            )
+                            (Dict.fromList [ ( ( 0, 0 ), 1 ), ( ( 1, 0 ), 2 ), ( ( 2, 0 ), 3 ), ( ( 3, 0 ), 4 ) ])
+                , test "2D input" <|
+                    \_ ->
+                        Expect.equal
+                            (Array.fromList
+                                [ Array.fromList [ 1, 2, 3, 4 ]
+                                , Array.fromList [ 5, 6, 7, 8 ]
+                                ]
+                                |> array2dToDict
+                            )
+                            (Dict.fromList
+                                [ ( ( 0, 0 ), 1 )
+                                , ( ( 1, 0 ), 2 )
+                                , ( ( 2, 0 ), 3 )
+                                , ( ( 3, 0 ), 4 )
+                                , ( ( 0, 1 ), 5 )
+                                , ( ( 1, 1 ), 6 )
+                                , ( ( 2, 1 ), 7 )
+                                , ( ( 3, 1 ), 8 )
+                                ]
+                            )
                 ]
             ]
         ]

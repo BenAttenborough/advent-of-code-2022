@@ -14,7 +14,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import List.Extra as List
 import Tuple3
-import Utilities.Utilities exposing (array2dToDict2d, uniqueItemFrom2DArray)
+import Utilities.Utilities exposing (array2dToDict, uniqueItemFrom2DArray)
 
 
 type alias Coordinates =
@@ -97,6 +97,14 @@ charToCode =
            )
 
 
+codeToString : Int -> String
+codeToString code =
+    code
+        + aCode
+        |> fromCode
+        |> String.fromChar
+
+
 
 -- Cell helpers
 
@@ -122,10 +130,10 @@ inputToCharArray input =
                         ( 0, 0, char )
                     )
                 >> Array.fromList
-                >> Array.indexedMap (\index ( x, _, z ) -> ( x, index, z ))
+                >> Array.indexedMap (\index ( _, y, z ) -> ( index, y, z ))
             )
         |> Array.fromList
-        |> Array.indexedMap (\index arr -> Array.map (\( _, y, z ) -> ( index, y, z )) arr)
+        |> Array.indexedMap (\index arr -> Array.map (\( x, _, z ) -> ( x, index, z )) arr)
 
 
 findStart : String -> Maybe Cell
@@ -133,7 +141,7 @@ findStart input =
     input
         |> inputToCharArray
         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == startChar)
-        |> Maybe.map (\item -> ( Tuple3.first item, Tuple3.second item, toCode (Tuple3.third item) ))
+        |> Maybe.map (\item -> ( Tuple3.first item, Tuple3.second item, charToCode (Tuple3.third item) ))
 
 
 findEnd : String -> Maybe Cell
@@ -141,7 +149,7 @@ findEnd input =
     input
         |> inputToCharArray
         |> uniqueItemFrom2DArray (\item -> Tuple3.third item == endChar)
-        |> Maybe.map (\item -> ( Tuple3.first item, Tuple3.second item, toCode (Tuple3.third item) ))
+        |> Maybe.map (\item -> ( Tuple3.first item, Tuple3.second item, charToCode (Tuple3.third item) ))
 
 
 inputToAtlas : String -> Atlas
@@ -151,13 +159,13 @@ inputToAtlas =
             (String.toList
                 >> List.map
                     (\char ->
-                        ( 0, 0, toCode char )
+                        ( 0, 0, charToCode char )
                     )
                 >> Array.fromList
-                >> Array.indexedMap (\index ( x, _, z ) -> ( x, index, z ))
+                >> Array.indexedMap (\index ( _, y, z ) -> ( index, y, z ))
             )
         >> Array.fromList
-        >> Array.indexedMap (\index arr -> Array.map (\( _, y, z ) -> ( index, y, z )) arr)
+        >> Array.indexedMap (\index arr -> Array.map (\( x, _, z ) -> ( x, index, z )) arr)
 
 
 array2dMap : (a -> b) -> Array (Array a) -> Array (Array b)
@@ -215,7 +223,8 @@ printCharRow row start end unvisited =
             (\item ->
                 let
                     _ =
-                        Debug.log "Dict" unvisited
+                        -- Debug.log "Dict" unvisited
+                        Debug.log "End" end
 
                     x =
                         Tuple3.first item
@@ -235,8 +244,10 @@ printCharRow row start end unvisited =
 
                         else
                             "gray"
+
+                    -- "greenyellow"
                 in
-                span [ style "color" cellStyle ] [ Html.text ((String.fromChar << fromCode << Tuple3.third) item) ]
+                span [ style "color" cellStyle ] [ Html.text (codeToString (Tuple3.third item)) ]
             )
         |> (\list ->
                 div []
@@ -291,7 +302,7 @@ puzzleView input =
                 unvisitedCells =
                     atlas
                         |> array2dMap Tuple3.third
-                        |> array2dToDict2d
+                        |> array2dToDict
                         |> Dict.filter
                             (\comparable _ ->
                                 not (List.member comparable visitedCells)
@@ -300,8 +311,10 @@ puzzleView input =
             div []
                 (printCharGrid atlas start end unvisitedCells
                     ++ [ div []
-                            [ Html.text "Unvisited cells"
+                            [ Html.text "visitedCells cells"
                             , Html.text (Debug.toString visitedCells)
+                            , Html.text "Unvisited cells"
+                            , Html.text (Debug.toString unvisitedCells)
                             ]
                        ]
                 )
@@ -327,6 +340,6 @@ main =
             ]
         , div [ class "panel" ]
             [ Html.text "Puzzle"
-            , puzzleView brokenInput
+            , puzzleView "Saaa\nbbbb\ncccE"
             ]
         ]
