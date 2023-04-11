@@ -8,7 +8,7 @@ module Advent12 exposing (..)
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Array exposing (Array)
 import Char exposing (fromCode, toCode)
-import Data.Advent12Data exposing (brokenInput)
+import Data.Advent12Data exposing (brokenInput, testInput)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -37,9 +37,26 @@ type Msg
     = Advance
 
 
+type alias Model =
+    { currentCells : List Cell
+    , unvisitedCells : UnvisitedCells
+    , steps : Int
+    }
 
--- type alias Model =
---     Dict ( Int, Int ) Int
+
+
+-- Initial model
+
+
+initModel : Model
+initModel =
+    { currentCells = []
+    , unvisitedCells = Dict.fromList []
+    , steps = 0
+    }
+
+
+
 -- Constants, can be adjusted for different problems
 
 
@@ -297,6 +314,7 @@ puzzleView input =
                 visitedCells =
                     getAvailableNeighbours start atlas
                         |> List.map (\item -> ( Tuple3.first item, Tuple3.second item ))
+                        |> List.append [ ( Tuple3.first start, Tuple3.second start ) ]
 
                 unvisitedCells : UnvisitedCells
                 unvisitedCells =
@@ -310,7 +328,7 @@ puzzleView input =
             in
             div []
                 (printCharGrid atlas start end unvisitedCells
-                    ++ [ div []
+                    ++ [ div [ style "margin-top" "1rem" ]
                             [ Html.text "visitedCells cells"
                             , Html.text (Debug.toString visitedCells)
                             , Html.text "Unvisited cells"
@@ -340,6 +358,8 @@ main =
             ]
         , div [ class "panel" ]
             [ Html.text "Puzzle"
-            , puzzleView "Saaa\nbbbb\ncccE"
+
+            -- , puzzleView "Saaa\nbbbb\ncccE"
+            , puzzleView testInput
             ]
         ]
