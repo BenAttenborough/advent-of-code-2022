@@ -7,8 +7,9 @@ module Advent12 exposing (..)
 
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Array exposing (Array)
+import Browser
 import Char exposing (fromCode, toCode)
-import Data.Advent12Data exposing (brokenInput, testInput)
+import Data.Advent12Data exposing (testInput)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -39,6 +40,7 @@ type Msg
 
 type alias Model =
     { currentCells : List Cell
+    , visitedCells : List Coordinates
     , unvisitedCells : UnvisitedCells
     , steps : Int
     }
@@ -48,16 +50,27 @@ type alias Model =
 -- Initial model
 
 
-initModel : Model
-initModel =
+initialModel : Model
+initialModel =
     { currentCells = []
-    , unvisitedCells = Dict.fromList []
+    , visitedCells = initVisitedCells
+    , unvisitedCells = initUnvisitedCells
     , steps = 0
     }
 
 
 
 -- Constants, can be adjusted for different problems
+
+
+puzzleInput : String
+puzzleInput =
+    testInput
+
+
+puzzleAtlas : Atlas
+puzzleAtlas =
+    inputToAtlas puzzleInput
 
 
 aCode : number
@@ -239,10 +252,6 @@ printCharRow row start end unvisited =
         |> List.map
             (\item ->
                 let
-                    _ =
-                        -- Debug.log "Dict" unvisited
-                        Debug.log "End" end
-
                     x =
                         Tuple3.first item
 
@@ -293,46 +302,50 @@ findStartAndEnd input =
                     Ok ( start, end )
 
 
-view : Coordinates -> Html msg
-view cell =
-    div []
-        [ Html.text (Debug.toString cell)
+view : Model -> Html msg
+view model =
+    div
+        []
+        [ div [ class "panel" ]
+            [ Html.button []
+                [ Html.text "Go" ]
+            ]
+        , div [ class "panel" ]
+            [ Html.text "Puzzle"
+            , puzzleView testInput model
+            ]
         ]
 
 
-puzzleView : String -> Html msg
-puzzleView input =
-    let
-        atlas : Atlas
-        atlas =
-            inputToAtlas input
-    in
+initVisitedCells : List Coordinates
+initVisitedCells =
+    []
+
+
+initUnvisitedCells : UnvisitedCells
+initUnvisitedCells =
+    puzzleAtlas
+        |> array2dMap Tuple3.third
+        |> array2dToDict
+        |> Dict.filter
+            (\comparable _ ->
+                not (List.member comparable initVisitedCells)
+            )
+
+
+puzzleView : String -> Model -> Html msg
+puzzleView input model =
     case findStartAndEnd input of
         Ok ( start, end ) ->
-            let
-                visitedCells : List Coordinates
-                visitedCells =
-                    getAvailableNeighbours start atlas
-                        |> List.map (\item -> ( Tuple3.first item, Tuple3.second item ))
-                        |> List.append [ ( Tuple3.first start, Tuple3.second start ) ]
-
-                unvisitedCells : UnvisitedCells
-                unvisitedCells =
-                    atlas
-                        |> array2dMap Tuple3.third
-                        |> array2dToDict
-                        |> Dict.filter
-                            (\comparable _ ->
-                                not (List.member comparable visitedCells)
-                            )
-            in
             div []
-                (printCharGrid atlas start end unvisitedCells
+                (printCharGrid puzzleAtlas start end model.unvisitedCells
                     ++ [ div [ style "margin-top" "1rem" ]
                             [ Html.text "visitedCells cells"
-                            , Html.text (Debug.toString visitedCells)
-                            , Html.text "Unvisited cells"
-                            , Html.text (Debug.toString unvisitedCells)
+                            , Html.text (Debug.toString model.visitedCells)
+                            , div [ style "margin-top" "1rem" ]
+                                [ Html.text "Unvisited cells"
+                                , Html.text (Debug.toString model.unvisitedCells)
+                                ]
                             ]
                        ]
                 )
@@ -349,17 +362,10 @@ update msg model =
             model
 
 
-main : Html msg
+main : Program () Model Msg
 main =
-    div []
-        [ div [ class "panel" ]
-            [ Html.button []
-                [ Html.text "Go" ]
-            ]
-        , div [ class "panel" ]
-            [ Html.text "Puzzle"
-
-            -- , puzzleView "Saaa\nbbbb\ncccE"
-            , puzzleView testInput
-            ]
-        ]
+    Browser.sandbox
+        { init = initialModel
+        , view = view
+        , update = update
+        }
