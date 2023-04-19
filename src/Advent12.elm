@@ -1,10 +1,5 @@
 module Advent12 exposing (..)
 
--- import Tree exposing (tree)
--- import Tree.Zipper exposing (Zipper, append)
--- import Set exposing (Set)
--- import Advent9 exposing (coordinatesX, coordinatesY)
-
 import AlternativeSolutions.DirectoryParser exposing (Msg)
 import Array exposing (Array)
 import Browser
@@ -13,6 +8,7 @@ import Data.Advent12Data exposing (testInput)
 import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick)
 import List.Extra as List
 import Tuple3
 import Utilities.Utilities exposing (array2dToDict, uniqueItemFrom2DArray)
@@ -40,7 +36,8 @@ type Msg
 
 type alias Model =
     { currentCells : List Cell
-    , visitedCells : List Coordinates
+
+    -- , visitedCells : List Coordinates
     , unvisitedCells : UnvisitedCells
     , steps : Int
     }
@@ -52,8 +49,9 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { currentCells = []
-    , visitedCells = initVisitedCells
+    { currentCells = initCurrentCells
+
+    -- , visitedCells = initVisitedCells
     , unvisitedCells = initUnvisitedCells
     , steps = 0
     }
@@ -270,8 +268,6 @@ printCharRow row start end unvisited =
 
                         else
                             "gray"
-
-                    -- "greenyellow"
                 in
                 span [ style "color" cellStyle ] [ Html.text (codeToString (Tuple3.third item)) ]
             )
@@ -302,12 +298,12 @@ findStartAndEnd input =
                     Ok ( start, end )
 
 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
     div
         []
         [ div [ class "panel" ]
-            [ Html.button []
+            [ Html.button [ onClick Advance ]
                 [ Html.text "Go" ]
             ]
         , div [ class "panel" ]
@@ -333,6 +329,16 @@ initUnvisitedCells =
             )
 
 
+initCurrentCells : List Cell
+initCurrentCells =
+    case findStart puzzleInput of
+        Just start ->
+            [ start ]
+
+        Nothing ->
+            []
+
+
 puzzleView : String -> Model -> Html msg
 puzzleView input model =
     case findStartAndEnd input of
@@ -341,7 +347,8 @@ puzzleView input model =
                 (printCharGrid puzzleAtlas start end model.unvisitedCells
                     ++ [ div [ style "margin-top" "1rem" ]
                             [ Html.text "visitedCells cells"
-                            , Html.text (Debug.toString model.visitedCells)
+
+                            -- , Html.text (Debug.toString model.visitedCells)
                             , div [ style "margin-top" "1rem" ]
                                 [ Html.text "Unvisited cells"
                                 , Html.text (Debug.toString model.unvisitedCells)
@@ -355,11 +362,18 @@ puzzleView input model =
                 [ Html.text err ]
 
 
-update : Msg -> model -> model
+update : Msg -> Model -> Model
 update msg model =
     case msg of
         Advance ->
-            model
+            let
+                neighbouringCells =
+                    List.map (\cell -> getAvailableNeighbours cell puzzleAtlas) model.currentCells
+                        |> List.concat
+                        -- |> List.filter (\item -> not (List.member item model.visitedCells))
+                        |> List.unique
+            in
+            { model | currentCells = neighbouringCells }
 
 
 main : Program () Model Msg
